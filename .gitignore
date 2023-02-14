@@ -1,2 +1,13 @@
 
 boin/Auth.cs
+*.dll
+*.pdb
+*.exe
+boin/bin/Debug/net7.0/boin
+boin/bin/Debug/net7.0/boin.deps.json
+boin/bin/Debug/net7.0/boin.runtimeconfig.json
+boin/bin/Debug/net7.0/chromedriver
+boin/bin/Debug/net7.0/selenium-manager/linux/selenium-manager
+boin/bin/Debug/net7.0/selenium-manager/macos/selenium-manager
+.vs/boin/xs/project-cache/boin-Debug.json
+.vs/boin/xs/UserPrefs.xml

@@ -21,7 +21,7 @@ namespace boin
         {
             var p = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
@@ -92,7 +92,9 @@ namespace boin
                     break;
                 }
                 nextPage.Click();
-                Thread.Sleep(0);
+
+                //TODO: 检查是否加载完成
+                Thread.Sleep(1000);
 
                 table = getCurrentTable(user.GameId, page);
                 //head = Head.ReadHead2(table);
@@ -118,19 +120,12 @@ namespace boin
             }
 
             // 点开所有的查询按钮
-            var selBtns =  tbody.FindElements(By.XPath(".//td/div/div/div/button/span[contains(text(),'查询')]"));
+            var selBtns =  tbody.FindElements(By.XPath(".//td/div/div/div/button/span[contains(text(),'查询')]/.."));
             foreach (var sel in selBtns)
             {
-                if (sel.Enabled && sel.Displayed)
+                if (sel.Enabled)
                 {
-                    try
-                    {
-                        sel.Click();
-                    }
-                    catch (Exception err)
-                    {
-                        Console.WriteLine(err);
-                    }
+                    sel.Click();
                 }
             }
 

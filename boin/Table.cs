@@ -190,7 +190,7 @@ namespace boin
         public static bool SafeClose(ChromeDriver driver, IWebElement table)
         {
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {

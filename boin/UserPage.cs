@@ -45,7 +45,7 @@ namespace boin
             {
                 if (trySelect(gameid))
                 {
-                    var users = ReadTable();
+                    var users = ReadTable(gameid);
                     if (users.Count > 0)
                     {
                         return users[0];
@@ -63,10 +63,11 @@ namespace boin
 
         private bool trySelect(string gameid)
         {
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
+                    // 设置游戏ID
                     var path = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
                     var name = driver.FindElement(By.XPath(path));
                     name.SendKeys(gameid);
@@ -83,11 +84,27 @@ namespace boin
                 }
                 return false;
             });
+            if (result && gameid != string.Empty)
+            {
+                // TODO: 等待查询结果
+                // /html/body/div[1]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span
+                // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span
+                var path = "//*[@id=\"LiveGameRoleList\"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span[text()='" + gameid + "']";
+                result = wait.Until(driver => {
+                    try
+                    {
+                        driver.FindElement(By.XPath(path));
+                        return true;
+                    }
+                    catch (NoSuchElementException) { }
+                    return false;
+                });
+            }
             return result;
         }
 
 
-        public List<User> ReadTable()
+        public List<User> ReadTable(string gameid)
         {
             var table = driver.FindElement(By.XPath("//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]"));
             var tbody = table.FindElement(By.XPath(".//tbody[@class='ivu-table-tbody']"));
@@ -121,8 +138,8 @@ namespace boin
             {
                 var user = users[i];
                 Console.WriteLine("AppID:" + user.AppId + "; GameId:" + user.GameId);
-                Int64 gameid;
-                if (Int64.TryParse(user.GameId, out gameid))
+                Int64 gid;
+                if (Int64.TryParse(user.GameId, out gid))
                 {
                     // 概况(资金)
                     var ls = readFunding(user.OpButton, user, gameCount);
@@ -177,7 +194,7 @@ namespace boin
             // 移动在操作+，显示出扩展按钮
             new Actions(driver).MoveToElement(opBtn).Perform();
             var xpath = "(//div[@id='timeListBox']/div/div[2]/button[4]/span[text()='注单'])[" + (i + 1).ToString() + "]";
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
@@ -206,7 +223,7 @@ namespace boin
             // 移动在操作+，显示出扩展按钮
             new Actions(driver).MoveToElement(opBtn).Perform();
             var xpath = "(//div[@id='timeListBox']/div/div[2]/button[3]/span[text()='概况'])[" + (i + 1).ToString() + "]";
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {

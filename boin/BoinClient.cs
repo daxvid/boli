@@ -73,11 +73,11 @@ namespace boin
             try
             {
                 var path = "//*[@id='b_home_notice']/h1";
-                var result = wait.Until(drv =>
+                var result = wait.Until(driver =>
                 {
                     try
                     {
-                        var e = drv.FindElement(By.XPath(path));
+                        var e = driver.FindElement(By.XPath(path));
                         var txt = e.Text;
                         if (txt.Contains("登入成功"))
                         {
@@ -110,12 +110,12 @@ namespace boin
         {
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
             wait.PollingInterval = TimeSpan.FromSeconds(1);
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
-                    drv.FindElement(By.CssSelector("nav li:nth-child(" + index + ")")).Click();
-                    drv.FindElement(By.LinkText(itme)).Click();
+                    driver.FindElement(By.CssSelector("nav li:nth-child(" + index + ")")).Click();
+                    driver.FindElement(By.LinkText(itme)).Click();
                     return true;
 
                 }

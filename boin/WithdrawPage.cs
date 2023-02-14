@@ -22,12 +22,11 @@ namespace boin
         {
             var p = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
                     var t = driver.FindElement(By.XPath(p));
-                    var ts = driver.FindElements(By.XPath(p));
                     var pageTag = t.FindElement(By.XPath(pagePath));
                     return t;
                 }
@@ -77,6 +76,9 @@ namespace boin
                     break;
                 }
                 nextPage.Click();
+
+                //TODO: 检查是否加载完成
+                Thread.Sleep(100);
 
                 table = getCurrentTable(user.GameId, page);
                 //head = Head.ReadHead2(table);

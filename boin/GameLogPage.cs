@@ -21,7 +21,7 @@ namespace boin
         {
             var p = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var result = wait.Until(drv =>
+            var result = wait.Until(driver =>
             {
                 try
                 {
