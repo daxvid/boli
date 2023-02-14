@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Globalization;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
-	public class Head
-	{
-		// 标题名
-		public string Name { get; set; }
-		// class name
-		public string Tag { get; set; }
+    public class Head
+    {
+        // 标题名
+        public string Name { get; set; }
+        // class name
+        public string Tag { get; set; }
 
         // 读取列表头
         public static List<Head> ReadHead(IWebElement table)
@@ -78,21 +80,21 @@ namespace boin
     }
 
     public class Table
-	{
-		IWebElement tb;
+    {
+        IWebElement tb;
         public List<Head> Heards = new List<Head>();
-		public Table(IWebElement tb)
-		{
-			this.tb = tb;
-		}
+        public Table(IWebElement tb)
+        {
+            this.tb = tb;
+        }
 
         public static Tuple<IWebElement, List<Head>> FindTable(ChromeDriver driver, IEnumerable<String> headNames)
         {
             var tables = driver.FindElements(By.ClassName("ivu-table"));
-            foreach(var table in tables)
+            foreach (var table in tables)
             {
                 var head = Head.ReadHead(table);
-                if(mathHead(head, headNames))
+                if (mathHead(head, headNames))
                 {
                     return new Tuple<IWebElement, List<Head>>(table, head);
                 }
@@ -107,7 +109,7 @@ namespace boin
                 bool exists = false;
                 foreach (var head in heads)
                 {
-                    if(head.Name == name)
+                    if (head.Name == name)
                     {
                         exists = true;
                         break;
@@ -149,24 +151,62 @@ namespace boin
             return d;
         }
 
+        public static DateTime ReadTime(Dictionary<string, string> head, string key, Dictionary<string, IWebElement> dicCell)
+        {
+            string value = ReadString(head, key, dicCell);
+            DateTime d = DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
+            return d;
+        }
+
         public static string ReadString(Dictionary<string, string> head, string key, Dictionary<string, IWebElement> dicCell)
         {
-            string value = string.Empty;
-            string className = string.Empty;
+            string className;
             if (!head.TryGetValue(key, out className))
             {
-                return value;
+                return string.Empty;
             }
             IWebElement cell;
             if (!dicCell.TryGetValue(className, out cell))
             {
-                return value;
+                return string.Empty;
             }
 
-            value = cell.Text;
+            var value = cell.Text;
             return value;
         }
 
+        public static Dictionary<string, IWebElement> Ele2Dic(IWebElement element)
+        {
+            var tdList = element.FindElements(By.XPath(".//td"));
+            Dictionary<string, IWebElement> row = new Dictionary<string, IWebElement>(tdList.Count*2);
+            foreach (var td in tdList)
+            {
+                var key = td.GetAttribute("class");
+                row.Add(key, td);
+            }
+            return row;
+        }
+
+        public static bool SafeClose(ChromeDriver driver, IWebElement table)
+        {
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+            var result = wait.Until(drv =>
+            {
+                try
+                {
+                    table.FindElement(By.XPath(".//a/i[@class='ivu-icon ivu-icon-ios-close']")).Click();
+                    return true;
+                }
+                catch (NoSuchElementException) { }
+                catch (ElementNotInteractableException) { }
+                catch (InvalidOperationException) { }
+                catch
+                {
+                    throw;
+                }
+                return false;
+            });
+            return result;
+        }
     }
 }
-

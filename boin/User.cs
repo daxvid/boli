@@ -26,6 +26,23 @@ namespace boin
         public string Device { get; set; } = "";
 
 
+        // 下注金额
+        public decimal TotalBet { get; set; }
+
+        // 中奖金额
+        public decimal TotalWin { get; set; }
+
+        // 有效下注金额
+        public decimal TotalValidBet { get; set; }
+
+
+        // 操作按钮
+        public IWebElement OpButton { get; set; } = null;
+
+        public List<GameLog> GameLogs { get; set; }
+
+        public Funding Funding { get; set; }
+
         public static string[] Heads = new string[] { "商户" , "用户信息", "等级/设备", "余额", "金流", "贵族",
 			"在线时长", "注册时间/最后上线", "注册IP/登录IP", "操作"};
 
@@ -36,16 +53,9 @@ namespace boin
 
 		public static User Create(Dictionary<string, string> head, IWebElement element)
 		{
-            Dictionary<string, IWebElement> row = new Dictionary<string, IWebElement>(head.Count * 2);
-            var tdList = element.FindElements(By.XPath(".//td"));
-            foreach (var td in tdList)
-            {
-                var key = td.GetAttribute("class");
-                row.Add(key, td);
-            }
-
+            var row = Table.Ele2Dic(element);
             User user = new User();
-            
+            user.OpButton = element.FindElement(By.XPath(".//button/span[text()='操作 +']"));
             user.Merchant = Table.ReadString(head, "商户", row);
 
             // 用户信息

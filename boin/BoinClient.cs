@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
@@ -10,15 +13,17 @@ namespace boin
         string userName = "";
         string password = "";
         string googleKey = "";
-        ChromeDriver driver = new ChromeDriver();
-
+        ChromeDriver driver;
+        WebDriverWait wait;
 
         public BoinClient()
         {
+            driver = new ChromeDriver();
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
 
 
-        public BoinClient(string home, string userName, string pwd, string googleKey)
+        public BoinClient(string home, string userName, string pwd, string googleKey):this()
         {
             this.home = home;
             this.userName = userName;
@@ -30,7 +35,6 @@ namespace boin
         public bool Login()
         {
             driver.Navigate().GoToUrl(home);
-
             //var name = driver.FindElement(By.CssSelector(".ivu-form-item:nth-child(1) .ivu-input"));
             var name = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div/div/div/input"));
             name.SendKeys(userName);
@@ -38,51 +42,92 @@ namespace boin
             //var pwd = driver.FindElement(By.CssSelector(".ivu-input-type-password > .ivu-input"));
             var pwd = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div[2]/div/div/input"));
             pwd.SendKeys(password);
+            for (var i = 1; i < 1000; i++)
+            {
+                if (login(i))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
+        private bool login(int i)
+        {
             // google认证
             var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
             var code = authenticator.GetCode(googleKey);
-            //var googlePwd = driver.FindElement(By.CssSelector(".ivu-form-item:nth-child(3) .ivu-input"));
             var googlePwd = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div[3]/div/div/input"));
-
+            googlePwd.Clear();
             googlePwd.SendKeys(code);
+            //if (i < 3) // test error 
+            //{
+            //    googlePwd.Clear();
+            //    googlePwd.SendKeys("234678");
+            //}
 
             // 登录按钮
             var sub = driver.FindElement(By.CssSelector(".ivu-btn-primary"));
             sub.Click();
 
-            for (var i = 60; i > 0; i--)
+            try
             {
-                Thread.Sleep(1000);
-                var urlNow = driver.Url;
-                if (urlNow != home)
+                var path = "//*[@id='b_home_notice']/h1";
+                var result = wait.Until(drv =>
                 {
-                    return true;
+                    try
+                    {
+                        var e = drv.FindElement(By.XPath(path));
+                        var txt = e.Text;
+                        if (txt.Contains("登入成功"))
+                        {
+                            return true;
+                        }
+                    }
+                    catch (NoSuchElementException) //TargetInvocationException/InvalidOperationException
+                    {
+                    }
+                    catch
+                    {
+                        throw;
+                    }
+                    return false;
                 }
-
+                );
+                return result;
+            }
+            catch (WebDriverTimeoutException)
+            {
+            }
+            catch
+            {
+                throw;
             }
             return false;
         }
 
-
         public static bool GoToPage(ChromeDriver driver, int index, string itme)
         {
-            for (var i = 0; i < 10; i++)
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+            wait.PollingInterval = TimeSpan.FromSeconds(1);
+            var result = wait.Until(drv =>
             {
                 try
                 {
-                    var money = driver.FindElement(By.CssSelector("nav li:nth-child(" + index + ")"));
-                    money.Click();
-                    Thread.Sleep(1000);
-                    var tx = driver.FindElement(By.LinkText(itme));
-                    tx.Click();
+                    drv.FindElement(By.CssSelector("nav li:nth-child(" + index + ")")).Click();
+                    drv.FindElement(By.LinkText(itme)).Click();
                     return true;
 
                 }
-                catch { }
-                Thread.Sleep(1000);
-            }
-            return false;
+                catch (NoSuchElementException) { }
+                catch (InvalidOperationException) { }
+                catch
+                {
+                    throw;
+                }
+                return false;
+            });
+            return result;
         }
 
 
@@ -94,14 +139,16 @@ namespace boin
             //orderPage.Open();
             //orderPage.Select(12);
             //var orders = orderPage.ReadTable();
+
             //var userPage = new UserPage(driver);
             //userPage.Open();
-            //userPage.Select(new List<Order>());
+            //userPage.Select(orders);
 
             var userPage2 = new UserPage(driver);
             userPage2.Open();
-            userPage2.Select("");
-            //userPage2.Select("107989384");
+            userPage2.Select("325961309");   // 325961309
+            //userPage2.Select("");
+
         }
 
         public void Quit()

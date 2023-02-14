@@ -1,18 +1,21 @@
 ﻿using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
     public class OrderPage
     {
+
         ChromeDriver driver;
+        WebDriverWait wait;
 
         public OrderPage(ChromeDriver driver)
         {
             this.driver = driver;
+            this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
-
 
         public bool Open()
         {
@@ -77,23 +80,21 @@ namespace boin
                 Thread.Sleep(1000);
             }
             return false;
-
         }
 
 
         public List<Order> ReadTable()
         {
             var table = driver.FindElement(By.XPath("//*[@id=\"Cash\"]/div[2]/div[1]"));
-            var tbody = table.FindElement(By.ClassName("ivu-table-tbody"));
+            var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+            var tbody = table.FindElement(By.XPath(bodyPath));
 
             // 展开所有列表
-            var expandList = tbody.FindElements(By.ClassName("ivu-table-cell-expand"));
+            var expandList = tbody.FindElements(By.XPath("//*[ivu-table-cell-expand]"));
             foreach (var exBtn in expandList)
             {
                 exBtn.Click();
-                Thread.Sleep(20);
             }
-            Thread.Sleep(2000);
 
             List<Head> head = Head.ReadHead(table);
             var orders = ReadOrders(head, tbody);
@@ -121,8 +122,7 @@ namespace boin
                 var row = allRows[i];
                 IWebElement rowEx = null;
                 var className = row.GetAttribute("class");
-                // if (!className.StartsWith("ivu-table-row"))
-                if (!(className == "ivu-table-row" || className == "ivu-table-row ivu-table-row-hove"))
+                if (!className.StartsWith("ivu-table-row"))
                 {
                     continue;
                 }
@@ -139,7 +139,6 @@ namespace boin
                     catch (Exception err)
                     {
                         Console.WriteLine(err);
-                        ;
                     }
                 }
                 var order = Order.Create(dicHead, row, rowEx);

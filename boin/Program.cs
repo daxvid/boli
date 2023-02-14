@@ -6,6 +6,7 @@ class Program
     {
         BoinClient client = new BoinClient(Auth.Home, Auth.UserName, Auth.Password, Auth.GoogleKey);
         client.Run();
+
         var s = Console.ReadKey(true).KeyChar;
         while (Char.ToLower(s) != 'q')
         {
