@@ -83,7 +83,7 @@ namespace boin
             user.Funding = fund;
 
             // 关闭窗口
-            Table.SafeClose(driver, table);
+            Helper.SafeClose(driver, table);
 
             return fund;
         }

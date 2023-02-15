@@ -46,20 +46,20 @@ namespace boin
 
         public static GameLog Create(Dictionary<string, string> head, IWebElement element)
         {
-            var row = Table.Ele2Dic(element);
+            var row = Helper.Ele2Dic(element);
 
             GameLog log = new GameLog();
-            log.LogId = Table.ReadString(head, "编号ID", row);
-            log.GameId = Table.ReadString(head, "游戏ID", row);
-            log.GamePlatform = Table.ReadString(head, "游戏平台", row);
-            log.No = Table.ReadString(head, "单号", row);
-            log.GameName = Table.ReadString(head, "游戏名", row);
-            log.OpTime = Table.ReadString(head, "操作时间", row);
-            log.TotalBet = Table.ReadDecimal(head, "下注总金额", row);
-            log.TotalWin = Table.ReadDecimal(head, "中奖金额", row);
-            log.ValidBet = Table.ReadDecimal(head, "有效下注", row);
-            log.Tip = Table.ReadDecimal(head, "小费", row);
-            log.CancelBet = Table.ReadString(head, "取消下注", row);
+            log.LogId = Helper.ReadString(head, "编号ID", row);
+            log.GameId = Helper.ReadString(head, "游戏ID", row);
+            log.GamePlatform = Helper.ReadString(head, "游戏平台", row);
+            log.No = Helper.ReadString(head, "单号", row);
+            log.GameName = Helper.ReadString(head, "游戏名", row);
+            log.OpTime = Helper.ReadString(head, "操作时间", row);
+            log.TotalBet = Helper.ReadDecimal(head, "下注总金额", row);
+            log.TotalWin = Helper.ReadDecimal(head, "中奖金额", row);
+            log.ValidBet = Helper.ReadDecimal(head, "有效下注", row);
+            log.Tip = Helper.ReadDecimal(head, "小费", row);
+            log.CancelBet = Helper.ReadString(head, "取消下注", row);
 
             return log;
         }

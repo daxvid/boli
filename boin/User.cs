@@ -53,10 +53,10 @@ namespace boin
 
 		public static User Create(Dictionary<string, string> head, IWebElement element)
 		{
-            var row = Table.Ele2Dic(element);
+            var row = Helper.Ele2Dic(element);
             User user = new User();
             user.OpButton = element.FindElement(By.XPath(".//button/span[text()='操作 +']"));
-            user.Merchant = Table.ReadString(head, "商户", row);
+            user.Merchant = Helper.ReadString(head, "商户", row);
 
             // 用户信息
             IWebElement userInfo = row[head["用户信息"]];

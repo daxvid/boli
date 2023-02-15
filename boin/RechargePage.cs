@@ -105,7 +105,7 @@ namespace boin
                 allLogs.AddRange(logs);
             }
             // 关闭窗口
-            Table.SafeClose(driver, table);
+            Helper.SafeClose(driver, table);
             return allLogs;
         }
 

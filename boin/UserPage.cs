@@ -226,13 +226,8 @@ namespace boin
                     driver.FindElement(By.XPath(xpath)).Click();
                     return true;
                 }
-                catch (ElementNotInteractableException) { }
                 catch (NoSuchElementException) { }
-                catch (InvalidOperationException) { }
-                catch
-                {
-                    throw;
-                }
+                catch (ElementClickInterceptedException) { }
                 return false;
             });
 

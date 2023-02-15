@@ -85,33 +85,33 @@ namespace boin
 
         public static Order Create(Dictionary<string, string> head, IWebElement element, IWebElement rowEx)
         {
-            var row = Table.Ele2Dic(element);
+            var row = Helper.Ele2Dic(element);
 
             Order order = new Order();
-            order.OrderID = Table.ReadString(head, "订单号", row);
-            order.Created = Table.ReadString(head, "发起时间", row);
-            order.TimeToAccount = Table.ReadString(head, "到账时间", row);
-            order.GameId = Table.ReadString(head, "游戏ID", row);
-            order.NickName = Table.ReadString(head, "用户昵称", row);
-            order.Amount = Table.ReadDecimal(head, "提现金额", row);
-            order.Way = Table.ReadString(head, "通道", row);
-            order.Review = Table.ReadString(head, "状态", row);
-            order.Transfer = Table.ReadString(head, "转账", row);
-            order.Operating = Table.ReadString(head, "操作类型", row);
-            order.Operator = Table.ReadString(head, "操作人", row);
-            order.Remark = Table.ReadString(head, "提现备注", row);
-            order.Status = Table.ReadString(head, "操作", row);
+            order.OrderID = Helper.ReadString(head, "订单号", row);
+            order.Created = Helper.ReadString(head, "发起时间", row);
+            order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
+            order.GameId = Helper.ReadString(head, "游戏ID", row);
+            order.NickName = Helper.ReadString(head, "用户昵称", row);
+            order.Amount = Helper.ReadDecimal(head, "提现金额", row);
+            order.Way = Helper.ReadString(head, "通道", row);
+            order.Review = Helper.ReadString(head, "状态", row);
+            order.Transfer = Helper.ReadString(head, "转账", row);
+            order.Operating = Helper.ReadString(head, "操作类型", row);
+            order.Operator = Helper.ReadString(head, "操作人", row);
+            order.Remark = Helper.ReadString(head, "提现备注", row);
+            order.Status = Helper.ReadString(head, "操作", row);
 
             var ex = readEx(rowEx);
-            order.PayWay = Table.GetValue(ex, "支付渠道：");
-            order.Name = Table.GetValue(ex, "实名：");
-            order.CardNo = Table.GetValue(ex, "账号/卡号：");
-            order.Gas = Table.GetDecimal(ex, "手续费：");
-            order.ActualAmount = Table.GetDecimal(ex, "实际到账金额：");
-            order.TransferOrderId = Table.GetValue(ex, "转账订单号：");
-            order.Reasons = Table.GetValue(ex, "拒绝理由：");
-            order.RequestError = Table.GetValue(ex, "请求错误信息：");
-            order.UserError = Table.GetValue(ex, "用户显示错误：");
+            order.PayWay = Helper.GetValue(ex, "支付渠道：");
+            order.Name = Helper.GetValue(ex, "实名：");
+            order.CardNo = Helper.GetValue(ex, "账号/卡号：");
+            order.Gas = Helper.GetDecimal(ex, "手续费：");
+            order.ActualAmount = Helper.GetDecimal(ex, "实际到账金额：");
+            order.TransferOrderId = Helper.GetValue(ex, "转账订单号：");
+            order.Reasons = Helper.GetValue(ex, "拒绝理由：");
+            order.RequestError = Helper.GetValue(ex, "请求错误信息：");
+            order.UserError = Helper.GetValue(ex, "用户显示错误：");
             return order;
         }
 
