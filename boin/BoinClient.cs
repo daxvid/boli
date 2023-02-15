@@ -87,10 +87,6 @@ namespace boin
                     catch (NoSuchElementException) //TargetInvocationException/InvalidOperationException
                     {
                     }
-                    catch
-                    {
-                        throw;
-                    }
                     return false;
                 }
                 );
@@ -98,10 +94,6 @@ namespace boin
             }
             catch (WebDriverTimeoutException)
             {
-            }
-            catch
-            {
-                throw;
             }
             return false;
         }
@@ -121,10 +113,6 @@ namespace boin
                 }
                 catch (NoSuchElementException) { }
                 catch (InvalidOperationException) { }
-                catch
-                {
-                    throw;
-                }
                 return false;
             });
             return result;

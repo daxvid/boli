@@ -78,17 +78,12 @@ namespace boin
                 }
                 catch (NoSuchElementException) { }
                 catch (InvalidOperationException) { }
-                catch
-                {
-                    throw;
-                }
                 return false;
             });
             if (result && gameid != string.Empty)
             {
-                // TODO: 等待查询结果
+                // 等待查询结果
                 // /html/body/div[1]/div/div/div[2]/div[2]/div/div/div/div[2]/div/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span
-                // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span
                 var path = "//*[@id=\"LiveGameRoleList\"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span[text()='" + gameid + "']";
                 result = wait.Until(driver => {
                     try

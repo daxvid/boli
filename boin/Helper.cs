@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
@@ -20,6 +21,24 @@ namespace boin
             string end = now.ToString("yyyy-MM-dd HH:mm:ss");
             et.SendKeys(start + " - " + end);
             Thread.Sleep(20);
+        }
+
+        public static bool TryClick(WebDriverWait wait, IWebElement btn)
+        {
+            if (btn.Enabled)
+            {
+                return wait.Until(driver =>
+                {
+                    try
+                    {
+                        btn.Click();
+                        return true;
+                    }
+                    catch (ElementClickInterceptedException) { }
+                    return false;
+                });
+            }
+            return true;
         }
 
     }

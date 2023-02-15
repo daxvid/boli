@@ -80,7 +80,6 @@ namespace boin
             order.Transfer = Table.ReadString(head, "转账", row);
             order.Operating = Table.ReadString(head, "操作类型", row);
 
-
             var ex = readEx(rowEx);
             //order.PayWay = Table.GetValue(ex, "支付渠道：");
             order.Name = Table.GetValue(ex, "实名：");

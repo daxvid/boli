@@ -93,7 +93,7 @@ namespace boin
             var expandList = tbody.FindElements(By.XPath("//*[ivu-table-cell-expand]"));
             foreach (var exBtn in expandList)
             {
-                exBtn.Click();
+                Helper.TryClick(wait, exBtn);
             }
 
             List<Head> head = Head.ReadHead(table);

@@ -21,8 +21,6 @@ namespace boin
         private IWebElement getCurrentTable(string gameId)
         {
             var p = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
-            //var t = driver.FindElement(By.XPath(p));
-            //return t;
             var result = wait.Until(driver =>
             {
                 try
@@ -67,25 +65,20 @@ namespace boin
             balTxt = balTxt.Substring(balTxt.IndexOf('：') + 1);
             fund.Balance = decimal.Parse(balTxt);
 
-            // 今日(默认)
-            // tbox.FindElement(By.XPath(".//div/div[text()='今日']")).Click();
-            // FillRechargeAndWithdraw(user, tbox, fund.ToDay);
-            fund.ToDay.ReadFrom(tbox);
+            //今日(默认)
+            tbox.FindElement(By.XPath(".//div/div[text()='今日']")).Click();
+            Thread.Sleep(1000);
+            FillRechargeAndWithdraw(user, fund.ToDay);
 
             // 昨日
             tbox.FindElement(By.XPath(".//div/div[text()='昨日']")).Click();
             Thread.Sleep(1000);
-            table = getCurrentTable(user.GameId);
-            tbox = table.FindElement(By.XPath(tboxPath));
-            //FillRechargeAndWithdraw(user, tbox, fund.Yesterday);
-            fund.Yesterday.ReadFrom(tbox);
+            FillRechargeAndWithdraw(user, fund.Yesterday);
 
             // 近2月
             tbox.FindElement(By.XPath(".//div/div[text()='近期（2个月）']")).Click();
             Thread.Sleep(1000);
-            table = getCurrentTable(user.GameId);
-            tbox = table.FindElement(By.XPath(tboxPath));
-            FillRechargeAndWithdraw(user, tbox, fund.Nearly2Months);
+            FillRechargeAndWithdraw(user, fund.Nearly2Months);
 
             user.Funding = fund;
 
@@ -95,63 +88,36 @@ namespace boin
             return fund;
         }
 
-        private void FillRechargeAndWithdraw(User user, IWebElement tbox, FundingDay fund)
+        private void FillRechargeAndWithdraw(User user, FundingDay fund)
         {
-            fund.ReadFrom(tbox);
-            // 充值/提现明细按钮
+            var tboxPath = ".//div[@class='tab_box ivu-row']";
+            var table = getCurrentTable(user.GameId);
+            var tbox = table.FindElement(By.XPath(tboxPath));
 
-            var btnRecharge = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]/a"));
-            var btnWithdraw = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]/a"));
-            //new WebDriverWait(driver, TimeSpan.FromSeconds(15)).Until(driver =>
-            //{
-            //    try
-            //    {
-            //        // 充值明细按钮
-            //        tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]/a")).Click();
-            //        return true;
-            //    }
-            //    catch (NoSuchElementException) { }
-            //    catch (ElementClickInterceptedException) { }
-            //    catch
-            //    {
-            //        throw;
-            //    }
-            //    return false;
-            //});
+            fund.ReadFrom(tbox);
 
             //读取充值明细
-            btnRecharge.Click();
-            Thread.Sleep(1000);
+            var btnRecharge = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]/a"));
+            Helper.TryClick(wait, btnRecharge);
+            Thread.Sleep(500);
+
             var rg = new RechargePage(driver);
             var recharegeLogs = rg.Select(user);
             fund.RechargeLog = recharegeLogs;
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
 
-            //wait.Until(driver =>
-            //{
-            //    try
-            //    {
-            //        // 提现明细按钮
-            //        tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]/a")).Click();
-            //        return true;
-            //    }
-            //    catch (NoSuchElementException) { }
-            //    catch (ElementClickInterceptedException) { }
-            //    catch
-            //    {
-            //        throw;
-            //    }
-            //    return false;
-            //});
+            table = getCurrentTable(user.GameId);
+            tbox = table.FindElement(By.XPath(tboxPath));
 
-            // 提现明细按钮
-            btnWithdraw.Click();
-            Thread.Sleep(1000);
+            // 读取提现明细
+            var btnWithdraw = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]/a"));
+            Helper.TryClick(wait, btnWithdraw);
+            Thread.Sleep(500);
 
             var wg = new WithdrawPage(driver);
             var withdrawLogs = wg.Select(user);
             fund.WithdrawLog = withdrawLogs;
-            Thread.Sleep(100);
+            Thread.Sleep(500);
         }
 
     }

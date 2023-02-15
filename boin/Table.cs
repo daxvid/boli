@@ -200,10 +200,6 @@ namespace boin
                 catch (NoSuchElementException) { }
                 catch (ElementNotInteractableException) { }
                 catch (InvalidOperationException) { }
-                catch
-                {
-                    throw;
-                }
                 return false;
             });
             return result;

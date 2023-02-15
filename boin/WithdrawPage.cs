@@ -28,13 +28,12 @@ namespace boin
                 {
                     var t = driver.FindElement(By.XPath(p));
                     var pageTag = t.FindElement(By.XPath(pagePath));
+                    var id = ((WebElement)t).ToString();
+                    Console.WriteLine("提现" + page.ToString() + ":" + id);
+                    Thread.Sleep(500);
                     return t;
                 }
                 catch (NoSuchElementException) { }
-                catch
-                {
-                    throw;
-                }
                 return null;
             });
             return result;
@@ -78,7 +77,7 @@ namespace boin
                 nextPage.Click();
 
                 //TODO: 检查是否加载完成
-                Thread.Sleep(100);
+                Thread.Sleep(500);
 
                 table = getCurrentTable(user.GameId, page);
                 //head = Head.ReadHead2(table);
@@ -105,9 +104,7 @@ namespace boin
             var expandList = tbody.FindElements(By.XPath (".//tr/td/div/div[@class='ivu-table-cell-expand']"));
             foreach (var exBtn in expandList)
             {
-                exBtn.Click();
-                //catch (StaleElementReferenceException) { }
-                //catch (ElementClickInterceptedException) { }
+                Helper.TryClick(wait, exBtn);
             }
 
             var allRows = tbody.FindElements(By.XPath(".//tr"));

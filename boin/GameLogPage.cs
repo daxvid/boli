@@ -26,51 +26,16 @@ namespace boin
                 try
                 {
                     var t = driver.FindElement(By.XPath(p));
-                    var ts = driver.FindElements(By.XPath(p));
                     var pageTag = t.FindElement(By.XPath(pagePath));
+                    var id = ((WebElement)t).ToString();
+                    Console.WriteLine("游戏" + page.ToString() + ":" + id);
+                    Thread.Sleep(500);
                     return t;
                 }
                 catch (NoSuchElementException) { }
-                catch
-                {
-                    throw;
-                }
                 return null;
             });
             return result;
-        }
-
-        private IWebElement getCurrentTable(string gameId)
-        {
-            IWebElement t = null;
-            //  var p = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././div/div/div/div/span[text()='游戏ID：" + gameId + "']/../../../../..";
-            var p = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-            try
-            {
-                t = driver.FindElement(By.XPath(p));
-                return t;
-            }
-            catch { }
-
-            var path = ".//span[text()='游戏ID：" + gameId + "']";
-            // 用户游戏日志 ivu-modal-content
-            var tables = driver.FindElements(By.XPath("//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.."));
-            for (var i = tables.Count - 1; i >= 0; i--)
-            {
-                var table = tables[i];
-                try
-                {
-                    var e = table.FindElement(By.XPath(path));
-                    if (e != null)
-                    {
-                        return table;
-                    }
-                }
-                catch
-                {
-                }
-            }
-            return null;
         }
 
         private decimal readBetDecimal(IWebElement e)
@@ -92,7 +57,7 @@ namespace boin
             // 点击查询按钮;
             var sub = table.FindElement(By.XPath(".//button/span[text()='查询']"));
             sub.Click();
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             // 读取用户查询出的输赢情况
             var items = table.FindElements(By.XPath(".//div[@class='countSty']/span[@class='total_item' and contains(text(),'下注金额：')]/../span"));
@@ -112,7 +77,7 @@ namespace boin
             var tbody = table.FindElement(By.XPath(bodyPath));
             var allLogs = ReadLogs(head, tbody, 1);
 
-            const int maxPage = 100;
+            const int maxPage = 5;
             for (var page = 2; page <= maxPage; page++)
             {
                 // 检查是否有下一页
@@ -123,12 +88,16 @@ namespace boin
                     break;
                 }
                 nextPage.Click();
-                Thread.Sleep(0);
+
+                //TODO: 检查是否加载完成
+                Thread.Sleep(500);
+
                 table = getCurrentTable(user.GameId, page);
                 tbody = table.FindElement(By.XPath(bodyPath));
                 var logs = ReadLogs(head, tbody, page);
                 allLogs.AddRange(logs);
             }
+
             // 关闭窗口
             Table.SafeClose(driver, table);
             return allLogs;
