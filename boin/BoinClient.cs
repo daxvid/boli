@@ -1,27 +1,28 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using boin.Review;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using TwoStepsAuthenticator;
 
 namespace boin
 {
-    public class BoinClient
+    public class BoinClient: PageBase
     {
         string home = "";
         string userName = "";
         string password = "";
         string googleKey = "";
-        ChromeDriver driver;
-        WebDriverWait wait;
 
-        public BoinClient()
+
+        TimeAuthenticator authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+        TelegramBot bot = new TelegramBot();
+
+        public BoinClient():base(new ChromeDriver())
         {
-            driver = new ChromeDriver();
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
-
 
         public BoinClient(string home, string userName, string pwd, string googleKey):this()
         {
@@ -35,13 +36,13 @@ namespace boin
         public bool Login()
         {
             driver.Navigate().GoToUrl(home);
-            //var name = driver.FindElement(By.CssSelector(".ivu-form-item:nth-child(1) .ivu-input"));
-            var name = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div/div/div/input"));
-            name.SendKeys(userName);
+            // //*[@id="logins"]/div/form/div[1]/div/div/input
+            var namePath = "//div[@id=\"logins\"]/div/form/div[1]/div/div/input[@type='text' and @placeholder='请输入账号']";
+            SetTextElementByXPath(namePath, userName);
 
-            //var pwd = driver.FindElement(By.CssSelector(".ivu-input-type-password > .ivu-input"));
-            var pwd = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div[2]/div/div/input"));
-            pwd.SendKeys(password);
+            // //*[@id="logins"]/div/form/div[2]/div/div/input
+            var pwdPath = "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
+            SetTextElementByXPath(pwdPath, password);
             for (var i = 1; i < 1000; i++)
             {
                 if (login(i))
@@ -55,42 +56,28 @@ namespace boin
         private bool login(int i)
         {
             // google认证
-            var authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
             var code = authenticator.GetCode(googleKey);
-            var googlePwd = driver.FindElement(By.XPath("//div[@id='logins']/div/form/div[3]/div/div/input"));
-            googlePwd.Clear();
-            googlePwd.SendKeys(code);
-            //if (i < 3) // test error 
+            // //*[@id="logins"]/div/form/div[3]/div/div/input
+            var glPath = "//div[@id=\"logins\"]/div/form/div[3]/div/div/input";
+            var googlePwd = SetTextElementByXPath(glPath, code);
+            //if (i <= 1) // test error 
             //{
             //    googlePwd.Clear();
             //    googlePwd.SendKeys("234678");
             //}
 
             // 登录按钮
-            var sub = driver.FindElement(By.CssSelector(".ivu-btn-primary"));
-            sub.Click();
+            // //*[@id="logins"]/div/form/div[4]/div/button
+            TryClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button");
 
             try
             {
-                var path = "//*[@id='b_home_notice']/h1";
-                var result = wait.Until(driver =>
+                var e = FindElementByXPath("//*[@id='b_home_notice']/h1");
+                var txt = e.Text;
+                if (txt.Contains("登入成功"))
                 {
-                    try
-                    {
-                        var e = driver.FindElement(By.XPath(path));
-                        var txt = e.Text;
-                        if (txt.Contains("登入成功"))
-                        {
-                            return true;
-                        }
-                    }
-                    catch (NoSuchElementException) //TargetInvocationException/InvalidOperationException
-                    {
-                    }
-                    return false;
+                    return true;
                 }
-                );
-                return result;
             }
             catch (WebDriverTimeoutException)
             {
@@ -98,45 +85,37 @@ namespace boin
             return false;
         }
 
-        public static bool GoToPage(ChromeDriver driver, int index, string itme)
-        {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-            wait.PollingInterval = TimeSpan.FromSeconds(1);
-            var result = wait.Until(driver =>
-            {
-                try
-                {
-                    driver.FindElement(By.CssSelector("nav li:nth-child(" + index + ")")).Click();
-                    driver.FindElement(By.LinkText(itme)).Click();
-                    return true;
-
-                }
-                catch (NoSuchElementException) { }
-                catch (InvalidOperationException) { }
-                return false;
-            });
-            return result;
-        }
-
 
         public void Run()
         {
+
+            //{   //test3
+            //    Recharge.GetRechargeName("OR1676436469554825");
+            //}
+            //{   // test1
+            //    var testCard = "6222801251011210972";
+            //    //var c = BankUtil.Chenk(testCard);
+            //    var d = BankUtil.GetBankInfo(testCard);
+            //}
+
             this.Login();
+            //{   // test 2
+            //    var userPage2 = new UserPage(driver);
+            //    userPage2.Open();
+            //    userPage2.Select("325961309");   // 325961309
+            //}
 
-            //var orderPage = new OrderPage(driver);
-            //orderPage.Open();
-            //orderPage.Select(12);
-            //var orders = orderPage.ReadTable();
 
-            //var userPage = new UserPage(driver);
-            //userPage.Open();
-            //userPage.Select(orders);
+            {   // run 
+                var orderPage = new OrderPage(driver);
+                orderPage.Open();
+                orderPage.Select(12);
+                var orders = orderPage.ReadTable();
 
-            var userPage2 = new UserPage(driver);
-            userPage2.Open();
-            userPage2.Select("325961309");   // 325961309
-            //userPage2.Select("");
-
+                var userPage = new UserPage(driver);
+                userPage.Open();
+                userPage.Select(orders);
+            }
         }
 
         public void Quit()

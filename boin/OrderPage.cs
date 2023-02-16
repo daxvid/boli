@@ -1,103 +1,75 @@
 ﻿using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
-    public class OrderPage
+    public class OrderPage : PageBase
     {
 
-        ChromeDriver driver;
-        WebDriverWait wait;
-
-        public OrderPage(ChromeDriver driver)
+        public OrderPage(ChromeDriver driver) : base(driver)
         {
-            this.driver = driver;
-            this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
+
 
         public bool Open()
         {
-            BoinClient.GoToPage(driver, 4, "提现管理");
+            GoToPage(4, "提现管理");
             return SetItem();
         }
 
         private bool SetItem()
         {
-            for (var i = 0; i < 10; i++)
-            {
-                try
-                {
+            // 全部，待审核
+            // //*[@id="Cash"]/div[1]/div[9]/div/div[1]/div/i
+            bool b1 = TryClickByXPath("//div[@id='Cash']/div[1]/div[9]/div/div[1]/div/i");
+            bool s1 = TryClickByXPath("//div[@id='Cash']/div[1]/div[9]/div/div[2]/ul[2]/li[2]");
 
-                    // 全部，待审核
-                    var cash = driver.FindElement(By.XPath("//div[@id='Cash']/div/div[9]/div/div/div/i"));
-                    cash.Click();
-                    Thread.Sleep(1000);
-                    //var waitItem = driver.FindElement(By.CssSelector(".ivu-select-visible .ivu-select-item:nth-child(2)"));
-                    var waitItem = driver.FindElement(By.XPath("//div[@id='Cash']/div/div[9]/div/div[2]/ul[2]/li[2]"));
-                    waitItem.Click();
-                    Thread.Sleep(1000);
-
-                    // 选择200条记录
-                    var pageSzie = driver.FindElement(By.XPath("//div[@id='Cash']/div[4]/div/div/div/div/span"));
-                    pageSzie.Click();
-                    Thread.Sleep(1000);
-                    var pageSzieItem = driver.FindElement(By.XPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]"));
-                    pageSzieItem.Click();
-                    Thread.Sleep(1000);
-
-                    return true;
-
-                }
-                catch { }
-                Thread.Sleep(1000);
-            }
-            return false;
+            // 选择200条记录
+            // //*[@id="Cash"]/div[4]/div/div/div[1]/div/i
+            bool b2 = true;
+            bool s2 = true;
+            //b2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i");
+            //s2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]");
+            return b1 && s1 && b2 && s2;
         }
 
         // 查询订单
         public bool Select(int hour)
         {
-
-            for (var i = 0; i < 10; i++)
-            {
-                try
-                {
-                    // 设置查询时间，12小时以内的订单
-                    var timeRang = driver.FindElement(By.XPath("//div[@id='Cash']/div/div[12]/div/div/div/input"));
-                    Helper.SetTimeRang(hour, timeRang);
-
-                    // 点击查询
-                    var select = driver.FindElement(By.XPath("//div[@id='Cash']/div/div[13]/button/span"));
-                    select.Click();
-                    Thread.Sleep(3000);
-
-                    return true;
-
-                }
-                catch { }
-                Thread.Sleep(1000);
-            }
-            return false;
+            // 设置查询时间，12小时以内的订单
+            var timeRang = FindElementByXPath("//div[@id='Cash']/div/div[12]/div/div/div/input");
+            Helper.SetTimeRang(hour, timeRang);
+            // 点击查询
+            // //*[@id="Cash"]/div[1]/div[13]/button[1]/span
+            var r = TryClickByXPath("//div[@id='Cash']/div[1]/div[13]/button[1]/span[text()='查询']", 5000);
+            return r;
         }
-
 
         public List<Order> ReadTable()
         {
-            var table = driver.FindElement(By.XPath("//*[@id=\"Cash\"]/div[2]/div[1]"));
+            var tablePath = "//*[@id=\"Cash\"]/div[2]/div[1]";
+            var table = FindElementByXPath(tablePath);
+
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
-            var tbody = table.FindElement(By.XPath(bodyPath));
+            var tbody = FindElementByXPath(table, bodyPath);
 
+            var dicHead = ReadHeadDic(table);
             // 展开所有列表
-            var expandList = tbody.FindElements(By.XPath("//*[ivu-table-cell-expand]"));
-            foreach (var exBtn in expandList)
+            // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[1]/div/div
+            // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
+            var expandPath = "./tr/td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+            var expandItems = FindElementsByXPath(tbody, expandPath);
+            for (var i = 0; i < expandItems.Count; i++)
             {
-                Helper.TryClick(wait, exBtn);
+                SafeClick(expandItems[i], 10);
             }
+            //for (var i= expandItems.Count - 1; i >= 0; i--)
+            //{
+            //    SafeClick(expandItems[i], 2);
+            //}
 
-            List<Head> head = Head.ReadHead(table);
-            var orders = ReadOrders(head, tbody);
+            var orders = ReadOrders(dicHead, tbody);
             foreach (var order in orders)
             {
                 Console.WriteLine(order.OrderID);
@@ -106,17 +78,11 @@ namespace boin
         }
 
         // 读取每一项的信息
-        private List<Order> ReadOrders(List<Head> head, IWebElement body)
+        private List<Order> ReadOrders(Dictionary<string, string> dicHead, IWebElement tbody)
         {
-            Dictionary<string, string> dicHead = new Dictionary<string, string>(19);
-            foreach (var item in head)
-            {
-                dicHead.Add(item.Name, item.Tag);
-            }
-
-            var allRows = body.FindElements(By.XPath(".//tr"));
-            var orders = new List<Order>();
+            var allRows = FindElementsByXPath(tbody, (".//tr"));
             var count = allRows.Count;
+            var orders = new List<Order>(count);
             for (var i = 0; i < count; i++)
             {
                 var row = allRows[i];
@@ -128,17 +94,10 @@ namespace boin
                 }
                 if (i + 1 < count)
                 {
-                    try
+                    rowEx = allRows[i + 1].FindElement(By.ClassName("ivu-table-expanded-cell"));
+                    if (rowEx != null)
                     {
-                        rowEx = allRows[i + 1].FindElement(By.ClassName("ivu-table-expanded-cell"));
-                        if (rowEx != null)
-                        {
-                            i += 1;
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        Console.WriteLine(err);
+                        i += 1;
                     }
                 }
                 var order = Order.Create(dicHead, row, rowEx);

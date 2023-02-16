@@ -4,8 +4,8 @@ using OpenQA.Selenium.Chrome;
 
 namespace boin
 {
-	public class User
-	{
+    public class User
+    {
 
         // 商户
         public string Merchant { get; set; } = "";
@@ -35,13 +35,14 @@ namespace boin
         // 有效下注金额
         public decimal TotalValidBet { get; set; }
 
-
-        // 操作按钮
-        public IWebElement OpButton { get; set; } = null;
-
         public List<GameLog> GameLogs { get; set; }
 
         public Funding Funding { get; set; }
+
+
+        public Order Order { get; set; }
+        public bool  Pass { get; set; }
+        public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
         public static string[] Heads = new string[] { "商户" , "用户信息", "等级/设备", "余额", "金流", "贵族",
 			"在线时长", "注册时间/最后上线", "注册IP/登录IP", "操作"};
@@ -55,7 +56,6 @@ namespace boin
 		{
             var row = Helper.Ele2Dic(element);
             User user = new User();
-            user.OpButton = element.FindElement(By.XPath(".//button/span[text()='操作 +']"));
             user.Merchant = Helper.ReadString(head, "商户", row);
 
             // 用户信息

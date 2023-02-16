@@ -112,6 +112,7 @@ namespace boin
             order.Reasons = Helper.GetValue(ex, "拒绝理由：");
             order.RequestError = Helper.GetValue(ex, "请求错误信息：");
             order.UserError = Helper.GetValue(ex, "用户显示错误：");
+
             return order;
         }
 

@@ -5,12 +5,11 @@ class Program
 {
     static void Main(string[] args)
     {
-        var testCard = "6222801251011210972";
-        var c = BankCardReview.Chenk(testCard);
-        var d = BankUtil.GetBankInfo(testCard);
+        TelegramBot.Run(Auth.BotToken, Auth.ChatId);
+        TelegramBot.SendMessage("start:" + DateTime.Now.ToString("yyyy-MM-dd hh::mm:ss"));
 
         BoinClient client = new BoinClient(Auth.Home, Auth.UserName, Auth.Password, Auth.GoogleKey);
-        client.Run();
+        //client.Run();
 
         var s = Console.ReadKey(true).KeyChar;
         while (Char.ToLower(s) != 'q')
@@ -20,6 +19,5 @@ class Program
         }
         client.Quit();
     }
-
 }
 

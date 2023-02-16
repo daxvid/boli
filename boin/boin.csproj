@@ -14,6 +14,7 @@
     <None Remove="TwoStepsAuthenticator.NetCore" />
     <None Remove="RestSharp" />
     <None Remove="Newtonsoft.Json" />
+    <None Remove="Telegram.BotAPI" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Selenium.WebDriver" Version="4.8.0" />
@@ -21,5 +22,6 @@
     <PackageReference Include="TwoStepsAuthenticator.NetCore" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
+    <PackageReference Include="Telegram.BotAPI" Version="6.5.0" />
   </ItemGroup>
 </Project>

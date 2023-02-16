@@ -5,7 +5,9 @@ using RestSharp;
 
 namespace boin.Review
 {
-    public class BankInfo
+    // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
+
+    public class BankCardInfo
     {
         // 卡类型。值：DC: "储蓄卡",CC: "信用卡",SCC: "准贷记卡",PC: "预付费卡"
         public string cardType;
@@ -18,7 +20,7 @@ namespace boin.Review
         // 银行卡状态。值：ok，no。
         public string stat;
         // 
-        public List<string> messages;
+        public List<Dictionary<string,string>> messages;
     }
 
     public class BankUtil
@@ -71,26 +73,27 @@ namespace boin.Review
         }
 
 
-        public static BankInfo GetBankInfo(string cardNo)
+        public static BankCardInfo GetBankInfo(string cardNo)
         {
             string url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=" + cardNo;
-
-            //远程获取数据
-            //HttpClient client = new HttpClient();
-            //var task = client.GetStringAsync(url);
-            //var content = task.Result;
-
-            // 创建HttpClient实例
-            var client = new RestClient(url);
-            var request = new RestRequest();
-            request.Method = Method.Get;
-            request.AddHeader("Accept", "application/json");
-            var response = client.Execute(request);
-            var content = response.Content; // raw content as string  
-
-            var bankInfo = JsonConvert.DeserializeObject<BankInfo>(content);
-            return bankInfo;
+            try
+            {
+                // 创建HttpClient实例
+                var client = new RestClient(url);
+                var request = new RestRequest();
+                request.Method = Method.Get;
+                request.AddHeader("Accept", "application/json");
+                var response = client.Execute(request);
+                var content = response.Content; // raw content as string  
+                var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
+                return bankInfo;
+            }
+            catch(Exception err)
+            {
+                return new BankCardInfo() { stat = err.Message};
+            }
         }
+
 
         // @param cardNo 银行卡卡号
         // @return {"bank":"CMB","validated":true,"cardType":"DC","key":"(卡号)","messages":[],"stat":"ok"}
@@ -112,6 +115,48 @@ namespace boin.Review
             //所属行。值：所属行简称，如：CMB 为招商银行
             string nameOfBank = GetNameOfBank(bankInfo.bank);
             return nameOfBank;
+        }
+
+        //6222801251011210972
+        public static bool Chenk(string bankCard)
+        {
+            //如果小于15位或大于19位为假
+            if (bankCard.Length < 15 || bankCard.Length > 19)
+            {
+                return false;
+            }
+            //声明一个bit 接收银行卡截取出来的字符串
+            char bit = getBank(bankCard.Substring(0, bankCard.Length - 1));
+            if (bit == 'F')
+            {
+                return false;//不是数据返回false
+            }
+            return bankCard[bankCard.Length - 1] == bit;
+        }
+
+        static char getBank(string non)
+        {
+            char[] cs = non.ToArray();
+            foreach (var c in cs)
+            {
+                if (c < '0' || c > '9')
+                {
+                    return 'F'; //如果传的不是数据返回F
+                }
+            }
+
+            int sum = 0;
+            for (int i = cs.Length - 1, j = 0; i >= 0; i--, j++)
+            {
+                int k = cs[i] - '0';
+                if (j % 2 == 0)
+                {
+                    k *= 2;
+                    k = k / 10 + k % 10;
+                }
+                sum += k;
+            }
+            return (sum % 10 == 0) ? '0' : (char)((10 - sum) % 10 + '0');
         }
     }
 }

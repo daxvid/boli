@@ -56,6 +56,7 @@ namespace boin
             }
 
             var value = cell.Text;
+            value = value.Trim();
             return value;
         }
 

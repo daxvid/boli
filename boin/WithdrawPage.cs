@@ -7,36 +7,24 @@ using OpenQA.Selenium.Support.UI;
 namespace boin
 {
     // 充值记录
-    public class WithdrawPage
+    public class WithdrawPage : PageBase
     {
-        ChromeDriver driver;
-        WebDriverWait wait;
 
-        public WithdrawPage(ChromeDriver driver)
+        public WithdrawPage(ChromeDriver driver) : base(driver)
         {
-            this.driver = driver;
-            this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
+
 
         private IWebElement getCurrentTable(string gameId, int page)
         {
             var p = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var result = wait.Until(driver =>
-            {
-                try
-                {
-                    var t = driver.FindElement(By.XPath(p));
-                    var pageTag = t.FindElement(By.XPath(pagePath));
-                    var id = ((WebElement)t).ToString();
-                    Console.WriteLine("提现" + page.ToString() + ":" + id);
-                    Thread.Sleep(500);
-                    return t;
-                }
-                catch (NoSuchElementException) { }
-                return null;
-            });
-            return result;
+            var t = FindElementByXPath(p);
+            var pageTag = FindElementByXPath(t, pagePath);
+            //var id = ((WebElement)t).ToString();
+            //Console.WriteLine("提现" + page.ToString() + ":" + id);
+            Thread.Sleep(500);
+            return t;
         }
 
         private decimal readBetDecimal(IWebElement e)
@@ -59,16 +47,16 @@ namespace boin
         // 读取日志数据 ivu-modal-content/ivu-modal-body
         private List<Withdraw> ReadWithdrawLog(User user, IWebElement table)
         {
-            var head = Head.ReadHead2(table);
+            var dicHead = ReadHeadDic(table);
             // table = ivu-modal-content
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
-            var tbody = table.FindElement(By.XPath(bodyPath));
-            var allLogs = ReadLogs(head, tbody, 1);
-            const int maxPage = 1000;
+            var tbody = FindElementByXPath(table, bodyPath);
+            var allLogs = ReadLogs(dicHead, tbody, 1);
+
             for (var page = 2; page <= maxPage; page++)
             {
                 // 检查是否有下一页
-                var nextPage = table.FindElement(By.XPath(".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../.."));
+                var nextPage = FindElementByXPath(table, ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
                 var next = nextPage.Enabled;
                 if (!next)
                 {
@@ -80,10 +68,9 @@ namespace boin
                 Thread.Sleep(500);
 
                 table = getCurrentTable(user.GameId, page);
-                //head = Head.ReadHead2(table);
-                tbody = table.FindElement(By.XPath(bodyPath));
+                tbody = FindElementByXPath(table, bodyPath);
 
-                var logs = ReadLogs(head, tbody, page);
+                var logs = ReadLogs(dicHead, tbody, page);
                 allLogs.AddRange(logs);
             }
             // 关闭窗口
@@ -92,22 +79,16 @@ namespace boin
         }
 
         // 读取每一项日志信息
-        private List<Withdraw> ReadLogs(List<Head> head, IWebElement tbody, int page)
+        private List<Withdraw> ReadLogs(Dictionary<string, string> dicHead, IWebElement tbody, int page)
         {
-            Dictionary<string, string> dicHead = new Dictionary<string, string>(19);
-            foreach (var item in head)
-            {
-                dicHead.Add(item.Name, item.Tag);
-            }
-
             // 展开所有列表
-            var expandList = tbody.FindElements(By.XPath (".//tr/td/div/div[@class='ivu-table-cell-expand']"));
+            var expandList = FindElementsByXPath (tbody, ".//tr/td/div/div[@class='ivu-table-cell-expand']");
             foreach (var exBtn in expandList)
             {
                 Helper.TryClick(wait, exBtn);
             }
 
-            var allRows = tbody.FindElements(By.XPath(".//tr"));
+            var allRows = FindElementsByXPath(tbody, ".//tr");
             var allLogs = new List<Withdraw>();
             var count = allRows.Count;
             for (var i = 0; i < count; i++)

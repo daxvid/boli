@@ -51,6 +51,23 @@ namespace boin
             WithdrawLog = null;
         }
 
+        public bool IsSync
+        {
+            get
+            {
+                if (RechargeLog != null)
+                {
+                    foreach (var r in RechargeLog)
+                    {
+                        if (r.IsSync == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
         public void ReadFrom(IWebElement tbox)
         {
 
@@ -101,11 +118,52 @@ namespace boin
             // 返利
             Rebate = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='返利']/../td[2]")).Text);
         }
+
+        // 成功提现总额
+        public decimal SuccessAmount(string card, string name)
+        {
+            decimal total = 0;
+            foreach (var w in WithdrawLog)
+            {
+                if (w.ActualAmount > 0 && w.CardNo == card && w.Transfer == "成功")
+                {
+                    total += w.Amount;
+                }
+            }
+            return total;
+        }
+
+        // 是否第一次提现
+        public bool FirstWithdraw(string card, string name)
+        {
+            foreach (var w in WithdrawLog)
+            {
+                if (w.ActualAmount > 0 && w.CardNo == card && w.Transfer == "成功")
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // 用户总的充值金额
+        public decimal TotalRechargeAmount(string name)
+        {
+            decimal total = 0;
+            foreach (var r in RechargeLog)
+            {
+                if (string.IsNullOrEmpty(name) || r.Depositor == name)
+                {
+                    total += r.RechargeAmount;
+                }
+            }
+            return total;
+        }
     }
 
     // 资金情况
     public class Funding
-	{
+    {
         // 余额
         public decimal Balance { get; set; }
         public FundingDay ToDay { get; set; } = new FundingDay();
@@ -113,8 +171,16 @@ namespace boin
         public FundingDay Nearly2Months { get; set; } = new FundingDay();
 
         public Funding()
-		{
-		}
-	}
+        {
+        }
+
+        public bool IsSync
+        {
+            get
+            {
+                return ToDay.IsSync && Yesterday.IsSync && Nearly2Months.IsSync;
+            }
+        }
+    }
 }
 
