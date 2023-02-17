@@ -4,8 +4,11 @@ using System.Reflection;
 using boin.Review;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.DevTools;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using TwoStepsAuthenticator;
+using static System.Collections.Specialized.BitVector32;
 
 namespace boin
 {
@@ -18,9 +21,8 @@ namespace boin
 
 
         TimeAuthenticator authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-        TelegramBot bot = new TelegramBot();
 
-        public BoinClient():base(new ChromeDriver())
+        public BoinClient():base(newDriver())
         {
         }
 
@@ -30,6 +32,24 @@ namespace boin
             this.userName = userName;
             this.password = pwd;
             this.googleKey = googleKey;
+
+        }
+
+
+        static ChromeDriver newDriver()
+        {
+            var op = new ChromeOptions();
+
+            // 为Chrome配置无头模式
+            op.AddArgument("--headless");
+            op.AddArgument("window-size=1920,1080");
+
+            //op.AddAdditionalChromeOption("excludeSwitches", new string[] { "enable-automation"});
+            //op.AddAdditionalChromeOption("useAutomationExtension", false);
+
+            var driver = new ChromeDriver(op);
+            //var session = ((IDevTools)driver).GetDevToolsSession();
+            return driver;
         }
 
         // 登录
@@ -76,11 +96,13 @@ namespace boin
                 var txt = e.Text;
                 if (txt.Contains("登入成功"))
                 {
+                    SendMsg(txt);
                     return true;
                 }
             }
             catch (WebDriverTimeoutException)
             {
+                SendMsg("登入超时："+ i.ToString());
             }
             return false;
         }
@@ -109,11 +131,13 @@ namespace boin
             {   // run 
                 var orderPage = new OrderPage(driver);
                 orderPage.Open();
+
                 orderPage.Select(12);
                 var orders = orderPage.ReadTable();
 
                 var userPage = new UserPage(driver);
                 userPage.Open();
+
                 userPage.Select(orders);
             }
         }

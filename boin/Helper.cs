@@ -124,6 +124,16 @@ namespace boin
             });
             return result;
         }
+
+        public static decimal ReadBetDecimal(IWebElement e)
+        {
+            var txt = e.Text;
+            var index = txt.IndexOf('：');
+            txt = txt.Substring(index + 1);
+            decimal r;
+            decimal.TryParse(txt, out r);
+            return r;
+        }
     }
 }
 

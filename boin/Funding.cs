@@ -68,9 +68,9 @@ namespace boin
                 return true;
             }
         }
+
         public void ReadFrom(IWebElement tbox)
         {
-
             // 有效投注
             ValidBet = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='有效投注']/../td[2]")).Text);
             // 游戏损益

@@ -10,32 +10,31 @@ namespace boin
     // 资金概况
     public class FundingPage: PageBase
     {
-
-        public FundingPage(ChromeDriver driver) : base(driver)
+        string gameId;
+        string path;
+        public FundingPage(ChromeDriver driver, string gameId) : base(driver)
         {
+            this.gameId = gameId;
+            this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
         }
 
-        private IWebElement getCurrentTable(string gameId)
+        public override bool Close()
         {
-            var p = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
-            var result = FindElementByXPath(p);
+            // 关闭窗口
+            var table = FindElementByXPath(path);
+            return Helper.SafeClose(driver, table);
+        }
+
+        private IWebElement getCurrentTable()
+        {
+            var result = FindElementByXPath(path);
             return result;
         }
 
-        private decimal readBetDecimal(IWebElement e)
-        {
-            var txt = e.Text;
-            var index = txt.IndexOf('：');
-            txt = txt.Substring(index + 1);
-            decimal r;
-            decimal.TryParse(txt, out r);
-            return r;
-        }
-
-        public Funding Select(User user)
+        public Funding Select()
         {
             var tboxPath = ".//div[@class='tab_box ivu-row']";
-            var table = getCurrentTable(user.GameId);
+            var table = getCurrentTable();
             var tbox = FindElementByXPath(table, tboxPath);
 
             //// 点击刷新按钮;
@@ -45,51 +44,57 @@ namespace boin
             Funding fund = new Funding();
 
             // 余额
-            var balTxt = FindElementByXPath(table,".//div/div/div/div[contains(text(),'余额：')]").Text;
-            balTxt = balTxt.Substring(balTxt.IndexOf('：') + 1);
-            fund.Balance = decimal.Parse(balTxt);
+            var balTxt = FindElementByXPath(table,".//div/div/div/div[contains(text(),'余额：')]");
+            fund.Balance = Helper.ReadBetDecimal(balTxt);
 
             //今日(默认)
-            TryClickByXPath(tbox, ".//div/div[text()='今日']");
-            FillRechargeAndWithdraw(user, fund.ToDay);
+            TryClickByXPath(tbox, ".//div/div[text()='今日' and contains(@class,'tab_sty')]");
+            FillRechargeAndWithdraw(fund.ToDay);
 
             // 昨日
-            TryClickByXPath(tbox, ".//div/div[text()='昨日']");
-            FillRechargeAndWithdraw(user, fund.Yesterday);
+            if (TryClickByXPath(tbox, ".//div/div[text()='昨日' and contains(@class,'tab_sty')]"))
+            {
+                FillRechargeAndWithdraw(fund.Yesterday);
+            }
 
             // 近2月
-            TryClickByXPath(tbox, ".//div/div[text()='近期（2个月）']");
-            FillRechargeAndWithdraw(user, fund.Nearly2Months);
-
-            user.Funding = fund;
-
-            // 关闭窗口
-            Helper.SafeClose(driver, table);
-
+            if (TryClickByXPath(tbox, ".//div/div[text()='近期（2个月）' and contains(@class,'tab_sty')]"))
+            {
+                FillRechargeAndWithdraw(fund.Nearly2Months);
+            }
             return fund;
         }
 
-        private void FillRechargeAndWithdraw(User user, FundingDay fund)
+        private void FillRechargeAndWithdraw(FundingDay fund)
         {
             var tboxPath = ".//div[@class='tab_box ivu-row']";
-            var table = getCurrentTable(user.GameId);
+            var table = getCurrentTable();
             var tbox = FindElementByXPath(table,tboxPath);
 
-            fund.ReadFrom(tbox);
-
+            using (var span = new Span())
+            {
+                fund.ReadFrom(tbox);
+                span.Msg = "ReadFrom";
+            }
             //读取充值明细
-            TryClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a");
-            var rg = new RechargePage(driver);
-            var recharegeLogs = rg.Select(user);
-            fund.RechargeLog = recharegeLogs;
+            if (TryClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a"))
+            {
+                using (var rg = new RechargePage(driver, gameId))
+                {
+                    var recharegeLogs = rg.Select();
+                    fund.RechargeLog = recharegeLogs;
+                }
+            }
 
             // 读取提现明细
-            table = getCurrentTable(user.GameId);
+            table = getCurrentTable();
             tbox = FindElementByXPath(table,tboxPath);
             TryClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a");
-            var wg = new WithdrawPage(driver);
-            var withdrawLogs = wg.Select(user);
-            fund.WithdrawLog = withdrawLogs;
+            using (var wg = new WithdrawPage(driver, gameId))
+            {
+                var withdrawLogs = wg.Select();
+                fund.WithdrawLog = withdrawLogs;
+            }
         }
 
     }

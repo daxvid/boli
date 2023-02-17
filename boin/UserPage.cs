@@ -18,7 +18,7 @@ namespace boin
         }
 
 
-        public bool Open()
+        public override bool Open()
         {
             return GoToPage(1, "用户列表");
         }
@@ -28,18 +28,25 @@ namespace boin
         {
             List<User> users = new List<User>();
             List<User> tmp = new List<User>();
-            foreach (var order in orders)
+            for(int i=0; i< orders.Count;i++)
             {
-                var user = Select(order.GameId);
-                user.Order = order;
-                users.Add(user);
-                if (user.Funding.IsSync)
+                var order = orders[i];
+                var msg = "no:" + i.ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
+                using (var span = new Span())
                 {
-                    Review(user);
-                }
-                else
-                {
-                    tmp.Add(user);
+                    SendMsg(msg);
+                    span.Msg = msg;
+                    var user = Select(order.GameId);
+                    user.Order = order;
+                    users.Add(user);
+                    if (user.Funding.IsSync)
+                    {
+                        Review(user);
+                    }
+                    else
+                    {
+                        tmp.Add(user);
+                    }
                 }
             }
 
@@ -63,12 +70,24 @@ namespace boin
 
         public User Select(string gameid)
         {
-            if (trySelect(gameid))
+            while (true)
             {
-                var users = ReadTable(gameid);
-                if (users.Count > 0)
+                try
                 {
-                    return users[0];
+                    if (trySelect(gameid))
+                    {
+                        var users = ReadTable(gameid);
+                        if (users.Count > 0)
+                        {
+                            return users[0];
+                        }
+                    }
+                }
+                catch (Exception err)
+                {
+                    SendMsg(err.Message);
+                    SendMsg(err.StackTrace);
+                    Thread.Sleep(10000);
                 }
             }
             return null;
@@ -83,15 +102,17 @@ namespace boin
             // 点击查询按钮
             //*[@id="LiveGameRoleList"]/div[1]/div/div[9]/button[1]/span
             var btnPath = "//div[@id='LiveGameRoleList']/div[1]/div/div[9]/button[1]/span[text()='查询']";
-            TryClickByXPath(btnPath, 2000);
-            // 等待查询结果
-            var path = "//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span";
-            path += "[contains(text(),'" + gameid + "')]";
-            var t = FindElementByXPath(path);
-            var gid = t.Text.Trim();
-            if (gid == gameid)
+            if (TryClickByXPath(btnPath, 2000))
             {
-                return true;
+                // 等待查询结果
+                var path = "//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span";
+                path += "[contains(text(),'" + gameid + "')]";
+                var t = FindElementByXPath(path);
+                var gid = t.Text.Trim();
+                if (gid == gameid)
+                {
+                    return true;
+                }
             }
             return false;
         }
@@ -101,20 +122,20 @@ namespace boin
             var table = FindElementByXPath("//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]");
             var tbody = FindElementByXPath(table, ".//tbody[@class='ivu-table-tbody']");
 
-            List<Head> head = ReadHeadList(table);
-            // fix head
-            for (var i = 0; i < User.Heads.Length && i < head.Count; i++)
-            {
-                if (head[i].Name == "")
-                {
-                    head[i].Name = User.Heads[i];
-                }
-            }
-            Dictionary<string, string> dicHead = new Dictionary<string, string>(head.Count * 2);
-            foreach (var item in head)
-            {
-                dicHead.Add(item.Name, item.Tag);
-            }
+            //List<Head> head = ReadHeadList(table);
+            //// fix head
+            //for (var i = 0; i < User.Heads.Length && i < head.Count; i++)
+            //{
+            //    if (head[i].Name == "")
+            //    {
+            //        head[i].Name = User.Heads[i];
+            //    }
+            //}
+            //Dictionary<string, string> dicHead = new Dictionary<string, string>(head.Count * 2);
+            //foreach (var item in head)
+            //{
+            //    dicHead.Add(item.Name, item.Tag);
+            //}
 
             // 展开所有显示
             var expandList = FindElementsByXPath(tbody, ".//button/span[text()='显示']");
@@ -127,7 +148,7 @@ namespace boin
                 }
             }
 
-            var users = readUsers(dicHead, tbody);
+            var users = readUsers(tbody);
             int gameCount = 0;
             for (var i = 0; i < users.Count; i++)
             {
@@ -140,7 +161,7 @@ namespace boin
         }
 
         // 读取每一项用户信息
-        private List<User> readUsers(Dictionary<string, string> dicHead, IWebElement tbody)
+        private List<User> readUsers(IWebElement tbody)
         {
             var allRows = FindElementsByXPath(tbody, ".//tr");
             var count = allRows.Count;
@@ -148,7 +169,7 @@ namespace boin
             for (var i = 0; i < count; i++)
             {
                 var row = allRows[i];
-                var user = User.Create(dicHead, row);
+                var user = User.Create(row);
                 if (user != null)
                 {
                     users.Add(user);
@@ -157,17 +178,16 @@ namespace boin
             return users;
         }
 
-
         private bool readUserInfo(User user, int i)
         {
             Console.WriteLine("AppID:" + user.AppId + "; GameId:" + user.GameId);
             Int64 gid;
             if (Int64.TryParse(user.GameId, out gid))
             {
+                // 注单(游戏)
+                bool r = readGameLog(user, i);
                 // 概况(资金)
                 bool f = readFunding(user, i);
-                // 注单
-                bool r = readGameLog(user, i);
                 return f && r;
             }
             else
@@ -187,15 +207,17 @@ namespace boin
                 var xpath = "(//div[@id='timeListBox']/div/div[2]/button[3]/span[text()='概况']/..)[" + (i + 1).ToString() + "]";
                 if (TryClickByXPath(xpath, 2000))
                 {
-                    FundingPage gl = new FundingPage(driver);
-                    user.Funding = gl.Select(user);
-                    return true;
+                    using (FundingPage gl = new FundingPage(driver, user.GameId))
+                    {
+                        user.Funding = gl.Select();
+                        return true;
+                    }
                 }
             }
             return false;
         }
 
-        // 注单
+        // 注单(游戏)
         private bool readGameLog(User user, int i)
         {
             if (moveToOp(user, i))
@@ -204,8 +226,10 @@ namespace boin
                 var xpath = "(//div[@id='timeListBox']/div/div[2]/button[4]/span[text()='注单']/..)[" + (i + 1).ToString() + "]";
                 if (TryClickByXPath(xpath, 2000))
                 {
-                    GameLogPage gl = new GameLogPage(driver);
-                    user.GameLogs = gl.Select(user);
+                    using (GameLogPage gl = new GameLogPage(driver, user.GameId))
+                    {
+                        user.GameInfo = gl.Select();
+                    }
                     return true;
                 }
             }
@@ -215,20 +239,11 @@ namespace boin
         private bool moveToOp(User user, int i)
         {
             var opBtn = FindElementByXPath(".//button/span[text()='操作 +']");
-            try
-            {
-                // 移动到【操作+】，显示出扩展按钮
-                new Actions(driver).MoveToElement(opBtn).Perform();
-                Thread.Sleep(1000);
-                return true;
-            }
-            catch (Exception err)
-            {
-                Console.WriteLine(err);
-            }
-            return false;
+            // 移动到【操作+】，显示出扩展按钮
+            new Actions(driver).MoveToElement(opBtn).Perform();
+            Thread.Sleep(1000);
+            return true;
         }
-
 
         private bool Review(User user)
         {

@@ -1,6 +1,7 @@
 ﻿using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.DevTools;
 
 namespace boin
 {
@@ -25,20 +26,8 @@ namespace boin
         // 设备
         public string Device { get; set; } = "";
 
-
-        // 下注金额
-        public decimal TotalBet { get; set; }
-
-        // 中奖金额
-        public decimal TotalWin { get; set; }
-
-        // 有效下注金额
-        public decimal TotalValidBet { get; set; }
-
-        public List<GameLog> GameLogs { get; set; }
-
+        public GameInfo GameInfo { get; set; }
         public Funding Funding { get; set; }
-
 
         public Order Order { get; set; }
         public bool  Pass { get; set; }
@@ -51,20 +40,51 @@ namespace boin
 		{
 		}
 
+        public static User Create(IWebElement element)
+        {
+            using (var span = new Span())
+            {
+                var ts = element.FindElements(By.XPath(".//td"));
+                if (ts.Count != Heads.Length)
+                {
+                    throw new ArgumentException("User Create");
+                }
 
-		public static User Create(Dictionary<string, string> head, IWebElement element)
-		{
-            var row = Helper.Ele2Dic(element);
-            User user = new User();
-            user.Merchant = Helper.ReadString(head, "商户", row);
+                User user = new User();
+                user.Merchant = ts[0].Text.Trim(); // 商户
 
-            // 用户信息
-            IWebElement userInfo = row[head["用户信息"]];
-            var spans = userInfo.FindElements(By.XPath(".//div/div/span"));
+                // 用户信息
+                IWebElement userInfo = ts[1]; // 用户信息;
+                var spans = userInfo.FindElements(By.XPath(".//div/div/span"));
 
-            user.AppId = spans[1].Text;
-            user.GameId = spans[2].Text;
-            return user;
+                user.AppId = spans[1].Text;
+                user.GameId = spans[2].Text;
+
+                span.Msg = "用户:" + user.GameId;
+
+                return user;
+            }
+        }
+
+        public static User Create(Dictionary<string, string> head, IWebElement element)
+        {
+            using (var span = new Span())
+            {
+                var row = Helper.Ele2Dic(element);
+                User user = new User();
+                user.Merchant = Helper.ReadString(head, "商户", row);
+
+                // 用户信息
+                IWebElement userInfo = row[head["用户信息"]];
+                var spans = userInfo.FindElements(By.XPath(".//div/div/span"));
+
+                user.AppId = spans[1].Text;
+                user.GameId = spans[2].Text;
+
+                span.Msg = "用户:" + user.GameId;
+
+                return user;
+            }
 		}
 	}
 }

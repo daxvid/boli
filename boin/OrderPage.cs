@@ -1,18 +1,17 @@
 ﻿using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using boin.Review;
 
 namespace boin
 {
     public class OrderPage : PageBase
     {
-
         public OrderPage(ChromeDriver driver) : base(driver)
         {
         }
 
-
-        public bool Open()
+        public override bool Open()
         {
             GoToPage(4, "提现管理");
             return SetItem();
@@ -53,10 +52,9 @@ namespace boin
 
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
             var tbody = FindElementByXPath(table, bodyPath);
+            // var dicHead = ReadHeadDic(table);
 
-            var dicHead = ReadHeadDic(table);
             // 展开所有列表
-            // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[1]/div/div
             // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
             var expandPath = "./tr/td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
             var expandItems = FindElementsByXPath(tbody, expandPath);
@@ -64,24 +62,17 @@ namespace boin
             {
                 SafeClick(expandItems[i], 10);
             }
-            //for (var i= expandItems.Count - 1; i >= 0; i--)
-            //{
-            //    SafeClick(expandItems[i], 2);
-            //}
 
-            var orders = ReadOrders(dicHead, tbody);
-            foreach (var order in orders)
-            {
-                Console.WriteLine(order.OrderID);
-            }
+            var orders = ReadOrders(tbody);
             return orders;
         }
 
         // 读取每一项的信息
-        private List<Order> ReadOrders(Dictionary<string, string> dicHead, IWebElement tbody)
+        private List<Order> ReadOrders(IWebElement tbody)
         {
             var allRows = FindElementsByXPath(tbody, (".//tr"));
             var count = allRows.Count;
+            SendMsg("order count:" + count.ToString());
             var orders = new List<Order>(count);
             for (var i = 0; i < count; i++)
             {
@@ -94,13 +85,13 @@ namespace boin
                 }
                 if (i + 1 < count)
                 {
-                    rowEx = allRows[i + 1].FindElement(By.ClassName("ivu-table-expanded-cell"));
+                    rowEx = allRows[i + 1].FindElement(By.XPath(".//td[@class='ivu-table-expanded-cell']"));
                     if (rowEx != null)
                     {
                         i += 1;
                     }
                 }
-                var order = Order.Create(dicHead, row, rowEx);
+                var order = Order.Create(row, rowEx);
                 if (order != null)
                 {
                     orders.Add(order);

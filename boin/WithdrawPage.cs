@@ -6,24 +6,30 @@ using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
-    // 充值记录
+    // 提现记录
     public class WithdrawPage : PageBase
     {
-
-        public WithdrawPage(ChromeDriver driver) : base(driver)
+        string gameId;
+        string path;
+        public WithdrawPage(ChromeDriver driver, string gameId) : base(driver)
         {
+            this.gameId = gameId;
+            this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
+
         }
 
-
-        private IWebElement getCurrentTable(string gameId, int page)
+        public override bool Close()
         {
-            var p = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
+            // 关闭窗口
+            var table = FindElementByXPath(path);
+            return Helper.SafeClose(driver, table);
+        }
+
+        private IWebElement getCurrentTable(int page)
+        {
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var t = FindElementByXPath(p);
+            var t = FindElementByXPath(path);
             var pageTag = FindElementByXPath(t, pagePath);
-            //var id = ((WebElement)t).ToString();
-            //Console.WriteLine("提现" + page.ToString() + ":" + id);
-            Thread.Sleep(500);
             return t;
         }
 
@@ -37,52 +43,43 @@ namespace boin
             return r;
         }
 
-        public List<Withdraw> Select(User user)
+        public List<Withdraw> Select()
         {
-            var table = getCurrentTable(user.GameId, 1);
+            var table = getCurrentTable(1);
 
-            return ReadWithdrawLog(user, table);
+            return ReadWithdrawLog(table);
         }
 
         // 读取日志数据 ivu-modal-content/ivu-modal-body
-        private List<Withdraw> ReadWithdrawLog(User user, IWebElement table)
+        private List<Withdraw> ReadWithdrawLog(IWebElement table)
         {
-            var dicHead = ReadHeadDic(table);
             // table = ivu-modal-content
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
             var tbody = FindElementByXPath(table, bodyPath);
-            var allLogs = ReadLogs(dicHead, tbody, 1);
+            var allLogs = ReadLogs(tbody, 1);
 
             for (var page = 2; page <= maxPage; page++)
             {
-                // 检查是否有下一页
-                var nextPage = FindElementByXPath(table, ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
-                var next = nextPage.Enabled;
-                if (!next)
+                // 去到下一页
+                if (!GoToNextPage(table))
                 {
                     break;
                 }
-                nextPage.Click();
 
-                //TODO: 检查是否加载完成
-                Thread.Sleep(500);
-
-                table = getCurrentTable(user.GameId, page);
+                table = getCurrentTable(page);
                 tbody = FindElementByXPath(table, bodyPath);
 
-                var logs = ReadLogs(dicHead, tbody, page);
+                var logs = ReadLogs(tbody, page);
                 allLogs.AddRange(logs);
             }
-            // 关闭窗口
-            Helper.SafeClose(driver, table);
             return allLogs;
         }
 
         // 读取每一项日志信息
-        private List<Withdraw> ReadLogs(Dictionary<string, string> dicHead, IWebElement tbody, int page)
+        private List<Withdraw> ReadLogs(IWebElement tbody, int page)
         {
             // 展开所有列表
-            var expandList = FindElementsByXPath (tbody, ".//tr/td/div/div[@class='ivu-table-cell-expand']");
+            var expandList = FindElementsByXPath(tbody, ".//tr/td/div/div[@class='ivu-table-cell-expand']");
             foreach (var exBtn in expandList)
             {
                 Helper.TryClick(wait, exBtn);
@@ -102,20 +99,13 @@ namespace boin
                 }
                 if (i + 1 < count)
                 {
-                    try
-                    {
-                        rowEx = allRows[i + 1].FindElement(By.ClassName("ivu-table-expanded-cell"));
+                        rowEx = allRows[i + 1].FindElement(By.XPath(".//td[@class='ivu-table-expanded-cell']"));
                         if (rowEx != null)
                         {
                             i += 1;
                         }
-                    }
-                    catch (Exception err)
-                    {
-                        Console.WriteLine(err);
-                    }
                 }
-                var withdraw = Withdraw.Create(dicHead, row, rowEx);
+                var withdraw = Withdraw.Create(row, rowEx);
                 if (withdraw != null)
                 {
                     allLogs.Add(withdraw);

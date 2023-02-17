@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reflection.Emit;
+using boin.Review;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 
 namespace boin
 {
-    public class PageBase
+    public class PageBase : IDisposable
     {
         protected ChromeDriver driver;
         protected WebDriverWait wait;
@@ -316,6 +318,22 @@ namespace boin
             return v1 && v2;
         }
 
+        public virtual bool Open()
+        {
+            return true;
+        }
+
+        public virtual bool Close()
+        {
+            return true;
+        }
+
+        public virtual void SendMsg(string msg)
+        {
+            Console.WriteLine(msg);
+            TelegramBot.SendMessage(msg);
+        }
+
 
         // 读取列表头
         public static List<Head> ReadHeadList(IWebElement table)
@@ -336,18 +354,38 @@ namespace boin
 
         public static Dictionary<string, string> ReadHeadDic(IWebElement table)
         {
-            var heads = table.FindElements(By.XPath(".//div[@class='ivu-table-header']/table/thead/tr/th"));
-            var dicHead = new Dictionary<string, string>(heads.Count * 2);
-            foreach (var th in heads)
-            {
-                var tag = th.GetAttribute("class");
-                if (!string.IsNullOrEmpty(tag))
-                {
-                    var key = th.Text;
-                    dicHead.Add(key, tag);
-                }
-            }
+            //var heads = table.FindElements(By.XPath(".//div[@class='ivu-table-header']/table/thead/tr/th"));
+            var dicHead = new Dictionary<string, string>(29);
+            //foreach (var th in heads)
+            //{
+            //    var tag = th.GetAttribute("class");
+            //    if (!string.IsNullOrEmpty(tag))
+            //    {
+            //        var key = th.Text;
+            //        dicHead.Add(key, tag);
+            //    }
+            //}
             return dicHead;
+        }
+
+        public void Dispose()
+        {
+            this.Close();
+        }
+
+        protected bool GoToNextPage(IWebElement table, int ms = 500)
+        {
+            // 检查是否有下一页
+            var nextPage = FindElementByXPath(table, ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
+            var next = nextPage.Enabled;
+            if (!next)
+            {
+                return false;
+            }
+            nextPage.Click();
+            //TODO: 检查是否加载完成
+            Thread.Sleep(ms);
+            return true;
         }
     }
 }

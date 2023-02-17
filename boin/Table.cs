@@ -19,7 +19,7 @@ namespace boin
             //var thList = table.FindElement(By.XPath(".//div[1]"));
             var thList = table.FindElement(By.ClassName("ivu-table-header"));
             List<Head> listHead = new List<Head>();
-            var heads = thList.FindElements(By.TagName("th"));
+            var heads = thList.FindElements(By.XPath(".//th"));
             foreach (var th in heads)
             {
                 var value = string.Empty;
@@ -30,27 +30,6 @@ namespace boin
                     if (string.IsNullOrEmpty(value))
                     {
                         Console.WriteLine(tag);
-                        //try
-                        //{
-                        //    var span = th.FindElement(By.XPath(".//div/span"));
-                        //    value = span.Text;
-                        //    if (string.IsNullOrEmpty(value))
-                        //    {
-                        //        var childs = th.FindElements(By.XPath(".//*"));
-                        //        foreach (var child in childs)
-                        //        {
-                        //            if (!string.IsNullOrEmpty(child.Text))
-                        //            {
-                        //                value = child.Text;
-                        //                break;
-                        //            }
-                        //        }
-                        //    }
-                        //}
-                        //catch(Exception err)
-                        //{
-                        //    Console.WriteLine(err);
-                        //}
                     }
                     listHead.Add(new Head { Name = value, Tag = tag });
                 }

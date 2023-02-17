@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Emit;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -9,35 +10,33 @@ namespace boin
 	public class RechargePage : PageBase
     {
 
-        public RechargePage(ChromeDriver driver) : base(driver)
+        string gameId;
+        string path;
+        public RechargePage(ChromeDriver driver, string gameId) : base(driver)
         {
+            this.gameId = gameId;
+            this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
+
         }
 
-        private IWebElement getCurrentTable(string gameId, int page)
+        public override bool Close()
         {
-            var p = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
+            // 关闭窗口
+            var table = FindElementByXPath(path);
+            return Helper.SafeClose(driver, table);
+        }
+
+        private IWebElement getCurrentTable(int page)
+        {
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var t = FindElementByXPath(p);
+            var t = FindElementByXPath(path);
             var pageTag = FindElementByXPath(t, pagePath);
-            //var id = ((WebElement)t).ToString();
-            //Console.WriteLine("充值" + page.ToString() + ":" + id);
-            Thread.Sleep(500);
             return t;
         }
 
-        private decimal readBetDecimal(IWebElement e)
+        public List<Recharge> Select()
         {
-            var txt = e.Text;
-            var index = txt.IndexOf('：');
-            txt = txt.Substring(index + 1);
-            decimal r;
-            decimal.TryParse(txt, out r);
-            return r;
-        }
-
-        public List<Recharge> Select(User user)
-        {
-            var table = getCurrentTable(user.GameId, 1);
+            var table = getCurrentTable(1);
 
             //// 日期区间
             //var timeRang = gameLog.FindElement(By.XPath(".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']"));
@@ -54,50 +53,40 @@ namespace boin
             {
                 onlineRechargeList.Add(item.Text);
             }
-            return ReadRechargeLog(user, table);
+            return ReadRechargeLog(table);
         }
 
         // 读取日志数据 ivu-modal-content/ivu-modal-body
-        private List<Recharge> ReadRechargeLog(User user, IWebElement table)
+        private List<Recharge> ReadRechargeLog(IWebElement table)
         {
-            var headDic = ReadHeadDic(table);
             // table = ivu-modal-content
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
             var tbody = FindElementByXPath(table,bodyPath);
             var bodys = new List<IWebElement>() { tbody };
             var tables = new List<IWebElement>() { table };
-            var allLogs = ReadLogs(headDic, tbody, 1);
+            var allLogs = ReadLogs(tbody, 1);
 
             for (var page = 2; page <= maxPage; page++)
             {
-                // 检查是否有下一页
-                var nextPage = FindElementByXPath(table, ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
-                var next = nextPage.Enabled;
-                if (!next)
+                // 去到下一页
+                if (!GoToNextPage(table))
                 {
                     break;
                 }
-                nextPage.Click();
 
-                //TODO: 检查是否加载完成
-                Thread.Sleep(500);
-
-                table = getCurrentTable(user.GameId, page);
-                //head = Head.ReadHead2(table);
+                table = getCurrentTable(page);
                 tbody = FindElementByXPath(table,bodyPath);
                 bodys.Add(tbody);
                 tables.Add(table);
 
-                var logs = ReadLogs(headDic, tbody, page);
+                var logs = ReadLogs(tbody, page);
                 allLogs.AddRange(logs);
             }
-            // 关闭窗口
-            Helper.SafeClose(driver, table);
             return allLogs;
         }
 
         // 读取每一项日志信息
-        private List<Recharge> ReadLogs(Dictionary<string, string> dicHead, IWebElement tbody, int page)
+        private List<Recharge> ReadLogs(IWebElement tbody, int page)
         {
             // 点开所有的查询按钮
             var selBtns =  FindElementsByXPath(tbody,".//td/div/div/div/button/span[contains(text(),'查询')]/..");
@@ -112,7 +101,7 @@ namespace boin
             for (var i = 0; i < count; i++)
             {
                 var row = allRows[i];
-                var log = Recharge.Create(dicHead, row);
+                var log = Recharge.Create(row);
                 if (log != null)
                 {
                     logs.Add(log);
