@@ -5,8 +5,6 @@ using RestSharp;
 
 namespace boin.Review
 {
-    // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
-
     public class BankCardInfo
     {
         // 卡类型。值：DC: "储蓄卡",CC: "信用卡",SCC: "准贷记卡",PC: "预付费卡"
@@ -72,7 +70,10 @@ namespace boin.Review
             return bankDic.GetValueOrDefault(bankAbbreviation, bankAbbreviation);
         }
 
-
+        // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=6222801251011210972
+        // {"cardType":"DC","bank":"CCB","key":"6222801251011210972","messages":[],"validated":true,"stat":"ok"}
+        // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=621669750004140425
+        // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
         public static BankCardInfo GetBankInfo(string cardNo)
         {
             string url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=" + cardNo;
@@ -88,15 +89,15 @@ namespace boin.Review
                 var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
                 return bankInfo;
             }
-            catch(Exception err)
+            catch (Exception err)
             {
-                return new BankCardInfo() { stat = err.Message};
+                return new BankCardInfo() { stat = "ok", validated = true, key = err.Message };
             }
         }
 
 
+
         // @param cardNo 银行卡卡号
-        // @return {"bank":"CMB","validated":true,"cardType":"DC","key":"(卡号)","messages":[],"stat":"ok"}
         public static string GetCardDetail(string cardNo)
         {
             var bankInfo = GetBankInfo(cardNo);

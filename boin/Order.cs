@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Principal;
+using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -10,49 +11,82 @@ namespace boin
     public class Order: WithdrawExpand
     {
         // 订单号
-        public string OrderID { get; set; } = "";
+        public string OrderID { get; set; } = string.Empty;
 
         // 创建时间
-        public string Created { get; set; } = "";
+        public string Created { get; set; } = string.Empty;
 
         // 到账时间
-        public string TimeToAccount { get; set; } = "";
+        public string TimeToAccount { get; set; } = string.Empty;
 
         // 游戏ID
-        public string GameId { get; set; } = "";
+        public string GameId { get; set; } = string.Empty;
 
         // 昵称
-        public string NickName { get; set; } = "";
+        public string NickName { get; set; } = string.Empty;
 
         // 提现金额
         public decimal Amount { get; set; } = 0;
 
         // 通道
-        public string Way { get; set; } = "";
+        public string Way { get; set; } = string.Empty;
 
         // 审核状态
-        public string Review { get; set; } = "";
+        public string Review { get; set; } = string.Empty;
 
         // 转账状态
-        public string Transfer { get; set; } = "";
+        public string Transfer { get; set; } = string.Empty;
 
         // 操作类型
-        public string Operating { get; set; } = "";
+        public string Operating { get; set; } = string.Empty;
 
         // 操作人
-        public string Operator { get; set; } = "";
+        public string Operator { get; set; } = string.Empty;
 
         // 提现备注
-        public string Remark { get; set; } = "";
+        public string Remark { get; set; } = string.Empty;
 
         // 订单状态
-        public string Status { get; set; } = "";
+        public string Status { get; set; } = string.Empty;
+
+
+        public bool Pass { get; set; }
+        public string ReviewMsg { get; set; } = string.Empty;
+        public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
         public Order()
         {
         }
 
-        public static string[] Heads = new string[] {"", "订单号" , "发起时间", "到账时间", "游戏ID",
+        public string ReviewNote()
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            sb.Append("order:").AppendLine(OrderID);
+            if (Pass)
+            {
+                sb.AppendLine("pass:true");
+            }
+            else
+            {
+                sb.AppendLine("pass:false");
+            }
+            if (!string.IsNullOrEmpty(ReviewMsg))
+            {
+                sb.Append("msg:").AppendLine(ReviewMsg);
+            }
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    sb.Append("code:").Append(r.Code).Append(";msg:").AppendLine(r.Msg);
+                }
+            }
+            var m = sb.ToString();
+            return m;
+        }
+
+
+        public static string[] Heads = new string[] {string.Empty, "订单号" , "发起时间", "到账时间", "游戏ID",
             "用户昵称", "提现金额", "通道", "状态", "转账", "操作类型", "操作人", "提现备注", "操作" };
 
         public static Order Create(IWebElement element, IWebElement rowEx)

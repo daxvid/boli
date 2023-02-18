@@ -7,22 +7,22 @@ namespace boin
     public class GameLog
     {
         // 编号ID
-        public string LogId { get; set; } = "";
+        public string LogId { get; set; } = string.Empty;
 
         // 游戏ID	
-        public string GameId { get; set; } = "";
+        public string GameId { get; set; } = string.Empty;
 
         // 游戏平台	
-        public string GamePlatform { get; set; } = "";
+        public string GamePlatform { get; set; } = string.Empty;
 
         // 单号
-        public string No { get; set; } = "";
+        public string No { get; set; } = string.Empty;
 
         // 游戏名
-        public string GameName { get; set; } = "";
+        public string GameName { get; set; } = string.Empty;
 
         // 操作时间
-        public string OpTime { get; set; } = "";
+        public string OpTime { get; set; } = string.Empty;
 
         // 下注总金额
         public Decimal TotalBet { get; set; } 
@@ -37,13 +37,13 @@ namespace boin
         public Decimal Tip { get; set; }
 
         // 取消下注
-        public string CancelBet { get; set; } = "";
+        public string CancelBet { get; set; } = string.Empty;
 
         public GameLog()
         {
         }
 
-        public static string[] Heads = new string[] {"", "编号ID" , "游戏ID", "游戏平台", "单号",
+        public static string[] Heads = new string[] {string.Empty, "编号ID" , "游戏ID", "游戏平台", "单号",
             "游戏名", "操作时间", "下注总金额", "中奖金额", "有效下注", "小费", "取消下注", "操作" };
 
         public static GameLog Create(IWebElement element)

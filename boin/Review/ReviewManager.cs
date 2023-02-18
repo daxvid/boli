@@ -3,38 +3,77 @@ namespace boin.Review
 {
 	public class ReviewManager
 	{
-        static List<IReviewInterface> reviews = new List<IReviewInterface>();
+        List<IReviewUser> userReviews = new List<IReviewUser>();
+        List<IReviewOrder> orderReviews = new List<IReviewOrder>();
 
-		static ReviewManager()
+        //public 
+
+        public ReviewManager(string cnfFile)
 		{
-			reviews.Add(new BankCardReview());
-            reviews.Add(new WithdrwReview());
-            reviews.Add(new RechargeReview());
-            reviews.Add(new GameReview());
+            ReviewConfig cnf = ReviewConfig.FromYamlFile(cnfFile);
+
+            orderReviews.Add(new BankCardReview(cnf));
+            orderReviews.Add(new AmountReview(cnf));
+
+            userReviews.Add(new BankCardReview(cnf));
+            userReviews.Add(new AmountReview(cnf));
+            userReviews.Add(new WithdrwReview(cnf));
+            userReviews.Add(new RechargeReview(cnf));
+            userReviews.Add(new GameReview(cnf));
         }
 
-        // 审核
-        public static bool Review(User user)
+        // 审核提现单
+        public bool Review(Order order)
+        {
+            var results = new List<ReviewResult>();
+            foreach (var review in orderReviews)
+            {
+                var rs = review.Review(order);
+                if (rs != null && rs != ReviewResult.Empty)
+                {
+                    results.AddRange(rs);
+                    foreach (var r in rs)
+                    {
+                        // 代码为负，强制中断
+                        if (r.Code < 0)
+                        {
+                            order.ReviewResult = results;
+                            return false;
+                        }
+                    }
+                }
+            }
+            order.Pass = true;
+            order.ReviewResult = results;
+            return true;
+        }
+
+        // 审核用户
+        public bool Review(User user)
 		{
 			List<ReviewResult> results = new List<ReviewResult>();
-			foreach (var review in reviews)
+			foreach (var review in userReviews)
 			{
-				var rs = review.Review(user, user.Order);
-				results.AddRange(rs);
-				foreach (var r in rs)
-				{
-					// 代码为负，强制中断
-					if (r.Code < 0)
-					{
-						user.ReviewResult = results;
-                        return false;
-					}
-				}
+				var rs = review.Review(user);
+                if (rs != null && rs != ReviewResult.Empty)
+                {
+                    results.AddRange(rs);
+                    foreach (var r in rs)
+                    {
+                        // 代码为负，强制中断
+                        if (r.Code < 0)
+                        {
+                            user.ReviewResult = results;
+                            return false;
+                        }
+                    }
+                }
 			}
 			user.Pass = true;
             user.ReviewResult = results;
 			return true;
 		}
+
     }
 }
 

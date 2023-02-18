@@ -35,25 +35,25 @@ namespace boin.Bot
             this.api = client;
             ThreadPool.QueueUserWorkItem(state =>
             {
-                SendMessage("start tg:" + DateTime.Now.ToString("yyyy-MM-dd hh::mm:ss"));
+                SendMessage("start bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
                 while (true)
                 {
                     try
                     {
-                        run(api);
+                        update(client);
                     }
                     catch
                     {
                         client = new BotClient(cnf.BotToken);
                         this.api = client;
-                        SendMessage("restart tg:" + DateTime.Now.ToString("yyyy-MM-dd hh::mm:ss"));
-                        run(client);
+                        SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
+                        update(client);
                     }
                 }
             });
         }
 
-        void run(BotClient client)
+        static void update(BotClient client)
         {
             var updates = client.GetUpdates();
             while (true)
@@ -62,8 +62,11 @@ namespace boin.Bot
                 {
                     foreach (var update in updates)
                     {
-                        long chatId = update.Message.Chat.Id; // Target chat Id
-                        client.SendMessage(chatId, "ok" + chatId.ToString());
+                        if (update.Message != null && update.Message.Chat != null)
+                        {
+                            long chatId = update.Message.Chat.Id; // Target chat Id
+                            client.SendMessage(chatId, "ok" + chatId.ToString());
+                        }
                     }
                     var offset = updates.Last().UpdateId + 1;
                     updates = client.GetUpdates(offset);
@@ -85,7 +88,14 @@ namespace boin.Bot
 
         public static void SendMsg(string msg)
         {
-            instance.SendMessage(msg);
+            try
+            {
+                instance.SendMessage(msg);
+            }
+            catch
+            {
+
+            }
         }
 
     }

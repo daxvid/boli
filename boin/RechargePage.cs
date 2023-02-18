@@ -12,8 +12,9 @@ namespace boin
 
         string gameId;
         string path;
-        public RechargePage(ChromeDriver driver, string gameId) : base(driver)
+        public RechargePage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
         {
+            this.maxPage = cnf.RechargeMaxPage;
             this.gameId = gameId;
             this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
 

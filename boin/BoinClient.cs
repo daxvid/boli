@@ -8,29 +8,33 @@ using OpenQA.Selenium.DevTools;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using TwoStepsAuthenticator;
-using static System.Collections.Specialized.BitVector32;
 
 namespace boin
 {
     public class BoinClient: PageBase
     {
-        AppConfig cnf;
+        ReviewManager reviewer;
+
         TimeAuthenticator authenticator;
 
-        public BoinClient(AppConfig cnf) : base(newDriver())
+        public BoinClient(AppConfig cnf) : base(newDriver(cnf.Headless), cnf)
         {
             this.cnf = cnf;
+            this.reviewer = new ReviewManager(cnf.ReviewFile);
             this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
         }
 
 
-        static ChromeDriver newDriver()
+        static ChromeDriver newDriver(bool headless)
         {
             var op = new ChromeOptions();
 
-            // 为Chrome配置无头模式
-            op.AddArgument("--headless");
-            op.AddArgument("window-size=1920,1080");
+            if (headless)
+            {
+                // 为Chrome配置无头模式
+                op.AddArgument("--headless");
+                op.AddArgument("window-size=1920,1080");
+            }
 
             //op.AddAdditionalChromeOption("excludeSwitches", new string[] { "enable-automation"});
             //op.AddAdditionalChromeOption("useAutomationExtension", false);
@@ -39,6 +43,7 @@ namespace boin
             //var session = ((IDevTools)driver).GetDevToolsSession();
             return driver;
         }
+
 
         // 登录
         public bool Login()
@@ -60,6 +65,7 @@ namespace boin
             }
             return false;
         }
+
 
         private bool login(int i)
         {
@@ -84,13 +90,13 @@ namespace boin
                 var txt = e.Text;
                 if (txt.Contains("登入成功"))
                 {
-                    SendMsg(txt);
+                    SendMsg("登入成功:" + cnf.UserName);
                     return true;
                 }
             }
             catch (WebDriverTimeoutException)
             {
-                SendMsg("登入超时："+ i.ToString());
+                SendMsg("登入超时:" + cnf.UserName + "_" + i.ToString());
             }
             return false;
         }
@@ -99,17 +105,18 @@ namespace boin
         public void Run()
         {
 
-            //{   //test3
+            //{   //test1
             //    Recharge.GetRechargeName("OR1676436469554825");
             //}
-            //{   // test1
+            //{   // test2
             //    var testCard = "6222801251011210972";
             //    //var c = BankUtil.Chenk(testCard);
             //    var d = BankUtil.GetBankInfo(testCard);
             //}
 
             this.Login();
-            //{   // test 2
+
+            //{   // test3
             //    var userPage2 = new UserPage(driver);
             //    userPage2.Open();
             //    userPage2.Select("325961309");   // 325961309
@@ -117,16 +124,29 @@ namespace boin
 
 
             {   // run 
-                var orderPage = new OrderPage(driver);
+                var orderPage = new OrderPage(driver, cnf);
                 orderPage.Open();
 
-                orderPage.Select(12);
+                orderPage.Select(cnf.OrderHour);
                 var orders = orderPage.ReadTable();
 
-                var userPage = new UserPage(driver);
-                userPage.Open();
+                var passOrders = new List<Order>(orders.Count);
+                foreach(var order in orders)
+                {
+                    if (reviewer.Review(order))
+                    {
+                        passOrders.Add(order);
+                    }
+                    else
+                    {
+                        // TODO:
+                    }
+                    SendMsg(order.ReviewNote());
+                }
 
-                userPage.Select(orders);
+                var userPage = new UserPage(driver,cnf, reviewer);
+                userPage.Open();
+                userPage.Select(passOrders);
             }
         }
 
@@ -134,5 +154,6 @@ namespace boin
         {
             driver.Quit();
         }
+
     }
 }

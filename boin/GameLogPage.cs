@@ -11,8 +11,9 @@ namespace boin
     {
         string gameId;
         string path;
-        public GameLogPage(ChromeDriver driver, string gameId) : base(driver)
+        public GameLogPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
         {
+            this.maxPage = cnf.GameLogMaxPage;
             this.gameId = gameId;
             this.path = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
         }

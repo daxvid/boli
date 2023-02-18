@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.DevTools;
@@ -7,30 +9,33 @@ namespace boin
 {
     public class User
     {
-
         // 商户
-        public string Merchant { get; set; } = "";
+        public string Merchant { get; set; } = string.Empty;
 
         // AppId
-        public string AppId { get; set; } = "";
+        public string AppId { get; set; } = string.Empty;
 
         // 游戏ID
-        public string GameId { get; set; } = "";
+        public string GameId { get; set; } = string.Empty;
 
         // 昵称
-        public string NickName { get; set; } = "";
+        public string NickName { get; set; } = string.Empty;
 
         // 等级
-        public string Level { get; set; } = "";
+        public string Level { get; set; } = string.Empty;
 
         // 设备
-        public string Device { get; set; } = "";
+        public string Device { get; set; } = string.Empty;
+
+        // 注册时间
+        public DateTime Created { get; set; }
 
         public GameInfo GameInfo { get; set; }
         public Funding Funding { get; set; }
 
         public Order Order { get; set; }
         public bool  Pass { get; set; }
+        public string ReviewMsg { get; set; } = string.Empty;
         public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
         public static string[] Heads = new string[] { "商户" , "用户信息", "等级/设备", "余额", "金流", "贵族",
@@ -39,6 +44,40 @@ namespace boin
 		public User()
 		{
 		}
+
+        public bool IsNewUser()
+        {
+            var day = DateTime.Now.Subtract(this.Created).TotalDays;
+            return day < 30;
+        }
+
+        public string ReviewNote()
+        {
+            StringBuilder sb = new StringBuilder(1024);
+            sb.Append("order:").AppendLine(Order.OrderID);
+            sb.Append("user:").AppendLine(this.GameId);
+            if (Pass)
+            {
+                sb.AppendLine("pass:true");
+            }
+            else
+            {
+                sb.AppendLine("pass:false");
+            }
+            if (!string.IsNullOrEmpty(ReviewMsg))
+            {
+                sb.Append("msg:").AppendLine(ReviewMsg);
+            }
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    sb.Append("code:").Append(r.Code).Append(";msg:").AppendLine(r.Msg);
+                }
+            }
+            var m = sb.ToString();
+            return m;
+        }
 
         public static User Create(IWebElement element)
         {
@@ -54,14 +93,26 @@ namespace boin
                 user.Merchant = ts[0].Text.Trim(); // 商户
 
                 // 用户信息
-                IWebElement userInfo = ts[1]; // 用户信息;
-                var spans = userInfo.FindElements(By.XPath(".//div/div/span"));
-
+                var spans = ts[1].FindElements(By.XPath(".//div/div/span"));
                 user.AppId = spans[1].Text;
                 user.GameId = spans[2].Text;
 
-                span.Msg = "用户:" + user.GameId;
+                // 注册时间/最后上线
+                var c = ts[7].FindElement(By.XPath(".//div/div/span[1]"));
+                var str = c.Text;
+                var now = DateTime.Now;
+                user.Created = now;
+                for (var year = now.Year; year >= 2022; year--)
+                {
+                    DateTime d = DateTime.ParseExact(year + "/" + str, "yyyy/MM/dd HH:mm:ss", CultureInfo.CurrentCulture);
+                    if (d < now)
+                    {
+                        user.Created = d;
+                        break;
+                    }
+                }
 
+                span.Msg = "用户:" + user.GameId;
                 return user;
             }
         }

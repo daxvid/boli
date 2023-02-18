@@ -7,7 +7,7 @@ namespace boin
 {
     public class OrderPage : PageBase
     {
-        public OrderPage(ChromeDriver driver) : base(driver)
+        public OrderPage(ChromeDriver driver, AppConfig cnf) : base(driver,cnf)
         {
         }
 

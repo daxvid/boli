@@ -1,15 +1,27 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 
 namespace boin.Review
 {
-	public class WithdrwReview : IReviewInterface
+    // 审核之前的提现
+	public class WithdrwReview : IReviewUser
     {
-		public WithdrwReview()
-		{
-		}
-
-        public List<ReviewResult> Review(User user, Order order)
+        ReviewConfig cnf;
+        public WithdrwReview(ReviewConfig cnf)
         {
+            this.cnf = cnf;
+        }
+
+
+        public ReadOnlyCollection<ReviewResult> Review(Order order)
+        {
+            return ReviewResult.Empty;
+        }
+
+
+        public ReadOnlyCollection<ReviewResult> Review(User user)
+        {
+            Order order = user.Order;
             List<ReviewResult> rs = new List<ReviewResult>();
 
             // 当前提现金额大于指定额度
@@ -27,9 +39,7 @@ namespace boin.Review
             {
                 rs.Add(new ReviewResult { Code = 201, Msg = "@当日提现" + amount + ">" + maxDayAmount.ToString() });
             }
-
-   
-            return rs;
+            return new ReadOnlyCollection<ReviewResult>(rs);
         }
     }
 }

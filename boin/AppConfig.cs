@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
@@ -12,8 +13,27 @@ namespace boin
         public string Password { get; set; }
         public string GoogleKey { get; set; }
 
+        // Telegram
         public string BotToken { get; set; }
         public List<long> ChatIds;
+
+        // Chrome
+        public bool Headless { get; set; }
+
+        // 订单时间小时
+        public int OrderHour { get; set; }
+
+        // 审核配置文件
+        public string ReviewFile { get; set; }
+
+        // 提现最多读取页数
+        public int WithdrawMaxPage { get; set; }
+
+        // 充值最多读取页数
+        public int RechargeMaxPage { get; set; }
+
+        // 游戏记录最多读取页数
+        public int GameLogMaxPage { get; set; }
 
         public AppConfig()
         {
@@ -21,10 +41,10 @@ namespace boin
 
         public static AppConfig FromYamlFile(string path)
         {
-            string yml = System.IO.File.ReadAllText(path);
+            string yml = File.ReadAllText(path);
             var deserializer = new DeserializerBuilder().Build();
-            var p = deserializer.Deserialize<AppConfig>(yml);
-            return p;
+            var cnf = deserializer.Deserialize<AppConfig>(yml);
+            return cnf;
         }
 
         public static void Test()

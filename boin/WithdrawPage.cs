@@ -11,8 +11,9 @@ namespace boin
     {
         string gameId;
         string path;
-        public WithdrawPage(ChromeDriver driver, string gameId) : base(driver)
+        public WithdrawPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
         {
+            this.maxPage = cnf.WithdrawMaxPage;
             this.gameId = gameId;
             this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
 

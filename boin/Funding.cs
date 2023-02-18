@@ -28,7 +28,7 @@ namespace boin
         public decimal ChargeCustomerLoss { get; set; }
 
         // 优惠赠送
-        public string Offers { get; set; } = "";
+        public string Offers { get; set; } = string.Empty;
 
         // 返利 rebate
         public decimal Rebate { get; set; }

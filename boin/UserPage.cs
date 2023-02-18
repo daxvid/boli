@@ -12,9 +12,11 @@ namespace boin
 {
     public class UserPage : PageBase
     {
+        ReviewManager reviewer;
 
-        public UserPage(ChromeDriver driver) : base(driver)
+        public UserPage(ChromeDriver driver, AppConfig cnf, ReviewManager reviewer) : base(driver, cnf)
         {
+            this.reviewer = reviewer;
         }
 
 
@@ -28,7 +30,7 @@ namespace boin
         {
             List<User> users = new List<User>();
             List<User> tmp = new List<User>();
-            for(int i=0; i< orders.Count;i++)
+            for (int i = 0; i < orders.Count; i++)
             {
                 var order = orders[i];
                 var msg = "no:" + i.ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
@@ -126,7 +128,7 @@ namespace boin
             //// fix head
             //for (var i = 0; i < User.Heads.Length && i < head.Count; i++)
             //{
-            //    if (head[i].Name == "")
+            //    if (head[i].Name == string.Empty)
             //    {
             //        head[i].Name = User.Heads[i];
             //    }
@@ -207,7 +209,7 @@ namespace boin
                 var xpath = "(//div[@id='timeListBox']/div/div[2]/button[3]/span[text()='概况']/..)[" + (i + 1).ToString() + "]";
                 if (TryClickByXPath(xpath, 2000))
                 {
-                    using (FundingPage gl = new FundingPage(driver, user.GameId))
+                    using (FundingPage gl = new FundingPage(driver, cnf, user.GameId))
                     {
                         user.Funding = gl.Select();
                         return true;
@@ -226,7 +228,7 @@ namespace boin
                 var xpath = "(//div[@id='timeListBox']/div/div[2]/button[4]/span[text()='注单']/..)[" + (i + 1).ToString() + "]";
                 if (TryClickByXPath(xpath, 2000))
                 {
-                    using (GameLogPage gl = new GameLogPage(driver, user.GameId))
+                    using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
                     {
                         user.GameInfo = gl.Select();
                     }
@@ -247,7 +249,7 @@ namespace boin
 
         private bool Review(User user)
         {
-           bool r = ReviewManager.Review(user);
+            bool r = reviewer.Review(user);
             // 通过
             if (r)
             {

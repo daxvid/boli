@@ -10,49 +10,49 @@ namespace boin
     {
 
         // 游戏ID	
-        public string GameId { get; set; } = "";
+        public string GameId { get; set; } = string.Empty;
 
         // 用户昵称
-        public string Nickname { get; set; } = "";
+        public string Nickname { get; set; } = string.Empty;
 
         // 存款人	
-        public string Depositor { get; set; } = "";
+        public string Depositor { get; set; } = string.Empty;
 
         // 订单号
-        public string OrderId { get; set; } = "";
+        public string OrderId { get; set; } = string.Empty;
 
         // 外部订单号
-        public string OutsideOrderId { get; set; } = "";
+        public string OutsideOrderId { get; set; } = string.Empty;
 
         // 充值金额
         public Decimal RechargeAmount { get; set; }
 
         // 首充
-        public string FirstRecharge { get; set; } = "";
+        public string FirstRecharge { get; set; } = string.Empty;
 
         // 实际到账金额
         public Decimal ActualAmount { get; set; }
 
         // 充值类型
-        public string RechargeType { get; set; } = "";
+        public string RechargeType { get; set; } = string.Empty;
 
         // 充值接口
-        public string RechargeChannel { get; set; } = "";
+        public string RechargeChannel { get; set; } = string.Empty;
 
         // VIP期数
-        public string VipPeriod { get; set; } = "";
+        public string VipPeriod { get; set; } = string.Empty;
 
         // 小费
         public Decimal Tip { get; set; }
 
         // 取消下注
-        public string CancelBet { get; set; } = "";
+        public string CancelBet { get; set; } = string.Empty;
 
         // 时间
         public DateTime Created { get; set; }
 
         // 说明
-        public string Mark { get; set; } = "";
+        public string Mark { get; set; } = string.Empty;
 
         public Recharge()
         {
@@ -68,7 +68,7 @@ namespace boin
         // 同步姓名
         private void syncName()
         {
-            if (Interlocked.CompareExchange(ref sync, 0, 1) == 0)
+            if (Interlocked.CompareExchange(ref sync, 1, 0) == 0)
             {
                 if ((string.IsNullOrEmpty(this.Depositor))
                     && (this.RechargeChannel.Contains("银联") && this.RechargeChannel.Contains("四方")))

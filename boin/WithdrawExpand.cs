@@ -6,13 +6,13 @@ namespace boin
     public class WithdrawExpand
     {
         // 支付渠道
-        public string PayWay { get; set; } = "";
+        public string PayWay { get; set; } = string.Empty;
 
         // 实名
-        public string Name { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
 
         // 账号/卡号
-        public string CardNo { get; set; } = "";
+        public string CardNo { get; set; } = string.Empty;
 
         // 手续费
         public decimal Gas { get; set; } = 0;
@@ -21,16 +21,16 @@ namespace boin
         public decimal ActualAmount { get; set; } = 0;
 
         // 转账订单号
-        public string TransferOrderId { get; set; } = "";
+        public string TransferOrderId { get; set; } = string.Empty;
 
         // 拒绝理由
-        public string Reasons { get; set; } = "";
+        public string Reasons { get; set; } = string.Empty;
 
         // 请求错误信息
-        public string RequestError { get; set; } = "";
+        public string RequestError { get; set; } = string.Empty;
 
         // 用户显示错误
-        public string UserError { get; set; } = "";
+        public string UserError { get; set; } = string.Empty;
 
         public WithdrawExpand()
         {

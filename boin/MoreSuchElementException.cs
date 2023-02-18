@@ -7,11 +7,11 @@ namespace boin
 	public class MoreSuchElementException: Exception
     {
         public By By { get; set; }
-        public ReadOnlyCollection<IWebElement> Es { get; set; }
+        public ReadOnlyCollection<IWebElement> Elemens { get; set; }
 
         public MoreSuchElementException(By by, string msg, ReadOnlyCollection<IWebElement> es):base(msg)
 		{
-            Es = es;
+            Elemens = es;
             By = by;
         }
 	}

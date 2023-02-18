@@ -10,40 +10,40 @@ namespace boin
     public class Withdraw : WithdrawExpand
     {
         // 订单号
-        public string OrderID { get; set; } = "";
+        public string OrderID { get; set; } = string.Empty;
 
         // 发起时间
-        public string Created { get; set; } = "";
+        public string Created { get; set; } = string.Empty;
 
         // 到账时间
-        public string TimeToAccount { get; set; } = "";
+        public string TimeToAccount { get; set; } = string.Empty;
 
         // 游戏ID
-        public string GameId { get; set; } = "";
+        public string GameId { get; set; } = string.Empty;
 
         // 昵称
-        public string NickName { get; set; } = "";
+        public string NickName { get; set; } = string.Empty;
 
         // 提现金额
         public decimal Amount { get; set; } = 0;
 
         // 通道
-        public string Way { get; set; } = "";
+        public string Way { get; set; } = string.Empty;
 
         // 审核状态
-        public string Review { get; set; } = "";
+        public string Review { get; set; } = string.Empty;
 
         // 转账状态
-        public string Transfer { get; set; } = "";
+        public string Transfer { get; set; } = string.Empty;
 
         // 操作类型
-        public string Operating { get; set; } = "";
+        public string Operating { get; set; } = string.Empty;
 
         public Withdraw()
         {
         }
 
-        public static string[] Heads = new string[] {"", "订单号" , "发起时间", "到账时间", "游戏ID", "用户昵称", "提现金额",
+        public static string[] Heads = new string[] {string.Empty, "订单号" , "发起时间", "到账时间", "游戏ID", "用户昵称", "提现金额",
             "通道", "状态", "转账", "操作类型"};
 
 

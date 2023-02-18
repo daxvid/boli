@@ -12,7 +12,7 @@ namespace boin
     {
         string gameId;
         string path;
-        public FundingPage(ChromeDriver driver, string gameId) : base(driver)
+        public FundingPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver,cnf)
         {
             this.gameId = gameId;
             this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
@@ -79,7 +79,7 @@ namespace boin
             //读取充值明细
             if (TryClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a"))
             {
-                using (var rg = new RechargePage(driver, gameId))
+                using (var rg = new RechargePage(driver, cnf,gameId))
                 {
                     var recharegeLogs = rg.Select();
                     fund.RechargeLog = recharegeLogs;
@@ -90,7 +90,7 @@ namespace boin
             table = getCurrentTable();
             tbox = FindElementByXPath(table,tboxPath);
             TryClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a");
-            using (var wg = new WithdrawPage(driver, gameId))
+            using (var wg = new WithdrawPage(driver, cnf, gameId))
             {
                 var withdrawLogs = wg.Select();
                 fund.WithdrawLog = withdrawLogs;

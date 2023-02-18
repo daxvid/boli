@@ -14,11 +14,13 @@ namespace boin
         protected ChromeDriver driver;
         protected WebDriverWait wait;
         protected int maxPage = 4;
+        protected AppConfig cnf;
 
         public static readonly ReadOnlyCollection<IWebElement> EmptyElements = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
-        public PageBase(ChromeDriver driver)
+        public PageBase(ChromeDriver driver, AppConfig cnf)
         {
+            this.cnf = cnf;
             this.driver = driver;
             this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
         }
