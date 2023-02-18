@@ -249,18 +249,33 @@ namespace boin
 
         private bool Review(User user)
         {
-            bool r = reviewer.Review(user);
+            bool noFaile = reviewer.Review(user);
             // 通过
-            if (r)
+            if (noFaile)
             {
+                bool pass = true;
+                foreach(var v in user.ReviewResult)
+                {
+                    if (v.Code > 0)
+                    {
+                        pass = false;
+                        break;
+                    }
+                }
+                if (pass)
+                {
 
+                }
+                else
+                {
+                    // 待定，进入人工
+                }
             }
-            // 
             else
             {
-
+                // 可以拒绝
             }
-            return r;
+            return noFaile;
         }
     }
 }

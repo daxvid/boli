@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Telegram.BotAPI.Games;
 
 namespace boin.Review
 {
@@ -21,6 +22,7 @@ namespace boin.Review
             var ac = cnf.GetAmountConfig(order.Way, isNew);
 
             // 检查用户玩的游戏
+            bool pass = true;
             if (user.GameInfo.GameLogs != null)
             {
                 foreach(var g in user.GameInfo.GameLogs)
@@ -29,9 +31,14 @@ namespace boin.Review
                     if (!string.IsNullOrEmpty(game))
                     {
                         rs.Add(new ReviewResult { Code = -301, Msg = "@游戏:" + game });
+                        pass = false;
                         break;
                     }
                 }
+            }
+            if (pass)
+            { 
+                rs.Add(new ReviewResult { Msg = "@游戏通过"});
             }
             return new ReadOnlyCollection < ReviewResult >(rs);
         }

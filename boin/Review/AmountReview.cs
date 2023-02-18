@@ -76,8 +76,9 @@ namespace boin.Review
             {
                 return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
             }
-            return null;
+            return (new ReviewResult { Msg = "@单笔限制通过" + max + ":" + amount });
         }
+
 
 
         ReviewResult checkDayMax(string way, decimal max, decimal amount)
@@ -103,7 +104,7 @@ namespace boin.Review
             {
                 return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
             }
-            return null;
+            return (new ReviewResult { Msg = "@当日限制通过" + max + ":" + amount });
         }
 
 

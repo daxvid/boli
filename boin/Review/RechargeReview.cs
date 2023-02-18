@@ -18,20 +18,44 @@ namespace boin.Review
             List<ReviewResult> rs = new List<ReviewResult>();
             var f = user.Funding.Nearly2Months;
 
-            //if (order.Way == "银行卡")
-            //{
-            //    // 检查银行卡姓名充值是否一致
-            //    var tr = f.TotalRechargeAmount(order.Name);
-            //    if (tr <= 0)
-            //    {
-            //        rs.Add(new ReviewResult { Code = 100, Msg = "@未充值:" + order.Name });
-            //    }
-            //    else if (tr < order.Amount)
-            //    {
-            //        rs.Add(new ReviewResult { Code = 101, Msg = "@充值:" + order.Name + "]" });
-            //    }
-            //}
-
+            if (order.Way == "银行卡")
+            {
+                // 检查银行卡姓名充值是否一致
+                var t2 = f.OtherRechargeAmount(order.Name);
+                if (t2 > 0)
+                {
+                    var name = f.OtherRechargeName(order.Name);
+                    rs.Add(new ReviewResult { Code = -401, Msg = "@其它名字充值:" + name });
+                }
+                else
+                {
+                    var t1 = f.TotalRechargeAmount(order.Name);
+                    if (t1 <= 0)
+                    {
+                        rs.Add(new ReviewResult { Code = -402, Msg = "@最近无充值:" + order.Name });
+                    }
+                    else if (t1 < order.Amount)
+                    {
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值:" + order.Name + "]" });
+                    }
+                    else
+                    {
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值通过:" + order.Name + "]" });
+                    }
+                }
+            }
+            else
+            {
+                var name = f.OtherRechargeName(string.Empty);
+                if (string.IsNullOrEmpty(name))
+                {
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@波币充值通过:" + order.Name + "]" });
+                }
+                else
+                {
+                    rs.Add(new ReviewResult { Code = -402, Msg = "@其它名字充值:" + name });
+                }
+            }
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
 

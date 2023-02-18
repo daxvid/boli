@@ -30,17 +30,18 @@ namespace boin.Review
                 }
                 if (bankInfo.key != order.CardNo)
                 {
-                    rs.Add(new ReviewResult { Code = 101, Msg = "@卡待定:" + order.CardNo });
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@卡待定:" + order.CardNo });
                 }
                 else
                 {
                     string bankname = BankUtil.GetNameOfBank(bankInfo.bank);
-                    rs.Add(new ReviewResult { Code = 102, Msg = "@卡正确:" + bankname });
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@卡正确:" + bankname });
                 }
             }
             else if (order.Way == "数字钱包")
             {
                 // TODO: 检查地址格式
+                rs.Add(new ReviewResult { Code = 0, Msg = "@数字钱包正确:" + order.CardNo });
             }
             else
             {

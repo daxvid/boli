@@ -152,13 +152,40 @@ namespace boin
             decimal total = 0;
             foreach (var r in RechargeLog)
             {
-                if (string.IsNullOrEmpty(name) || r.Depositor == name)
+                if (string.IsNullOrEmpty(r.Depositor) || r.Depositor == name)
                 {
                     total += r.RechargeAmount;
                 }
             }
             return total;
         }
+
+        // 其它充值金额
+        public decimal OtherRechargeAmount(string name)
+        {
+            decimal total = 0;
+            foreach (var r in RechargeLog)
+            {
+                if ((!string.IsNullOrEmpty(r.Depositor)) && r.Depositor!= name)
+                {
+                    total += r.RechargeAmount;
+                }
+            }
+            return total;
+        }
+
+        public string OtherRechargeName(string name)
+        {
+            foreach (var r in RechargeLog)
+            {
+                if ((!string.IsNullOrEmpty(r.Depositor)) && (r.Depositor != name))
+                {
+                    return r.Depositor;
+                }
+            }
+            return string.Empty;
+        }
+
     }
 
     // 资金情况
