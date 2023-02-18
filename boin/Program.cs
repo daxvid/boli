@@ -1,13 +1,16 @@
 ﻿namespace boin;
+using boin.Bot;
 using boin.Review;
 
 class Program
 {
     static void Main(string[] args)
     {
-        TelegramBot.Run(Auth.BotToken, Auth.ChatId);
+        AppConfig cnf = AppConfig.FromYamlFile("app.yaml");
 
-        BoinClient client = new BoinClient(Auth.Home, Auth.UserName, Auth.Password, Auth.GoogleKey);
+        TelegramBot.Instance.Run(cnf);
+
+        BoinClient client = new BoinClient(cnf);
         client.Run();
 
         var s = Console.ReadKey(true).KeyChar;

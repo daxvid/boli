@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Reflection.Emit;
+using boin.Bot;
 using boin.Review;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -331,7 +332,7 @@ namespace boin
         public virtual void SendMsg(string msg)
         {
             Console.WriteLine(msg);
-            TelegramBot.SendMessage(msg);
+            TelegramBot.SendMsg(msg);
         }
 
 

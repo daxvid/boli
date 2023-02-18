@@ -14,25 +14,13 @@ namespace boin
 {
     public class BoinClient: PageBase
     {
-        string home = "";
-        string userName = "";
-        string password = "";
-        string googleKey = "";
+        AppConfig cnf;
+        TimeAuthenticator authenticator;
 
-
-        TimeAuthenticator authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-
-        public BoinClient():base(newDriver())
+        public BoinClient(AppConfig cnf) : base(newDriver())
         {
-        }
-
-        public BoinClient(string home, string userName, string pwd, string googleKey):this()
-        {
-            this.home = home;
-            this.userName = userName;
-            this.password = pwd;
-            this.googleKey = googleKey;
-
+            this.cnf = cnf;
+            this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
         }
 
 
@@ -55,14 +43,14 @@ namespace boin
         // 登录
         public bool Login()
         {
-            driver.Navigate().GoToUrl(home);
+            driver.Navigate().GoToUrl(cnf.Home);
             // //*[@id="logins"]/div/form/div[1]/div/div/input
             var namePath = "//div[@id=\"logins\"]/div/form/div[1]/div/div/input[@type='text' and @placeholder='请输入账号']";
-            SetTextElementByXPath(namePath, userName);
+            SetTextElementByXPath(namePath, cnf.UserName);
 
             // //*[@id="logins"]/div/form/div[2]/div/div/input
             var pwdPath = "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
-            SetTextElementByXPath(pwdPath, password);
+            SetTextElementByXPath(pwdPath, cnf.Password);
             for (var i = 1; i < 1000; i++)
             {
                 if (login(i))
@@ -76,7 +64,7 @@ namespace boin
         private bool login(int i)
         {
             // google认证
-            var code = authenticator.GetCode(googleKey);
+            var code = authenticator.GetCode(cnf.GoogleKey);
             // //*[@id="logins"]/div/form/div[3]/div/div/input
             var glPath = "//div[@id=\"logins\"]/div/form/div[3]/div/div/input";
             var googlePwd = SetTextElementByXPath(glPath, code);

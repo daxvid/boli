@@ -29,3 +29,6 @@ boin/obj/Debug/net7.0/boin.GlobalUsings.g.cs
 boin/obj/project.assets.json
 boin/obj/project.nuget.cache
 .vs/boin/xs/project-cache/BankCardValidation-Debug.json
+boin/app.yaml
+boin/bin/Debug/net7.0/app.yaml
+*.yaml
