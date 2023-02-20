@@ -74,6 +74,7 @@ namespace boin.Bot
                 else
                 {
                     updates = client.GetUpdates();
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -88,13 +89,16 @@ namespace boin.Bot
 
         public static void SendMsg(string msg)
         {
-            try
+            lock (instance)
             {
-                instance.SendMessage(msg);
-            }
-            catch
-            {
+                try
+                {
+                    instance.SendMessage(msg);
+                }
+                catch
+                {
 
+                }
             }
         }
 

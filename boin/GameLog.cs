@@ -64,10 +64,10 @@ namespace boin
                 log.No = ts[4].Text.Trim(); //单号
                 log.GameName = ts[5].Text.Trim(); //游戏名
                 log.OpTime = ts[6].Text.Trim(); //操作时间
-                log.TotalBet = decimal.Parse(ts[7].Text.Trim()); //下注总金额
-                log.TotalWin = decimal.Parse(ts[8].Text.Trim()); //中奖金额
-                log.ValidBet = decimal.Parse(ts[9].Text.Trim()); //有效下注
-                log.Tip = decimal.Parse(ts[10].Text.Trim()); //小费
+                log.TotalBet =  Helper.ReadDecimal(ts[7]); //下注总金额
+                log.TotalWin = Helper.ReadDecimal(ts[8]); //中奖金额
+                log.ValidBet = Helper.ReadDecimal(ts[9]); //有效下注
+                log.Tip = Helper.ReadDecimal(ts[10]); //小费
                 log.CancelBet = ts[11].Text.Trim(); //取消下注
 
                 span.Msg = "游志:" + log.LogId;

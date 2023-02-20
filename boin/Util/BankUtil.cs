@@ -40,9 +40,9 @@ namespace boin.Util
     };
 
         static Dictionary<string, string> bankDic = new Dictionary<string, string>();
-        static  BankUtil()
+        static BankUtil()
         {
-            for(var i=0; i< bankBin.Length; i++)
+            for (var i = 0; i < bankBin.Length; i++)
             {
                 bankDic.Add(bankBin[i], bankName[i]);
             }
@@ -63,15 +63,25 @@ namespace boin.Util
         public static BankCardInfo GetBankInfo(string cardNo)
         {
             string url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=" + cardNo;
+            string content = string.Empty;
             try
             {
-                // 创建HttpClient实例
-                var client = new RestClient(url);
-                var request = new RestRequest();
-                request.Method = Method.Get;
-                request.AddHeader("Accept", "application/json");
-                var response = client.Execute(request);
-                var content = response.Content; // raw content as string  
+                for (var i = 0; i < 4; i++)
+                {
+                    // 创建HttpClient实例
+                    var client = new RestClient(url);
+                    var request = new RestRequest();
+                    request.Method = Method.Get;
+                    request.AddHeader("Accept", "application/json");
+                    var response = client.Execute(request);
+                    Thread.Sleep(1);
+                    content = response.Content; // raw content as string
+                    if (!string.IsNullOrWhiteSpace(content))
+                    {
+                        break;
+                    }
+                    Thread.Sleep(100);
+                }
                 var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
                 return bankInfo;
             }
@@ -80,7 +90,9 @@ namespace boin.Util
                 Dictionary<string, string> msg = new Dictionary<string, string>();
                 msg.Add("Message", err.Message);
                 msg.Add("StackTrace", err.StackTrace);
-                var bankInfo = new BankCardInfo() {
+                msg.Add("content", content ?? string.Empty);
+                var bankInfo = new BankCardInfo()
+                {
                     stat = "ok",
                     validated = true,
                     key = err.Message,

@@ -23,7 +23,7 @@ namespace boin
     public class WithdrawExpand
     {
         // 支付渠道
-        public string PayWay { get; set; } = string.Empty;
+        public string PayChan { get; set; } = string.Empty;
 
         // 实名
         public string Name { get; set; } = string.Empty;
@@ -92,7 +92,7 @@ namespace boin
         public void ReadExpand(IWebElement rowEx, bool readBankInfo)
         {
             var ex = readEx(rowEx);
-            this.PayWay = Helper.GetValue(ex, "支付渠道：");
+            this.PayChan = Helper.GetValue(ex, "支付渠道：");
             this.Name = Helper.GetValue(ex, "实名：");
             this.CardNo = Helper.GetValue(ex, "账号/卡号：");
             this.Gas = Helper.GetDecimal(ex, "手续费：");

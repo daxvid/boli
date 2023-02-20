@@ -64,7 +64,7 @@ namespace boin
                 order.TimeToAccount = ts[3].Text.Trim(); // 到账时间
                 order.GameId = ts[4].Text.Trim(); // 游戏ID
                 order.NickName = ts[5].Text.Trim(); // 用户昵称
-                order.Amount = decimal.Parse(ts[6].Text.Trim()); // 提现金额
+                order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
                 order.Way = ts[7].Text.Trim(); // 通道
                 order.Review = ts[8].Text.Trim(); // 状态
                 order.Transfer = ts[9].Text.Trim(); // 转账

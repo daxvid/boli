@@ -13,62 +13,15 @@ namespace boin
 {
     public class UserPage : PageBase
     {
-        ReviewManager reviewer;
 
-        public UserPage(ChromeDriver driver, AppConfig cnf, ReviewManager reviewer) : base(driver, cnf)
+        public UserPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf)
         {
-            this.reviewer = reviewer;
         }
 
 
         public override bool Open()
         {
             return GoToPage(1, "用户列表");
-        }
-
-
-        public List<User> Select(List<Order> orders)
-        {
-            List<User> users = new List<User>();
-            List<User> tmp = new List<User>();
-            for (int i = 0; i < orders.Count; i++)
-            {
-                var order = orders[i];
-                var msg = "no:" + i.ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
-                using (var span = new Span())
-                {
-                    SendMsg(msg);
-                    span.Msg = msg;
-                    var user = Select(order.GameId);
-                    user.Order = order;
-                    users.Add(user);
-                    if (user.Funding.IsSyncName)
-                    {
-                        Review(user);
-                    }
-                    else
-                    {
-                        tmp.Add(user);
-                    }
-                }
-            }
-
-            foreach (var user in tmp)
-            {
-                for (int i = 0; i < 1000; i++)
-                {
-                    if (user.Funding.IsSyncName)
-                    {
-                        Review(user);
-                        break;
-                    }
-                    else
-                    {
-                        Thread.Sleep(100);
-                    }
-                }
-            }
-            return users;
         }
 
         public User Select(string gameid)
@@ -86,11 +39,24 @@ namespace boin
                         }
                     }
                 }
-                catch (Exception err)
+                catch (WebDriverTimeoutException)
+                {
+                    Thread.Sleep(1000);
+                }
+                //catch (NoSuchElementException) { }
+                //catch (ElementClickInterceptedException) { }
+                //catch (ElementNotInteractableException) { }
+                //catch (InvalidOperationException) { }
+                catch (WebDriverException)
+                {
+                    throw;
+                }
+                catch(Exception err)
                 {
                     SendMsg(err.Message);
                     SendMsg(err.StackTrace);
                     Thread.Sleep(10000);
+                    throw;
                 }
             }
             return null;
@@ -246,39 +212,6 @@ namespace boin
             new Actions(driver).MoveToElement(opBtn).Perform();
             Thread.Sleep(1000);
             return true;
-        }
-
-        private bool Review(User user)
-        {
-            bool noFaile = reviewer.Review(user);
-            // 通过
-            if (noFaile)
-            {
-                bool pass = true;
-                foreach(var v in user.ReviewResult)
-                {
-                    if (v.Code > 0)
-                    {
-                        pass = false;
-                        break;
-                    }
-                }
-                if (pass)
-                {
-                    SendMsg("pass:" + user.Order.OrderID);
-                }
-                else
-                {
-                    // 待定，进入人工
-                    SendMsg("unknow:" + user.Order.OrderID);
-                }
-            }
-            else
-            {
-                // 可以拒绝
-                SendMsg("refusal:" + user.Order.OrderID);
-            }
-            return noFaile;
         }
     }
 }

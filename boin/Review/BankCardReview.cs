@@ -38,7 +38,7 @@ namespace boin.Review
                     {
                         rs.Add(new ReviewResult { Code = -102, Msg = "@卡号不正确:" + order.CardNo });
                     }
-                    if (bankInfo.key != order.CardNo)
+                    else if(bankInfo.key != order.CardNo)
                     {
                         rs.Add(new ReviewResult { Code = 0, Msg = "@卡待定:" + order.CardNo });
                     }

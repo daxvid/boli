@@ -19,6 +19,7 @@
     <None Remove="Bot\" />
     <None Remove="Page\" />
     <None Remove="Util\" />
+    <None Remove="StackExchange.Redis" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Selenium.WebDriver" Version="4.8.1" />
@@ -28,6 +29,7 @@
     <PackageReference Include="RestSharp" Version="108.0.3" />
     <PackageReference Include="Telegram.BotAPI" Version="6.5.0" />
     <PackageReference Include="YamlDotNet" Version="13.0.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
   </ItemGroup>
   <ItemGroup>
     <None Update="app.yaml">

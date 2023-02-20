@@ -10,7 +10,7 @@ namespace boin
 {
     // 提现订单
     public class Order: WithdrawExpand
-    {
+    {  
         // 订单号
         public string OrderID { get; set; } = string.Empty;
 
@@ -61,24 +61,20 @@ namespace boin
         public string ReviewNote()
         {
             StringBuilder sb = new StringBuilder(1024);
-            sb.Append("order:").AppendLine(OrderID);
-            if (Pass)
-            {
-                sb.AppendLine("pass:true");
-            }
-            else
-            {
-                sb.AppendLine("pass:false");
-            }
+            sb.Append("card:").AppendLine(this.CardNo);
             if (!string.IsNullOrEmpty(ReviewMsg))
             {
-                sb.Append("msg:").AppendLine(ReviewMsg);
+                sb.Append(OrderID).Append(":").AppendLine(ReviewMsg);
             }
             if (ReviewResult != null)
             {
                 foreach (var r in ReviewResult)
                 {
-                    sb.Append("code:").Append(r.Code).Append(";msg:").AppendLine(r.Msg);
+                    if (r.Code != 0)
+                    {
+                        sb.Append(r.Code).Append(":");
+                    }
+                    sb.AppendLine(r.Msg);
                 }
             }
             var m = sb.ToString();
@@ -104,7 +100,7 @@ namespace boin
                 order.TimeToAccount = ts[3].Text.Trim(); // 到账时间
                 order.GameId = ts[4].Text.Trim(); // 游戏ID"
                 order.NickName = ts[5].Text.Trim(); // 用户昵称
-                order.Amount = decimal.Parse(ts[6].Text.Trim()); // 提现金额
+                order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
                 order.Way = ts[7].Text.Trim(); // 通道
                 order.Review = ts[8].Text.Trim(); // 状态
                 order.Transfer = ts[9].Text.Trim(); // 转账

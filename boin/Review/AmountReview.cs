@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace boin.Review
 {
     // 金额审核
-    public class AmountReview : IReviewInterface
+    public class AmountReview : IReviewUser
     {
         static readonly ReadOnlyCollection<ReviewResult> empty = new ReadOnlyCollection<ReviewResult>(new List<ReviewResult>());
         ReviewConfig cnf;
@@ -13,17 +13,17 @@ namespace boin.Review
             this.cnf = cnf;
         }
 
-        public ReadOnlyCollection<ReviewResult> Review(Order order)
-        {
-            List<ReviewResult> rs = new List<ReviewResult>();
-            var ac = cnf.GetAmountConfig(order.Way, false);
-            var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
-            if (r1 != null)
-            {
-                rs.Add(r1);
-            }
-            return new ReadOnlyCollection<ReviewResult>(rs);
-        }
+        //public ReadOnlyCollection<ReviewResult> Review(Order order)
+        //{
+        //    List<ReviewResult> rs = new List<ReviewResult>();
+        //    var ac = cnf.GetAmountConfig(order.Way, false);
+        //    var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
+        //    if (r1 != null)
+        //    {
+        //        rs.Add(r1);
+        //    }
+        //    return new ReadOnlyCollection<ReviewResult>(rs);
+        //}
 
 
         public ReadOnlyCollection<ReviewResult> Review(User user)
@@ -32,19 +32,15 @@ namespace boin.Review
             var order = user.Order;
             bool isNew = user.IsNewUser();
             var ac = cnf.GetAmountConfig(order.Way, isNew);
-            // 判断用户是新用户还是老用户,老用户上面己经做过检查
-            if (isNew)
+            var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
+            if (r1 != null)
             {
-                var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
-                if (r1 != null)
-                {
-                    rs.Add(r1);
-                }
+                rs.Add(r1);
             }
 
             // 检查当日总额度
             var withdraw = user.Funding.ToDay.WithdrawAmount + order.Amount;
-            var r2 = checkDayMax(order.Way,ac.DayMax, withdraw);
+            var r2 = checkDayMax(order.Way, ac.DayMax, withdraw);
             if (r2 != null)
             {
                 rs.Add(r2);

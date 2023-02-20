@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -55,9 +56,9 @@ namespace boin
         public void ReadFrom(IWebElement tbox)
         {
             // 有效投注
-            ValidBet = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='有效投注']/../td[2]")).Text);
+            ValidBet = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='有效投注']/../td[2]")));
             // 游戏损益
-            GameProfitLoss = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='游戏损益']/../td[2]")).Text);
+            GameProfitLoss = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='游戏损益']/../td[2]")));
             var index = 0;
             // 充值
             var recharge = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]")).Text;
@@ -95,11 +96,11 @@ namespace boin
 
 
             // 提充客损
-            ChargeCustomerLoss = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提充客损']/../td[2]")).Text);
+            ChargeCustomerLoss = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提充客损']/../td[2]")));
             // 优惠赠送
             Offers = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='优惠赠送']/../td[2]")).Text;
             // 返利
-            Rebate = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='返利']/../td[2]")).Text);
+            Rebate = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='返利']/../td[2]")));
         }
 
     }
@@ -168,6 +169,19 @@ namespace boin
                 }
             }
             return true;
+        }
+
+        // 最近提现的名字
+        public string NearBankName()
+        {
+            foreach (var w in WithdrawLog)
+            {
+                if (string.IsNullOrEmpty(w.Name) && w.Transfer == "成功")
+                {
+                    return w.Name;
+                }
+            }
+            return string.Empty;
         }
 
         // 用户名总的充值金额

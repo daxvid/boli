@@ -35,15 +35,6 @@ namespace boin
             return t;
         }
 
-        private decimal readBetDecimal(IWebElement e)
-        {
-            var txt = e.Text;
-            var index = txt.IndexOf('：');
-            txt = txt.Substring(index + 1);
-            decimal r;
-            decimal.TryParse(txt, out r);
-            return r;
-        }
 
         public List<Withdraw> Select(int maxDay)
         {

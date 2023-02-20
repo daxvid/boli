@@ -96,7 +96,6 @@ namespace boin.Util
             et.SendKeys(Keys.Delete);
             et.SendKeys(Keys.Command + "a");
             et.SendKeys(Keys.Delete);
-            Thread.Sleep(10);
 
             var now = DateTime.Now;
             string start = now.AddDays(-(day-1)).ToString("yyyy-MM-dd");
@@ -151,6 +150,34 @@ namespace boin.Util
             decimal r;
             decimal.TryParse(txt, out r);
             return r;
+        }
+
+        public static decimal ReadDecimal(IWebElement e)
+        {
+            try
+            {
+                var txt = e.Text.Trim();
+                decimal r = decimal.Parse(txt);
+                return r;
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        public static DateTime ReadDateTime(IWebElement e)
+        {
+            try
+            {
+                var txt = e.Text.Trim();
+                var r = DateTime.ParseExact(txt, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
+                return r;
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

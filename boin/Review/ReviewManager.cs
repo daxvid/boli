@@ -13,7 +13,6 @@ namespace boin.Review
             ReviewConfig cnf = ReviewConfig.FromYamlFile(cnfFile);
 
             orderReviews.Add(new BankCardReview(cnf));
-            orderReviews.Add(new AmountReview(cnf));
 
             userReviews.Add(new BankCardReview(cnf));
             userReviews.Add(new AmountReview(cnf));

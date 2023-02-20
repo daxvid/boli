@@ -35,16 +35,17 @@ namespace boin
         public Funding Funding { get; set; }
 
         public Order Order { get; set; }
-        public bool  Pass { get; set; }
+
+        public bool Pass { get; set; }
         public string ReviewMsg { get; set; } = string.Empty;
         public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
         public static string[] Heads = new string[] { "商户" , "用户信息", "等级/设备", "余额", "金流", "贵族",
-			"在线时长", "注册时间/最后上线", "注册IP/登录IP", "操作"};
+            "在线时长", "注册时间/最后上线", "注册IP/登录IP", "操作"};
 
-		public User()
-		{
-		}
+        public User()
+        {
+        }
 
         public bool IsNewUser()
         {
@@ -55,25 +56,17 @@ namespace boin
         public string ReviewNote()
         {
             StringBuilder sb = new StringBuilder(1024);
-            sb.Append("order:").AppendLine(Order.OrderID);
-            sb.Append("user:").AppendLine(this.GameId);
-            if (Pass)
-            {
-                sb.AppendLine("pass:true");
-            }
-            else
-            {
-                sb.AppendLine("pass:false");
-            }
-            if (!string.IsNullOrEmpty(ReviewMsg))
-            {
-                sb.Append("msg:").AppendLine(ReviewMsg);
-            }
+            sb.Append(Order.OrderID).Append(":").AppendLine(ReviewMsg);
+            sb.Append("game:").AppendLine(this.GameId);
             if (ReviewResult != null)
             {
                 foreach (var r in ReviewResult)
                 {
-                    sb.Append("code:").Append(r.Code).Append(";msg:").AppendLine(r.Msg);
+                    if (r.Code != 0)
+                    {
+                        sb.Append(r.Code).Append(":");
+                    }
+                    sb.AppendLine(r.Msg);
                 }
             }
             var m = sb.ToString();
@@ -137,7 +130,7 @@ namespace boin
 
                 return user;
             }
-		}
-	}
+        }
+    }
 }
 

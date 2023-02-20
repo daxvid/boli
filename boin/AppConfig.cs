@@ -48,6 +48,10 @@ namespace boin
         // Chrome
         public bool Headless { get; set; }
 
+        // redis连接
+        public string Redis { get; set; }
+
+
         public AppConfig()
         {
         }

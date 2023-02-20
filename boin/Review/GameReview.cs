@@ -30,7 +30,7 @@ namespace boin.Review
                     var game = ac.ExistsGame(g.GamePlatform, g.GameName);
                     if (!string.IsNullOrEmpty(game))
                     {
-                        rs.Add(new ReviewResult { Code = -301, Msg = "@游戏:" + game });
+                        rs.Add(new ReviewResult { Code = 301, Msg = "@游戏:" + game });
                         pass = false;
                         break;
                     }

@@ -108,13 +108,13 @@ namespace boin
                 log.OrderId = ts[3].Text.Trim(); // 订单号
                 log.OutsideOrderId = ts[4].Text.Trim(); // 外部订单号
 
-                log.RechargeAmount = decimal.Parse(ts[5].Text.Trim()); // 充值金额
+                log.RechargeAmount = Helper.ReadDecimal(ts[5]); // 充值金额
                 log.FirstRecharge = ts[6].Text.Trim(); // 首充
-                log.ActualAmount = decimal.Parse(ts[7].Text.Trim()); // 实际到账金额
+                log.ActualAmount = Helper.ReadDecimal(ts[7]); // 实际到账金额
                 log.RechargeType = ts[8].Text.Trim(); // 充值类型
                 log.RechargeChannel = ts[9].Text.Trim(); // 充值接口
                 log.VipPeriod = ts[10].Text.Trim(); // VIP期数
-                log.Created = DateTime.ParseExact(ts[11].Text.Trim(), "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture); // 时间
+                log.Created = Helper.ReadDateTime(ts[11]); // 时间
                 log.Mark = ts[12].Text.Trim(); // 说明
                 if (log.Depositor == "--")
                 {

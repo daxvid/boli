@@ -32,15 +32,15 @@ namespace boin.Review
                     var t1 = f.TotalRechargeAmount(order.Name);
                     if (t1 <= 0)
                     {
-                        rs.Add(new ReviewResult { Code = -402, Msg = "@最近无充值:" + order.Name });
+                        rs.Add(new ReviewResult { Code = 402, Msg = "@最近无充值:" + order.Name });
                     }
                     else if (t1 < order.Amount)
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值:" + order.Name + "]" });
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@近期充值:" + t1});
                     }
                     else
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值通过:" + order.Name + "]" });
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值通过:" + t1 });
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace boin.Review
                 var name = f.FirstOtherRechargeName(string.Empty);
                 if (string.IsNullOrEmpty(name))
                 {
-                    rs.Add(new ReviewResult { Code = 0, Msg = "@波币充值通过:" + order.Name + "]" });
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@波币充值通过"});
                 }
                 else
                 {

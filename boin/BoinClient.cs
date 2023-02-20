@@ -1,27 +1,24 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using boin.Review;
+﻿using boin.Review;
+using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.DevTools;
-using OpenQA.Selenium.Interactions;
-using OpenQA.Selenium.Support.UI;
 using TwoStepsAuthenticator;
 
 namespace boin
 {
-    public class BoinClient: PageBase
+    public class BoinClient : PageBase
     {
         ReviewManager reviewer;
-
         TimeAuthenticator authenticator;
+        OrderCache cache;
 
         public BoinClient(AppConfig cnf) : base(newDriver(cnf.Headless), cnf)
         {
             this.cnf = cnf;
             this.reviewer = new ReviewManager(cnf.ReviewFile);
             this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+            this.cache = new OrderCache(cnf.Redis);
+
         }
 
 
@@ -104,7 +101,6 @@ namespace boin
 
         public void Run()
         {
-
             //{   //test1
             //    Recharge.GetRechargeName("OR1676436469554825");
             //}
@@ -122,32 +118,151 @@ namespace boin
             //    userPage2.Select("325961309");   // 325961309
             //}
 
+            ThreadPool.QueueUserWorkItem(state =>
+            {
+                while (true)
+                {   // run
+                    var orders = loadOrders();
+                    var passOrders = new List<Order>(orders.Count);
+                    foreach (var order in orders)
+                    {
+                        if (reviewer.Review(order))
+                        {
+                            passOrders.Add(order);
+                        }
+                        else
+                        {
+                            order.ReviewMsg = "fail";
+                            SendMsg(order.ReviewNote());
+                        }
+                    }
+                    Review(passOrders);
+                }
+            });
+        }
 
-            {   // run 
-                var orderPage = new OrderPage(driver, cnf);
+        public List<Order> loadOrders()
+        {
+            using (var orderPage = new OrderPage(driver, cnf))
+            {
                 orderPage.Open();
-
                 orderPage.Select(cnf.OrderHour);
                 var orders = orderPage.ReadTable();
-
-                var passOrders = new List<Order>(orders.Count);
-                foreach(var order in orders)
+                var r = new List<Order>(orders.Count);
+                foreach (var order in orders)
                 {
-                    if (reviewer.Review(order))
+                    // 过滤已经处理过的订单
+                    var msg = cache.GetOrderInfo(order.OrderID);
+                    if (!string.IsNullOrEmpty(msg))
                     {
-                        passOrders.Add(order);
+                        continue;
+                    }
+                    if ((!string.IsNullOrEmpty(order.Remark)) && order.Remark != "--")
+                    {
+                        continue;
+                    }
+                    // 过滤金额，只处理5000以下的订单
+                    if (order.Amount > 5000)
+                    {
+                        continue;
+                    }
+                    r.Add(order);
+                }
+                return r;
+            }
+        }
+
+
+        public User loacUser(string gameId)
+        {
+            using (var userPage = new UserPage(driver, cnf))
+            {
+                userPage.Open();
+                var user = userPage.Select(gameId);
+                return user;
+            }
+        }
+
+        public List<User> Review(List<Order> orders)
+        {
+            long wait = 0;
+            List<User> users = new List<User>();
+            for (int i = 0; i < orders.Count; i++)
+            {
+                var order = orders[i];
+                var msg = "no:" + i.ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
+                using (var span = new Span())
+                {
+                    SendMsg(msg);
+                    span.Msg = msg;
+                    var user = loacUser(order.GameId);
+                    user.Order = order;
+                    users.Add(user);
+                    if (user.Funding.IsSyncName)
+                    {
+                        Review(user);
                     }
                     else
                     {
-                        // TODO:
+                        Interlocked.Increment(ref wait);
+                        ThreadPool.QueueUserWorkItem(state =>
+                        {
+                            while (true)
+                            {
+                                if (user.Funding.IsSyncName)
+                                {
+                                    Review(user);
+                                    break;
+                                }
+                                Thread.Sleep(1);
+                            }
+                            Interlocked.Decrement(ref wait);
+                        });
                     }
-                    SendMsg(order.ReviewNote());
                 }
-
-                var userPage = new UserPage(driver,cnf, reviewer);
-                userPage.Open();
-                userPage.Select(passOrders);
             }
+            while (Interlocked.Read(ref wait) > 0)
+            {
+                Thread.Sleep(1);
+            }
+            return users;
+        }
+
+
+        private bool Review(User user)
+        {
+            bool success = reviewer.Review(user);
+            // 通过
+            if (success)
+            {
+                bool pass = true;
+                foreach (var v in user.ReviewResult)
+                {
+                    if (v.Code > 0)
+                    {
+                        pass = false;
+                        break;
+                    }
+                }
+                if (pass)
+                {
+                    user.ReviewMsg = "pass";
+                }
+                else
+                {
+                    // 待定，进入人工
+                    user.ReviewMsg = "unknow";
+                }
+            }
+            else
+            {
+                // 可以拒绝
+                user.ReviewMsg = "fail";
+            }
+            var msg = user.ReviewNote();
+            cache.Save(user.Order.OrderID, msg);
+            SendMsg(msg);
+            return success;
         }
 
         public void Quit()

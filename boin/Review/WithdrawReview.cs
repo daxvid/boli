@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 namespace boin.Review
 {
     // 审核之前的提现
-	public class WithdrwReview : IReviewUser
+    public class WithdrwReview : IReviewUser
     {
         ReviewConfig cnf;
         public WithdrwReview(ReviewConfig cnf)
@@ -23,22 +23,19 @@ namespace boin.Review
         {
             Order order = user.Order;
             List<ReviewResult> rs = new List<ReviewResult>();
-
-            //// 当前提现金额大于指定额度
-            //const int maxAmount = 2000;
-            //var amount = order.Amount;
-            //if (amount > maxAmount)
-            //{
-            //    rs.Add(new ReviewResult { Code = 200, Msg = "@提现" + amount + ">" + maxAmount.ToString() });
-            //}
-
-            //// 当日提现金额大于指定额度
-            //const int maxDayAmount = 10000;
-            //amount = user.Funding.ToDay.WithdrawAmount;
-            //if (amount > maxDayAmount)
-            //{
-            //    rs.Add(new ReviewResult { Code = 201, Msg = "@当日提现" + amount + ">" + maxDayAmount.ToString() });
-            //}
+            //最新两笔提款名字不一致-不可以通过
+            var nearName = user.Funding.NearBankName();
+            if (order.Way == "银行卡")
+            {
+                if (nearName == order.Name || string.IsNullOrEmpty(nearName))
+                {
+                    rs.Add(new ReviewResult { Msg = "@提现名字通过:" + order.Name });
+                }
+                else
+                {
+                    rs.Add(new ReviewResult { Code = 200, Msg = "@提现名字不一致:" + nearName });
+                }
+            }
 
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
