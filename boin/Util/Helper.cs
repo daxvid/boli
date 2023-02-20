@@ -5,7 +5,7 @@ using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace boin
+namespace boin.Util
 {
 	public class Helper
 	{
@@ -72,7 +72,24 @@ namespace boin
             return row;
         }
 
-        public static void SetTimeRang(int hour, IWebElement et)
+        // 设置查询的时间范围
+        public static void SetTimeRang(IWebElement et, int hour)
+        {
+            et.Click();
+            et.SendKeys(Keys.Control + "a");
+            et.SendKeys(Keys.Delete);
+            et.SendKeys(Keys.Command + "a");
+            et.SendKeys(Keys.Delete);
+
+            var now = DateTime.Now;
+            string start = now.AddHours(-hour).ToString("yyyy-MM-dd HH:mm:ss");
+            string end = now.ToString("yyyy-MM-dd 23:59:59");
+            et.SendKeys(start + " - " + end);
+            Thread.Sleep(10);
+        }
+
+        // 设置查询的日期范围
+        public static void SetDayRang(IWebElement et, int day)
         {
             et.Click();
             et.SendKeys(Keys.Control + "a");
@@ -82,11 +99,12 @@ namespace boin
             Thread.Sleep(10);
 
             var now = DateTime.Now;
-            string start = now.AddHours(-hour).ToString("yyyy-MM-dd HH:mm:ss");
-            string end = now.ToString("yyyy-MM-dd HH:mm:ss");
+            string start = now.AddDays(-(day-1)).ToString("yyyy-MM-dd");
+            string end = now.ToString("yyyy-MM-dd");
             et.SendKeys(start + " - " + end);
             Thread.Sleep(10);
         }
+
 
         public static bool TryClick(WebDriverWait wait, IWebElement btn)
         {

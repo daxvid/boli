@@ -3,23 +3,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace boin.Review
+namespace boin.Util
 {
-    public class BankCardInfo
-    {
-        // 卡类型。值：DC: "储蓄卡",CC: "信用卡",SCC: "准贷记卡",PC: "预付费卡"
-        public string cardType;
-        // 银行代码
-        public string bank;
-        // 卡号
-        public string key;
-        // 有效性，是否正确有效。值：true为是，false为否。
-        public bool validated;
-        // 银行卡状态。值：ok，no。
-        public string stat;
-        // 
-        public List<Dictionary<string,string>> messages;
-    }
 
     public class BankUtil
     {
@@ -67,7 +52,8 @@ namespace boin.Review
         // 通过银行简称获取银行卡所属银行全名 如没有查到全名则返回银行简称
         public static string GetNameOfBank(string bankAbbreviation)
         {
-            return bankDic.GetValueOrDefault(bankAbbreviation, bankAbbreviation);
+            var n = bankAbbreviation ?? string.Empty;
+            return bankDic.GetValueOrDefault(n, n);
         }
 
         // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=6222801251011210972
@@ -91,10 +77,18 @@ namespace boin.Review
             }
             catch (Exception err)
             {
-                return new BankCardInfo() { stat = "ok", validated = true, key = err.Message };
+                Dictionary<string, string> msg = new Dictionary<string, string>();
+                msg.Add("Message", err.Message);
+                msg.Add("StackTrace", err.StackTrace);
+                var bankInfo = new BankCardInfo() {
+                    stat = "ok",
+                    validated = true,
+                    key = err.Message,
+                    messages = new List<Dictionary<string, string>>() { msg }
+                };
+                return bankInfo;
             }
         }
-
 
 
         // @param cardNo 银行卡卡号

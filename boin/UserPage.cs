@@ -7,6 +7,7 @@ using OpenQA.Selenium.Interactions;
 using boin.Review;
 using OpenQA.Selenium.Internal;
 using System.Linq;
+using boin.Util;
 
 namespace boin
 {
@@ -41,7 +42,7 @@ namespace boin
                     var user = Select(order.GameId);
                     user.Order = order;
                     users.Add(user);
-                    if (user.Funding.IsSync)
+                    if (user.Funding.IsSyncName)
                     {
                         Review(user);
                     }
@@ -56,7 +57,7 @@ namespace boin
             {
                 for (int i = 0; i < 1000; i++)
                 {
-                    if (user.Funding.IsSync)
+                    if (user.Funding.IsSyncName)
                     {
                         Review(user);
                         break;
@@ -230,7 +231,7 @@ namespace boin
                 {
                     using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
                     {
-                        user.GameInfo = gl.Select();
+                        user.GameInfo = gl.Select(cnf.GameLogMaxHour);
                     }
                     return true;
                 }
@@ -264,16 +265,18 @@ namespace boin
                 }
                 if (pass)
                 {
-
+                    SendMsg("pass:" + user.Order.OrderID);
                 }
                 else
                 {
                     // 待定，进入人工
+                    SendMsg("unknow:" + user.Order.OrderID);
                 }
             }
             else
             {
                 // 可以拒绝
+                SendMsg("refusal:" + user.Order.OrderID);
             }
             return noFaile;
         }

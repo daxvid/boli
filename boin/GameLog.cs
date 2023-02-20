@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenQA.Selenium;
+using boin.Util;
 
 namespace boin
 {

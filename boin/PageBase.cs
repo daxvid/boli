@@ -357,17 +357,17 @@ namespace boin
 
         public static Dictionary<string, string> ReadHeadDic(IWebElement table)
         {
-            //var heads = table.FindElements(By.XPath(".//div[@class='ivu-table-header']/table/thead/tr/th"));
+            var heads = table.FindElements(By.XPath(".//div[@class='ivu-table-header']/table/thead/tr/th"));
             var dicHead = new Dictionary<string, string>(29);
-            //foreach (var th in heads)
-            //{
-            //    var tag = th.GetAttribute("class");
-            //    if (!string.IsNullOrEmpty(tag))
-            //    {
-            //        var key = th.Text;
-            //        dicHead.Add(key, tag);
-            //    }
-            //}
+            foreach (var th in heads)
+            {
+                var tag = th.GetAttribute("class");
+                if (!string.IsNullOrEmpty(tag))
+                {
+                    var key = th.Text;
+                    dicHead.Add(key, tag);
+                }
+            }
             return dicHead;
         }
 

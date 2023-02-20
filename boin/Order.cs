@@ -4,6 +4,7 @@ using System.Security.Principal;
 using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using boin.Util;
 
 namespace boin
 {
@@ -48,7 +49,6 @@ namespace boin
 
         // 订单状态
         public string Status { get; set; } = string.Empty;
-
 
         public bool Pass { get; set; }
         public string ReviewMsg { get; set; } = string.Empty;
@@ -113,7 +113,7 @@ namespace boin
                 order.Remark = ts[12].Text.Trim(); // 提现备注
                 order.Status = ts[13].Text.Trim(); //  操作
 
-                 order.ReadExpand(rowEx);
+                order.ReadExpand(rowEx, true);
 
                 span.Msg = "订单:" + order.OrderID;
                 return order;
@@ -142,7 +142,8 @@ namespace boin
                 order.Remark = Helper.ReadString(head, "提现备注", row);
                 order.Status = Helper.ReadString(head, "操作", row);
 
-                order.ReadExpand(rowEx);
+                order.ReadExpand(rowEx, true);
+                order.syncName();
 
                 span.Msg = "订单:" + order.OrderID;
                 return order;

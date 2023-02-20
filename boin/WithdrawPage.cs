@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using boin.Util;
 
 namespace boin
 {
@@ -44,9 +45,17 @@ namespace boin
             return r;
         }
 
-        public List<Withdraw> Select()
+        public List<Withdraw> Select(int maxDay)
         {
             var table = getCurrentTable(1);
+            if (maxDay > 0)
+            {
+                var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                Helper.SetDayRang(dayRang, maxDay);
+                // 点击查询按钮;
+                TryClickByXPath(table, ".//button/span[text()='查询']", 1000);
+                table = getCurrentTable(1);
+            }
 
             return ReadWithdrawLog(table);
         }

@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using boin.Util;
 
 namespace boin
 {
@@ -35,17 +36,17 @@ namespace boin
             return t;
         }
 
-        public List<Recharge> Select()
+        public List<Recharge> Select(int maxDay)
         {
             var table = getCurrentTable(1);
-
-            //// 日期区间
-            //var timeRang = gameLog.FindElement(By.XPath(".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']"));
-            //Helper.SetTimeRang(24, timeRang);
-            //// 点击查询按钮;
-            //var sub = gameLog.FindElement(By.XPath(".//button/span[text()='查询']"));
-            //sub.Click();
-            //Thread.Sleep(2000);
+            if (maxDay > 0)
+            {
+                var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                Helper.SetDayRang(dayRang, maxDay);
+                // 点击查询按钮;
+                TryClickByXPath(table, ".//div/button[1]/span[text()='查询']", 1000);
+                table = getCurrentTable(1);
+            }
 
             // 在线充值次数/后台充值次数/等
             var items = FindElementsByXPath(table, ".//div[@class='countSty']/span[contains(text(),'在线充值次数：')]/../span");

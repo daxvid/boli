@@ -1,5 +1,6 @@
 ﻿using System;
-namespace boin
+
+namespace boin.Util
 {
     public class Span : IDisposable
     {

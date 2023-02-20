@@ -3,6 +3,7 @@ using System.Reflection.Emit;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using boin.Util;
 
 namespace boin
 {
@@ -33,15 +34,18 @@ namespace boin
             return t;
         }
 
-        public GameInfo Select()
+        // 查询用户游戏日志
+        public GameInfo Select(int hour)
         {
             GameInfo info = new GameInfo();
             var table = getCurrentTable(1);
-            // 用户游戏日志
-            var timeRang = FindElementByXPath(table,".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
-            Helper.SetTimeRang(24, timeRang);
-            // 点击查询按钮;
-            TryClickByXPath(table, ".//button/span[text()='查询']", 1000);
+            if (hour > 0)
+            {
+                var timeRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                Helper.SetTimeRang(timeRang, hour);
+                // 点击查询按钮;
+                TryClickByXPath(table, ".//button/span[text()='查询']", 1000);
+            }
 
             // 读取用户查询出的输赢情况
             var spath = ".//div[@class='countSty']/span[@class='total_item' and contains(text(),'下注金额：')]/../span";

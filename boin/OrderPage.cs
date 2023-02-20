@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Review;
+using boin.Util;
 
 namespace boin
 {
@@ -38,7 +39,7 @@ namespace boin
         {
             // 设置查询时间，12小时以内的订单
             var timeRang = FindElementByXPath("//div[@id='Cash']/div/div[12]/div/div/div/input");
-            Helper.SetTimeRang(hour, timeRang);
+            Helper.SetTimeRang(timeRang, hour);
             // 点击查询
             // //*[@id="Cash"]/div[1]/div[13]/button[1]/span
             var r = TryClickByXPath("//div[@id='Cash']/div[1]/div[13]/button[1]/span[text()='查询']", 5000);

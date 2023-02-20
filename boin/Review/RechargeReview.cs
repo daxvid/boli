@@ -16,7 +16,7 @@ namespace boin.Review
         {
             Order order = user.Order;
             List<ReviewResult> rs = new List<ReviewResult>();
-            var f = user.Funding.Nearly2Months;
+            var f = user.Funding;
 
             if (order.Way == "银行卡")
             {
@@ -24,7 +24,7 @@ namespace boin.Review
                 var t2 = f.OtherRechargeAmount(order.Name);
                 if (t2 > 0)
                 {
-                    var name = f.OtherRechargeName(order.Name);
+                    var name = f.FirstOtherRechargeName(order.Name);
                     rs.Add(new ReviewResult { Code = -401, Msg = "@其它名字充值:" + name });
                 }
                 else
@@ -46,7 +46,7 @@ namespace boin.Review
             }
             else
             {
-                var name = f.OtherRechargeName(string.Empty);
+                var name = f.FirstOtherRechargeName(string.Empty);
                 if (string.IsNullOrEmpty(name))
                 {
                     rs.Add(new ReviewResult { Code = 0, Msg = "@波币充值通过:" + order.Name + "]" });

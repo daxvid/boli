@@ -2,6 +2,7 @@
 using System.Globalization;
 using OpenQA.Selenium;
 using OpenQA.Selenium.DevTools;
+using boin.Util;
 
 namespace boin
 {
@@ -58,17 +59,17 @@ namespace boin
         {
         }
 
-        public bool IsSync
+        public bool IsSyncName
         {
-            get { return Interlocked.Read(ref sync) == 2; }
+            get { return Interlocked.Read(ref nameLocker) == 2; }
         }
 
-        private long sync = 0;
+        private long nameLocker = 0;
 
         // 同步姓名
         private void syncName()
         {
-            if (Interlocked.CompareExchange(ref sync, 1, 0) == 0)
+            if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
             {
                 if ((string.IsNullOrEmpty(this.Depositor))
                     && (this.RechargeChannel.Contains("银联") && this.RechargeChannel.Contains("四方")))
@@ -77,12 +78,12 @@ namespace boin
                     {
                         var depositor = GetRechargeName(this.OutsideOrderId);
                         this.Depositor = depositor;
-                        Interlocked.Increment(ref sync);
+                        Interlocked.Increment(ref nameLocker);
                     });
                 }
                 else
                 {
-                    Interlocked.Increment(ref sync);
+                    Interlocked.Increment(ref nameLocker);
                 }
             }
         }
@@ -158,10 +159,10 @@ namespace boin
             }
         }
 
+        public static string RechargeHost = "";
         public static string GetRechargeName(string orderId)
         {
-            const string host = "http://man.xyyj315.com/order/query_order/?orderId=";
-            var url = host + orderId;
+            var url = RechargeHost + orderId;
             try
             {
                 HttpClient client = new HttpClient();

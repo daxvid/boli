@@ -15,25 +15,38 @@ namespace boin
 
         // Telegram
         public string BotToken { get; set; }
+        // 所有接收通知的聊天ID
         public List<long> ChatIds;
-
-        // Chrome
-        public bool Headless { get; set; }
 
         // 订单时间小时
         public int OrderHour { get; set; }
 
-        // 审核配置文件
-        public string ReviewFile { get; set; }
-
         // 提现最多读取页数
         public int WithdrawMaxPage { get; set; }
+
+        // 提现最多天数
+        public int WithdrawMaxDay { get; set; }
 
         // 充值最多读取页数
         public int RechargeMaxPage { get; set; }
 
+        // 充值最多天数
+        public int RechargeMaxDay { get; set; }
+
         // 游戏记录最多读取页数
         public int GameLogMaxPage { get; set; }
+
+        // 游戏记录最多小时
+        public int GameLogMaxHour { get; set; }
+
+        // 审核配置文件
+        public string ReviewFile { get; set; }
+
+        // 充值查询地址
+        public string RechargeHost { get; set; }
+
+        // Chrome
+        public bool Headless { get; set; }
 
         public AppConfig()
         {

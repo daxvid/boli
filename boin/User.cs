@@ -4,6 +4,7 @@ using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.DevTools;
+using boin.Util;
 
 namespace boin
 {

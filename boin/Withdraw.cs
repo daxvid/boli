@@ -4,6 +4,7 @@ using System.Security.Principal;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using Telegram.BotAPI.AvailableTypes;
+using boin.Util;
 
 namespace boin
 {
@@ -69,7 +70,7 @@ namespace boin
                 order.Transfer = ts[9].Text.Trim(); // 转账
                 order.Operating = ts[10].Text.Trim(); // 操作类型
 
-                order.ReadExpand(rowEx);
+                order.ReadExpand(rowEx, false);
 
                 span.Msg = "提现:" + order.OrderID;
                 return order;
@@ -94,7 +95,7 @@ namespace boin
                 order.Transfer = Helper.ReadString(head, "转账", row);
                 order.Operating = Helper.ReadString(head, "操作类型", row);
 
-                order.ReadExpand(rowEx);
+                order.ReadExpand(rowEx, false);
 
                 span.Msg = "提现:" + order.OrderID;
                 return order;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
@@ -39,34 +40,16 @@ namespace boin
         // 筹码兑钻石金额
         public decimal ChipToDiamondAmount { get; set; }
 
-        // 充值记录
-        public List<Recharge> RechargeLog { get; set; }
+        //// 充值记录
+        //public List<Recharge> RechargeLog { get; set; }
 
-        // 提现记录
-        public List<Withdraw> WithdrawLog { get; set; }
+        //// 提现记录
+        //public List<Withdraw> WithdrawLog { get; set; }
 
         public FundingDay()
         {
-            RechargeLog = null;
-            WithdrawLog = null;
-        }
-
-        public bool IsSync
-        {
-            get
-            {
-                if (RechargeLog != null)
-                {
-                    foreach (var r in RechargeLog)
-                    {
-                        if (r.IsSync == false)
-                        {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
+            //RechargeLog = null;
+            //WithdrawLog = null;
         }
 
         public void ReadFrom(IWebElement tbox)
@@ -119,6 +102,47 @@ namespace boin
             Rebate = decimal.Parse(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='返利']/../td[2]")).Text);
         }
 
+    }
+
+    // 资金情况
+    public class Funding
+    {
+        // 余额
+        public decimal Balance { get; set; }
+        public FundingDay ToDay { get; set; } = new FundingDay();
+        public FundingDay Yesterday { get; set; } = new FundingDay();
+        public FundingDay Nearly2Months { get; set; } = new FundingDay();
+
+        // 充值记录
+        public List<Recharge> RechargeLog { get; set; }
+
+        // 提现记录
+        public List<Withdraw> WithdrawLog { get; set; }
+
+        public Funding()
+        {
+        }
+
+
+        public bool IsSyncName
+        {
+            get
+            {
+                if (RechargeLog != null)
+                {
+                    foreach (var r in RechargeLog)
+                    {
+                        if (r.IsSyncName == false)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+
+
         // 成功提现总额
         public decimal SuccessAmount(string card, string name)
         {
@@ -146,7 +170,7 @@ namespace boin
             return true;
         }
 
-        // 用户总的充值金额
+        // 用户名总的充值金额
         public decimal TotalRechargeAmount(string name)
         {
             decimal total = 0;
@@ -160,13 +184,13 @@ namespace boin
             return total;
         }
 
-        // 其它充值金额
+        // 其它用户名充值金额
         public decimal OtherRechargeAmount(string name)
         {
             decimal total = 0;
             foreach (var r in RechargeLog)
             {
-                if ((!string.IsNullOrEmpty(r.Depositor)) && r.Depositor!= name)
+                if ((!string.IsNullOrEmpty(r.Depositor)) && r.Depositor != name)
                 {
                     total += r.RechargeAmount;
                 }
@@ -174,7 +198,8 @@ namespace boin
             return total;
         }
 
-        public string OtherRechargeName(string name)
+        // 第一个其它用户名
+        public string FirstOtherRechargeName(string name)
         {
             foreach (var r in RechargeLog)
             {
@@ -186,27 +211,26 @@ namespace boin
             return string.Empty;
         }
 
-    }
-
-    // 资金情况
-    public class Funding
-    {
-        // 余额
-        public decimal Balance { get; set; }
-        public FundingDay ToDay { get; set; } = new FundingDay();
-        public FundingDay Yesterday { get; set; } = new FundingDay();
-        public FundingDay Nearly2Months { get; set; } = new FundingDay();
-
-        public Funding()
+        // 所有其它用户充值
+        public Dictionary<string, decimal> AllOtherRecharge(string name)
         {
-        }
-
-        public bool IsSync
-        {
-            get
+            Dictionary<string, decimal> names = new Dictionary<string, decimal>();
+            foreach (var r in RechargeLog)
             {
-                return ToDay.IsSync && Yesterday.IsSync && Nearly2Months.IsSync;
+                if ((!string.IsNullOrEmpty(r.Depositor)) && (r.Depositor != name))
+                {
+                    decimal t;
+                    if (names.TryGetValue(r.Depositor, out t))
+                    {
+                        names[r.Depositor] = t + r.RechargeAmount;
+                    }
+                    else
+                    {
+                        names.Add(r.Depositor, r.RechargeAmount);
+                    }
+                }
             }
+            return names;
         }
     }
 }

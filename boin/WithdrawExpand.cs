@@ -1,8 +1,25 @@
 ﻿using System;
 using OpenQA.Selenium;
+using boin.Util;
 
 namespace boin
 {
+    public class BankCardInfo
+    {
+        // 卡类型。值：DC: "储蓄卡",CC: "信用卡",SCC: "准贷记卡",PC: "预付费卡"
+        public string cardType = string.Empty;
+        // 银行代码
+        public string bank = string.Empty;
+        // 卡号
+        public string key = string.Empty;
+        // 有效性，是否正确有效。值：true为是，false为否。
+        public bool validated;
+        // 银行卡状态。值：ok，no。
+        public string stat = string.Empty;
+        // 
+        public List<Dictionary<string, string>> messages;
+    }
+
     public class WithdrawExpand
     {
         // 支付渠道
@@ -37,7 +54,42 @@ namespace boin
 
         }
 
-        public void ReadExpand(IWebElement rowEx)
+        public BankCardInfo BankCardInfo { get; set; }
+        // 开户行名称
+        public string BankName { get; set; } = string.Empty;
+
+        public bool IsSyncName
+        {
+            get { return Interlocked.Read(ref nameLocker) == 2; }
+        }
+
+        private long nameLocker = 0;
+
+        // 同步银行卡名称
+        protected void syncName()
+        {
+            if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
+            {
+                if ((string.IsNullOrEmpty(this.BankName)))
+                {
+                    ThreadPool.QueueUserWorkItem(state =>
+                    {
+                        //var bankName =  GetRechargeName(this.CardNo);
+                        var info = BankUtil.GetBankInfo(this.CardNo);
+                        this.BankCardInfo = info;
+                        this.BankName = BankUtil.GetNameOfBank(info.bank);
+                        Interlocked.Increment(ref nameLocker);
+                    });
+                }
+                else
+                {
+                    Interlocked.Increment(ref nameLocker);
+                }
+            }
+        }
+
+
+        public void ReadExpand(IWebElement rowEx, bool readBankInfo)
         {
             var ex = readEx(rowEx);
             this.PayWay = Helper.GetValue(ex, "支付渠道：");
@@ -49,6 +101,10 @@ namespace boin
             this.Reasons = Helper.GetValue(ex, "拒绝理由：");
             this.RequestError = Helper.GetValue(ex, "请求错误信息：");
             this.UserError = Helper.GetValue(ex, "用户显示错误：");
+            if (readBankInfo)
+            {
+                syncName();
+            }
         }
 
         Dictionary<string, string> readEx(IWebElement row)
