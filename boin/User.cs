@@ -73,6 +73,8 @@ namespace boin
             return m;
         }
 
+        // 是否玩了指定的游戏
+
         public static User Create(IWebElement element)
         {
             using (var span = new Span())

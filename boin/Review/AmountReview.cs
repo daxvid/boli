@@ -47,6 +47,8 @@ namespace boin.Review
             {
                 rs.Add(r2);
             }
+            
+            // 检查玩游戏
 
             // 检查当日总充值
             var dayRecharge = user.Funding.ToDay.RechargeAmount;
@@ -55,6 +57,8 @@ namespace boin.Review
             {
                 rs.Add(r3);
             }
+            
+            // 
 
             return new ReadOnlyCollection<ReviewResult>(rs);
         }

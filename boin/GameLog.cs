@@ -44,6 +44,30 @@ namespace boin
         {
         }
 
+        // 繁体转为简体
+        public void Init()
+        {
+            var gp = StringUtility.TW2ZH(this.GamePlatform);
+            if (gp != this.GamePlatform)
+            {
+                this.GamePlatform = gp;
+            }
+            var gn = StringUtility.TW2ZH(this.GameName);
+            if (gn != this.GameName)
+            {
+                this.GameName = gn;
+            }
+        }
+
+        public bool IsMatch(string platform, string game)
+        {
+            if (string.IsNullOrEmpty(platform) || platform == "all" || platform == this.GamePlatform)
+            {
+                return this.GameName.Contains(game);
+            }
+            return false;
+        }
+
         public static string[] Heads = new string[] {string.Empty, "编号ID" , "游戏ID", "游戏平台", "单号",
             "游戏名", "操作时间", "下注总金额", "中奖金额", "有效下注", "小费", "取消下注", "操作" };
 
@@ -69,7 +93,8 @@ namespace boin
                 log.ValidBet = Helper.ReadDecimal(ts[9]); //有效下注
                 log.Tip = Helper.ReadDecimal(ts[10]); //小费
                 log.CancelBet = Helper.ReadString(ts[11]); //取消下注
-
+                log.Init();
+                
                 span.Msg = "游志:" + log.LogId;
                 return log;
             }
@@ -93,7 +118,8 @@ namespace boin
                 log.ValidBet = Helper.ReadDecimal(head, "有效下注", row);
                 log.Tip = Helper.ReadDecimal(head, "小费", row);
                 log.CancelBet = Helper.ReadString(head, "取消下注", row);
-
+                log.Init();
+                
                 span.Msg = "游志:" + log.LogId;
                 return log;
             }
@@ -112,6 +138,25 @@ namespace boin
         public decimal TotalValidBet { get; set; }
 
         public List<GameLog> GameLogs { get; set; }
+        
+        public bool PlayGame(string platform, string game)
+        {
+            if (GameLogs == null)
+            {
+                return false;
+            }
+
+            foreach (var log in GameLogs)
+            {
+                if (log.IsMatch(platform, game))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
     }
 }
 

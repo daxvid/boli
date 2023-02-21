@@ -8,6 +8,7 @@ namespace boin.Util
 
     public class BankUtil
     {
+        const string aliUrl = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=";
         private static string[] bankBin = {
             "CDB","ICBC","ABC","BOC","CCB","PSBC","COMM","CMB","SPDB","CIB","HXBANK","GDB", "CMBC","CITIC","CEB","EGBANK",
             "CZBANK","BOHAIB","SPABANK","SHRCB","YXCCB","YDRCB","BJBANK","SHBANK","JSBANK","HZCB","NJCB","NBBANK","HSBANK",
@@ -60,9 +61,11 @@ namespace boin.Util
         // {"cardType":"DC","bank":"CCB","key":"6222801251011210972","messages":[],"validated":true,"stat":"ok"}
         // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=621669750004140425
         // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
+        // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=340826199307111837
+        // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"340826199307111837"}
         public static BankCardInfo GetBankInfo(string cardNo)
         {
-            string url = "https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=" + cardNo;
+            string url = aliUrl + cardNo;
             string content = string.Empty;
             try
             {

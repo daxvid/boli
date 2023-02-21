@@ -13,6 +13,10 @@ class Program
         BoinClient client = new BoinClient(cnf);
         client.Run();
 
+        // while(true){
+        //     Thread.Sleep(1000);
+        // }
+        
         var s = Console.ReadKey(true).KeyChar;
         while (Char.ToLower(s) != 'q')
         {

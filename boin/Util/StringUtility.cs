@@ -1,0 +1,35 @@
+using  boin.Util;
+using OpenCCNET;
+using OpenQA.Selenium.DevTools.V109.Target;
+
+namespace boin.Util
+{
+    public class StringUtility
+    {
+        static StringUtility()
+        {
+            ZhConverter.Initialize();
+            // var input = "为我的电脑换了新的内存，开启电脑后感觉看网络视频更加流畅了";
+            //
+            // // 爲我的電腦換了新的內存，開啓電腦後感覺看網絡視頻更加流暢了
+            // Console.WriteLine(ZhConverter.HansToHant(input));
+            //
+            // // 為我的電腦換了新的內存，開啟電腦後感覺看網絡視頻更加流暢了
+            // Console.WriteLine(ZhConverter.HansToTW(input));
+            //
+            // // 為我的電腦換了新的記憶體，開啟電腦後感覺看網路影片更加流暢了
+            // Console.WriteLine(ZhConverter.HansToTW(input, true));
+            //
+            // // 為我的電腦換了新的內存，開啓電腦後感覺看網絡視頻更加流暢了
+            // Console.WriteLine(ZhConverter.HansToHK(input));
+            //
+            // // 沖繩縣內の學校
+            // Console.WriteLine(ZhConverter.ShinToKyuu("沖縄県内の学校"));
+        }
+
+        public static string TW2ZH(string str)
+        {
+            return ZhConverter.HantToHans(str);
+        }
+    }
+}

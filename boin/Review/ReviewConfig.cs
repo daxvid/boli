@@ -1,5 +1,6 @@
 ﻿using System;
 using YamlDotNet.Serialization;
+using boin.Util;
 
 namespace boin.Review
 {
@@ -14,7 +15,10 @@ namespace boin.Review
     //新会员首提使用银行卡提款-游戏炸金花-可以通过
     //会员游戏『环亚棋牌』『炸金花』—提款任何方式-不可以通过
     //会员使用卡卡充值的姓名，与提款姓名不符-不可以通过
-    //充值和提款两者都超过四万的
+    //波音没绑姓名的话不给予通过
+    //充值和提款两者都超过四万的人工审核
+    //玩百家乐的会员 波币一天不超过3000提款
+    //最近10笔提款内 波币不能超过4笔吗
 
     public class AmountConfig
     {
@@ -28,22 +32,44 @@ namespace boin.Review
         public decimal OnceMax { get; set; }
 
         // 不可以通过的游戏
-        public List<string> BanGames { get; set; }
-
-        public string ExistsGame(string p, string g)
+        public Dictionary<string, List<string>> BanGames { get; set; }
+        
+        // 玩某个游戏的提款限制， 玩百家乐的会员，波币一天不超过3000提款
+        public Dictionary<string, decimal> DayMaxGames{ get; set; }
+        
+        public string ExistsGame(string platform, string game)
         {
-            string pg = p + g;
-            foreach (var item in BanGames)
+            foreach (var kv in BanGames)
             {
-                if (!string.IsNullOrEmpty(item))
+                var k = kv.Key;
+                foreach (var ban in kv.Value)
                 {
-                    if (item == g || item == pg)
+                    if (!string.IsNullOrEmpty(ban))
                     {
-                        return item;
+                        if (game.Contains(ban) && (k == "all" || k == platform))
+                        {
+                            return k + ban;
+                        }
                     }
                 }
             }
             return string.Empty;
+        }
+
+        
+        public void Init()
+        {
+            var newBans = new Dictionary<string, List<string>>();
+            foreach (var kv in BanGames)
+            {
+                var key = kv.Key;
+                for (var i = 0; i < kv.Value.Count; i++)
+                {
+                    kv.Value[i] = StringUtility.TW2ZH(kv.Value[i]);
+                }
+                newBans.Add(key, kv.Value);
+            }
+            BanGames = newBans;
         }
     }
 
@@ -63,6 +89,12 @@ namespace boin.Review
 
         // 每笔最大额度
         public decimal OrderAmountMax { get; set; }
+        
+        // 最近10笔提款内 波币不能超过4笔
+        public int NearWithdrawCount { get; set; }
+        public int BobiMaxCount { get; set; }
+        
+
 
         public ReviewConfig()
         {
@@ -86,6 +118,10 @@ namespace boin.Review
             string yml = File.ReadAllText(path);
             var deserializer = new DeserializerBuilder().Build();
             var cnf = deserializer.Deserialize<ReviewConfig>(yml);
+            cnf.NewBank.Init();
+            cnf.NewBobi.Init();
+            cnf.OldBank.Init();
+            cnf.OldBobi.Init();
             return cnf;
         }
 

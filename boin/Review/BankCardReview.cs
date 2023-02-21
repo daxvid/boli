@@ -40,7 +40,7 @@ namespace boin.Review
                     }
                     else if (bankInfo.key != order.CardNo)
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@卡号未知:" + order.CardNo });
+                        rs.Add(new ReviewResult { Code = 101, Msg = "@卡需验证:" + order.CardNo });
                     }
                     else
                     {
