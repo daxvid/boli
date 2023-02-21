@@ -54,6 +54,8 @@ namespace boin
         public string ReviewMsg { get; set; } = string.Empty;
         public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
+        public GameBind Bind { get; set; }
+
         public Order()
         {
         }
@@ -95,19 +97,19 @@ namespace boin
                     throw new ArgumentException("Order Create");
                 }
                 Order order = new Order();
-                order.OrderID = ts[1].Text.Trim(); // 订单号
-                order.Created = ts[2].Text.Trim(); // 发起时间
-                order.TimeToAccount = ts[3].Text.Trim(); // 到账时间
-                order.GameId = ts[4].Text.Trim(); // 游戏ID"
-                order.NickName = ts[5].Text.Trim(); // 用户昵称
+                order.OrderID = Helper.ReadString(ts[1]); // 订单号
+                order.Created = Helper.ReadString(ts[2]); // 发起时间
+                order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
+                order.GameId = Helper.ReadString(ts[4]); // 游戏ID"
+                order.NickName = Helper.ReadString(ts[5]); // 用户昵称
                 order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
-                order.Way = ts[7].Text.Trim(); // 通道
-                order.Review = ts[8].Text.Trim(); // 状态
-                order.Transfer = ts[9].Text.Trim(); // 转账
-                order.Operating = ts[10].Text.Trim(); // 操作类型
-                order.Operator = ts[11].Text.Trim(); //  操作人
-                order.Remark = ts[12].Text.Trim(); // 提现备注
-                order.Status = ts[13].Text.Trim(); //  操作
+                order.Way = Helper.ReadString(ts[7]); // 通道
+                order.Review = Helper.ReadString(ts[8]); // 状态
+                order.Transfer = Helper.ReadString(ts[9]); // 转账
+                order.Operating = Helper.ReadString(ts[10]); // 操作类型
+                order.Operator = Helper.ReadString(ts[11]); //  操作人
+                order.Remark = Helper.ReadString(ts[12]); // 提现备注
+                order.Status = Helper.ReadString(ts[13]); //  操作
 
                 order.ReadExpand(rowEx, true);
 

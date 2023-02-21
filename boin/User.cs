@@ -84,16 +84,16 @@ namespace boin
                 }
 
                 User user = new User();
-                user.Merchant = ts[0].Text.Trim(); // 商户
+                user.Merchant = Helper.ReadString(ts[0]); // 商户
 
                 // 用户信息
                 var spans = ts[1].FindElements(By.XPath(".//div/div/span"));
-                user.AppId = spans[1].Text;
-                user.GameId = spans[2].Text;
+                user.AppId = Helper.ReadString(spans[1]);
+                user.GameId = Helper.ReadString(spans[2]);
 
                 // 注册时间/最后上线
                 var c = ts[7].FindElement(By.XPath(".//div/div/span[1]"));
-                var str = c.Text;
+                var str = Helper.ReadString(c);
                 var now = DateTime.Now;
                 user.Created = now;
                 for (var year = now.Year; year >= 2022; year--)
@@ -123,8 +123,8 @@ namespace boin
                 IWebElement userInfo = row[head["用户信息"]];
                 var spans = userInfo.FindElements(By.XPath(".//div/div/span"));
 
-                user.AppId = spans[1].Text;
-                user.GameId = spans[2].Text;
+                user.AppId = Helper.ReadString(spans[1]);
+                user.GameId = Helper.ReadString(spans[2]);
 
                 span.Msg = "用户:" + user.GameId;
 

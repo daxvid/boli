@@ -66,23 +66,28 @@ namespace boin.Util
             string content = string.Empty;
             try
             {
-                for (var i = 0; i < 4; i++)
+                content = Cache.GetBank(cardNo);
+                if (string.IsNullOrEmpty(content))
                 {
-                    // 创建HttpClient实例
-                    var client = new RestClient(url);
-                    var request = new RestRequest();
-                    request.Method = Method.Get;
-                    request.AddHeader("Accept", "application/json");
-                    var response = client.Execute(request);
-                    Thread.Sleep(1);
-                    content = response.Content; // raw content as string
-                    if (!string.IsNullOrWhiteSpace(content))
+                    for (var i = 0; i < 4; i++)
                     {
-                        break;
+                        // 创建HttpClient实例
+                        var client = new RestClient(url);
+                        var request = new RestRequest();
+                        request.Method = Method.Get;
+                        request.AddHeader("Accept", "application/json");
+                        var response = client.Execute(request);
+                        Thread.Sleep(1);
+                        content = response.Content; // raw content as string
+                        if (!string.IsNullOrWhiteSpace(content))
+                        {
+                            break;
+                        }
+                        Thread.Sleep(100);
                     }
-                    Thread.Sleep(100);
                 }
                 var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
+                Cache.SaveBank(cardNo, content);
                 return bankInfo;
             }
             catch (Exception err)

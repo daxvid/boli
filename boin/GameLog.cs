@@ -58,17 +58,17 @@ namespace boin
                 }
 
                 GameLog log = new GameLog();
-                log.LogId = ts[1].Text.Trim(); // 编号ID
-                log.GameId = ts[2].Text.Trim(); //游戏ID
-                log.GamePlatform = ts[3].Text.Trim(); //游戏平台
-                log.No = ts[4].Text.Trim(); //单号
-                log.GameName = ts[5].Text.Trim(); //游戏名
-                log.OpTime = ts[6].Text.Trim(); //操作时间
+                log.LogId = Helper.ReadString(ts[1]); // 编号ID
+                log.GameId = Helper.ReadString(ts[2]); //游戏ID
+                log.GamePlatform = Helper.ReadString(ts[3]); //游戏平台
+                log.No = Helper.ReadString(ts[4]); //单号
+                log.GameName = Helper.ReadString(ts[5]); //游戏名
+                log.OpTime = Helper.ReadString(ts[6]); //操作时间
                 log.TotalBet =  Helper.ReadDecimal(ts[7]); //下注总金额
                 log.TotalWin = Helper.ReadDecimal(ts[8]); //中奖金额
                 log.ValidBet = Helper.ReadDecimal(ts[9]); //有效下注
                 log.Tip = Helper.ReadDecimal(ts[10]); //小费
-                log.CancelBet = ts[11].Text.Trim(); //取消下注
+                log.CancelBet = Helper.ReadString(ts[11]); //取消下注
 
                 span.Msg = "游志:" + log.LogId;
                 return log;

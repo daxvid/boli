@@ -21,26 +21,26 @@ namespace boin.Review
             if (order.Way == "银行卡")
             {
                 // 检查银行卡姓名充值是否一致
-                var t2 = f.OtherRechargeAmount(order.Name);
+                var t2 = f.OtherRechargeAmount(order.Payee);
                 if (t2 > 0)
                 {
-                    var name = f.FirstOtherRechargeName(order.Name);
+                    var name = f.FirstOtherRechargeName(order.Payee);
                     rs.Add(new ReviewResult { Code = -401, Msg = "@其它名字充值:" + name });
                 }
                 else
                 {
-                    var t1 = f.TotalRechargeAmount(order.Name);
+                    var t1 = f.TotalRechargeAmount(order.Payee);
                     if (t1 <= 0)
                     {
-                        rs.Add(new ReviewResult { Code = 402, Msg = "@最近无充值:" + order.Name });
+                        rs.Add(new ReviewResult { Code = 402, Msg = "@最近无充值:" + order.Payee });
                     }
                     else if (t1 < order.Amount)
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@近期充值:" + t1});
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1});
                     }
                     else
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@充值通过:" + t1 });
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 });
                     }
                 }
             }
@@ -49,7 +49,7 @@ namespace boin.Review
                 var name = f.FirstOtherRechargeName(string.Empty);
                 if (string.IsNullOrEmpty(name))
                 {
-                    rs.Add(new ReviewResult { Code = 0, Msg = "@波币充值通过"});
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@币充值通过"});
                 }
                 else
                 {

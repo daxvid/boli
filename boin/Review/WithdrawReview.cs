@@ -27,13 +27,13 @@ namespace boin.Review
             var nearName = user.Funding.NearBankName();
             if (order.Way == "银行卡")
             {
-                if (nearName == order.Name || string.IsNullOrEmpty(nearName))
+                if (nearName == order.Payee || string.IsNullOrEmpty(nearName))
                 {
-                    rs.Add(new ReviewResult { Msg = "@提现名字通过:" + order.Name });
+                    rs.Add(new ReviewResult { Msg = "@名字通过:" + order.Payee });
                 }
                 else
                 {
-                    rs.Add(new ReviewResult { Code = 200, Msg = "@提现名字不一致:" + nearName });
+                    rs.Add(new ReviewResult { Code = 200, Msg = "@名字不一致:" + nearName });
                 }
             }
 

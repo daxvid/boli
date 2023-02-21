@@ -102,24 +102,21 @@ namespace boin
                 }
 
                 Recharge log = new Recharge();
-                log.GameId = ts[0].Text.Trim(); // 充值账户游戏ID
-                log.Nickname = ts[1].Text.Trim(); //  用户昵称
-                log.Depositor = ts[2].Text.Trim(); // 存款人
-                log.OrderId = ts[3].Text.Trim(); // 订单号
-                log.OutsideOrderId = ts[4].Text.Trim(); // 外部订单号
+                log.GameId = Helper.ReadString(ts[0]); // 充值账户游戏ID
+                log.Nickname = Helper.ReadString(ts[1]); //  用户昵称
+                log.Depositor = Helper.ReadString(ts[2]); // 存款人
+                log.OrderId = Helper.ReadString(ts[3]); // 订单号
+                log.OutsideOrderId = Helper.ReadString(ts[4]); // 外部订单号
 
                 log.RechargeAmount = Helper.ReadDecimal(ts[5]); // 充值金额
-                log.FirstRecharge = ts[6].Text.Trim(); // 首充
+                log.FirstRecharge = Helper.ReadString(ts[6]); // 首充
                 log.ActualAmount = Helper.ReadDecimal(ts[7]); // 实际到账金额
-                log.RechargeType = ts[8].Text.Trim(); // 充值类型
-                log.RechargeChannel = ts[9].Text.Trim(); // 充值接口
-                log.VipPeriod = ts[10].Text.Trim(); // VIP期数
+                log.RechargeType = Helper.ReadString(ts[8]); // 充值类型
+                log.RechargeChannel = Helper.ReadString(ts[9]); // 充值接口
+                log.VipPeriod = Helper.ReadString(ts[10]); // VIP期数
                 log.Created = Helper.ReadDateTime(ts[11]); // 时间
-                log.Mark = ts[12].Text.Trim(); // 说明
-                if (log.Depositor == "--")
-                {
-                    log.Depositor = string.Empty;
-                }
+                log.Mark = Helper.ReadString(ts[12]); // 说明
+
                 log.syncName();
 
                 span.Msg = "充值:" + log.OrderId;
@@ -148,10 +145,7 @@ namespace boin
                 log.VipPeriod = Helper.ReadString(head, "VIP期数", row);
                 log.Created = Helper.ReadTime(head, "时间", row);
                 log.Mark = Helper.ReadString(head, "说明", row);
-                if (log.Depositor == "--")
-                {
-                    log.Depositor = string.Empty;
-                }
+
                 log.syncName();
 
                 span.Msg = "充值:" + log.OrderId;
@@ -165,6 +159,11 @@ namespace boin
             var url = RechargeHost + orderId;
             try
             {
+                var name = Cache.GetRecharge(orderId);
+                if (name != null)
+                {
+                    return name;
+                }
                 HttpClient client = new HttpClient();
                 var task = client.GetStringAsync(url);
                 var content = task.Result;
@@ -174,7 +173,8 @@ namespace boin
                 {
                     int start = content.IndexOf("\"", index + 6, 16);
                     int end = content.IndexOf("\"", start + 1, 64);
-                    var name = content.Substring(start + 1, end - start - 1);
+                    name = content.Substring(start + 1, end - start - 1);
+                    Cache.SaveRecharge(orderId, name);
                     return name;
                 }
             }

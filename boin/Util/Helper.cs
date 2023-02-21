@@ -55,8 +55,7 @@ namespace boin.Util
                 return string.Empty;
             }
 
-            var value = cell.Text;
-            value = value.Trim();
+            var value = cell.Text.Trim();
             return value;
         }
 
@@ -156,7 +155,7 @@ namespace boin.Util
         {
             try
             {
-                var txt = e.Text.Trim();
+                var txt = ReadString(e);
                 decimal r = decimal.Parse(txt);
                 return r;
             }
@@ -166,11 +165,21 @@ namespace boin.Util
             }
         }
 
+        public static string ReadString(IWebElement e)
+        {
+            var txt = e.Text.Trim();
+            if (txt == "--")
+            {
+                return string.Empty;
+            }
+            return txt;
+        }
+
         public static DateTime ReadDateTime(IWebElement e)
         {
             try
             {
-                var txt = e.Text.Trim();
+                var txt = ReadString(e);
                 var r = DateTime.ParseExact(txt, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
                 return r;
             }

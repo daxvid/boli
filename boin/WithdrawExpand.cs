@@ -25,14 +25,14 @@ namespace boin
         // 支付渠道
         public string PayChan { get; set; } = string.Empty;
 
-        // 实名
-        public string Name { get; set; } = string.Empty;
+        // 实名(收款人)
+        public string Payee { get; set; } = string.Empty;
 
         // 账号/卡号
         public string CardNo { get; set; } = string.Empty;
 
         // 手续费
-        public decimal Gas { get; set; } = 0;
+        public decimal Fee { get; set; } = 0;
 
         // 实际到账金额
         public decimal ActualAmount { get; set; } = 0;
@@ -93,9 +93,9 @@ namespace boin
         {
             var ex = readEx(rowEx);
             this.PayChan = Helper.GetValue(ex, "支付渠道：");
-            this.Name = Helper.GetValue(ex, "实名：");
+            this.Payee = Helper.GetValue(ex, "实名：");
             this.CardNo = Helper.GetValue(ex, "账号/卡号：");
-            this.Gas = Helper.GetDecimal(ex, "手续费：");
+            this.Fee = Helper.GetDecimal(ex, "手续费：");
             this.ActualAmount = Helper.GetDecimal(ex, "实际到账金额：");
             this.TransferOrderId = Helper.GetValue(ex, "转账订单号：");
             this.Reasons = Helper.GetValue(ex, "拒绝理由：");
@@ -113,7 +113,7 @@ namespace boin
             Dictionary<string, string> dic = new Dictionary<string, string>(cells.Count * 3 / 2);
             foreach (var cell in cells)
             {
-                var txt = cell.Text;
+                var txt = Helper.ReadString(cell);
                 int index = txt.IndexOf('：');
                 if (index > 0 && index < txt.Length - 1)
                 {
@@ -128,27 +128,6 @@ namespace boin
                         dic.TryAdd(txt, string.Empty);
                     }
                 }
-                //var spanList = cell.FindElements(By.XPath(".//span[not (@style='display: none;')]"));
-                //var count = spanList.Count;
-                //if (count == 0)
-                //{
-                //    continue;
-                //}
-                //var key = spanList[0].Text;
-                //if (string.IsNullOrEmpty(key))
-                //{
-                //    continue;
-                //}
-                //string value = string.Empty;
-                //if (count >= 2)
-                //{
-                //    value = spanList[1].Text;
-                //}
-                //for (var i = 2; i < count; i++)
-                //{
-                //    value += "|" + spanList[i].Text;
-                //}
-                //dic.Add(key, value);
             }
             return dic;
         }

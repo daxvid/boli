@@ -31,16 +31,16 @@ namespace boin.Review
                     // 银行卡状态。值：ok，no。
                     if (!bankInfo.stat.Equals("ok"))
                     {
-                        rs.Add(new ReviewResult { Code = -101, Msg = "@卡不可使用" + order.CardNo });
+                        rs.Add(new ReviewResult { Code = -101, Msg = "@卡不可用" + order.CardNo });
                     }
                     // 有效性，是否正确有效。值：true为是，false为否。
                     else if (!bankInfo.validated)
                     {
-                        rs.Add(new ReviewResult { Code = -102, Msg = "@卡号不正确:" + order.CardNo });
+                        rs.Add(new ReviewResult { Code = -102, Msg = "@卡不正确:" + order.CardNo });
                     }
-                    else if(bankInfo.key != order.CardNo)
+                    else if (bankInfo.key != order.CardNo)
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@卡待定:" + order.CardNo });
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@卡号未知:" + order.CardNo });
                     }
                     else
                     {
@@ -51,8 +51,24 @@ namespace boin.Review
             }
             else if (order.Way == "数字钱包")
             {
-                // TODO: 检查地址格式
-                rs.Add(new ReviewResult { Code = 0, Msg = "@数字钱包正确:" + order.CardNo });
+                // 波音没绑姓名的话不给予通过
+                bool passName = false;
+                var b = order.Bind;
+                if (b != null)
+                {
+                    if (b.CardNo == order.CardNo && (!string.IsNullOrEmpty(b.Payee)))
+                    {
+                        if (b.Payee == order.Payee || order.Payee == string.Empty)
+                        {
+                            rs.Add(new ReviewResult { Code = 0, Msg = "@钱包正确:" + b.Payee });
+                            passName = true;
+                        }
+                    }
+                }
+                if (!passName)
+                {
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@钱包未认证:" + order.CardNo });
+                }
             }
             else
             {
@@ -60,7 +76,6 @@ namespace boin.Review
             }
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
-
 
         public ReadOnlyCollection<ReviewResult> Review(User user)
         {

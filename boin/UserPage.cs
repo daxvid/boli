@@ -43,9 +43,12 @@ namespace boin
                 {
                     Thread.Sleep(1000);
                 }
+                catch (ElementNotInteractableException)
+                {
+                    Thread.Sleep(1000);
+                }
                 //catch (NoSuchElementException) { }
                 //catch (ElementClickInterceptedException) { }
-                //catch (ElementNotInteractableException) { }
                 //catch (InvalidOperationException) { }
                 catch (WebDriverException)
                 {
@@ -77,7 +80,7 @@ namespace boin
                 var path = "//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]/div[2]/table/tbody/tr/td[2]/div/div/div/div[2]/div[3]/div/span";
                 path += "[contains(text(),'" + gameid + "')]";
                 var t = FindElementByXPath(path);
-                var gid = t.Text.Trim();
+                var gid = Helper.ReadString(t);
                 if (gid == gameid)
                 {
                     return true;
@@ -107,7 +110,9 @@ namespace boin
             //}
 
             // 展开所有显示
-            var expandList = FindElementsByXPath(tbody, ".//button/span[text()='显示']");
+            // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[10]/div/div/button/span
+            // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr[3]/td[10]/div/div/button/span
+            var expandList = FindElementsByXPath(tbody, ".//td[10]/div/div/button/span[text()='显示']");
             for (var i = 0; i < expandList.Count; i++)
             {
                 var exBtn = expandList[i];
@@ -116,6 +121,7 @@ namespace boin
                     SafeClick(exBtn, 5);
                 }
             }
+            Thread.Sleep(100);
 
             var users = readUsers(tbody);
             int gameCount = 0;

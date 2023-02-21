@@ -2,7 +2,8 @@
 namespace boin.Review
 {
 	public class ReviewManager
-	{
+    {
+        public ReviewConfig Cnf;
         List<IReviewUser> userReviews = new List<IReviewUser>();
         List<IReviewOrder> orderReviews = new List<IReviewOrder>();
 
@@ -10,7 +11,8 @@ namespace boin.Review
 
         public ReviewManager(string cnfFile)
 		{
-            ReviewConfig cnf = ReviewConfig.FromYamlFile(cnfFile);
+            var cnf = ReviewConfig.FromYamlFile(cnfFile);
+            Cnf = cnf;
 
             orderReviews.Add(new BankCardReview(cnf));
 
@@ -51,7 +53,8 @@ namespace boin.Review
         public bool Review(User user)
 		{
 			List<ReviewResult> results = new List<ReviewResult>();
-			foreach (var review in userReviews)
+            results.AddRange(user.Order.ReviewResult);
+            foreach (var review in userReviews)
 			{
 				var rs = review.Review(user);
                 if (rs != null && rs != ReviewResult.Empty)

@@ -14,9 +14,13 @@ namespace boin.Review
     //新会员首提使用银行卡提款-游戏炸金花-可以通过
     //会员游戏『环亚棋牌』『炸金花』—提款任何方式-不可以通过
     //会员使用卡卡充值的姓名，与提款姓名不符-不可以通过
+    //充值和提款两者都超过四万的
 
     public class AmountConfig
     {
+        // 当日充值达多少不审
+        public decimal DayRecharge { get; set; }
+
         // 每日最大额度
         public decimal DayMax { get; set; }
 
@@ -56,6 +60,9 @@ namespace boin.Review
 
         // 老会员波币检查条件
         public AmountConfig OldBobi { get; set; }
+
+        // 每笔最大额度
+        public decimal OrderAmountMax { get; set; }
 
         public ReviewConfig()
         {

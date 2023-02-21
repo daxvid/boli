@@ -53,7 +53,8 @@ namespace boin
             List<string> onlineRechargeList = new List<string>();
             foreach(var item in items)
             {
-                onlineRechargeList.Add(item.Text);
+                var value = Helper.ReadString(item);
+                onlineRechargeList.Add(value);
             }
             return ReadRechargeLog(table);
         }

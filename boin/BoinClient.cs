@@ -10,15 +10,13 @@ namespace boin
     {
         ReviewManager reviewer;
         TimeAuthenticator authenticator;
-        OrderCache cache;
 
         public BoinClient(AppConfig cnf) : base(newDriver(cnf.Headless), cnf)
         {
             this.cnf = cnf;
             this.reviewer = new ReviewManager(cnf.ReviewFile);
             this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-            this.cache = new OrderCache(cnf.Redis);
-
+            Cache.Init(cnf.Redis);
         }
 
 
@@ -84,7 +82,7 @@ namespace boin
             try
             {
                 var e = FindElementByXPath("//*[@id='b_home_notice']/h1");
-                var txt = e.Text;
+                var txt = Helper.ReadString(e);
                 if (txt.Contains("登入成功"))
                 {
                     SendMsg("登入成功:" + cnf.UserName);
@@ -122,7 +120,7 @@ namespace boin
             {
                 while (true)
                 {   // run
-                    var orders = loadOrders();
+                    var orders = LoadOrders();
                     var passOrders = new List<Order>(orders.Count);
                     foreach (var order in orders)
                     {
@@ -141,7 +139,7 @@ namespace boin
             });
         }
 
-        public List<Order> loadOrders()
+        public List<Order> LoadOrders()
         {
             using (var orderPage = new OrderPage(driver, cnf))
             {
@@ -152,34 +150,59 @@ namespace boin
                 foreach (var order in orders)
                 {
                     // 过滤已经处理过的订单
-                    var msg = cache.GetOrderInfo(order.OrderID);
+                    var msg = Cache.GetOrder(order.OrderID);
                     if (!string.IsNullOrEmpty(msg))
                     {
                         continue;
                     }
-                    if ((!string.IsNullOrEmpty(order.Remark)) && order.Remark != "--")
+                    // 已经备注的订单不处理
+                    if (!string.IsNullOrEmpty(order.Remark))
                     {
                         continue;
                     }
                     // 过滤金额，只处理5000以下的订单
-                    if (order.Amount > 5000)
+                    if (order.Amount > reviewer.Cnf.OrderAmountMax)
                     {
                         continue;
                     }
+                    // 查询绑定
+                    var bind = LoadBind(order.GameId, order.CardNo);
+                    order.Bind = bind;
                     r.Add(order);
                 }
+                SendMsg("order count:" + r.Count.ToString());
                 return r;
             }
         }
 
 
-        public User loacUser(string gameId)
+        public User LoadUser(string gameId)
         {
             using (var userPage = new UserPage(driver, cnf))
             {
                 userPage.Open();
                 var user = userPage.Select(gameId);
                 return user;
+            }
+        }
+
+        public List<GameBind> LoadBinds(string gameId)
+        {
+            using (var bindPage = new GameBindPage(driver, cnf))
+            {
+                bindPage.Open();
+                var binds = bindPage.Select(gameId);
+                return binds;
+            }
+        }
+
+        public GameBind LoadBind(string gameId, string cardNo)
+        {
+            using (var bindPage = new GameBindPage(driver, cnf))
+            {
+                bindPage.Open();
+                var bind = bindPage.Select(gameId, cardNo);
+                return bind;
             }
         }
 
@@ -195,7 +218,7 @@ namespace boin
                 {
                     SendMsg(msg);
                     span.Msg = msg;
-                    var user = loacUser(order.GameId);
+                    var user = LoadUser(order.GameId);
                     user.Order = order;
                     users.Add(user);
                     if (user.Funding.IsSyncName)
@@ -260,7 +283,7 @@ namespace boin
                 user.ReviewMsg = "fail";
             }
             var msg = user.ReviewNote();
-            cache.Save(user.Order.OrderID, msg);
+            Cache.SaveOrder(user.Order.OrderID, msg);
             SendMsg(msg);
             return success;
         }

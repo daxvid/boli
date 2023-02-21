@@ -32,6 +32,8 @@ namespace boin.Review
             var order = user.Order;
             bool isNew = user.IsNewUser();
             var ac = cnf.GetAmountConfig(order.Way, isNew);
+
+            // 检查单笔额度
             var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
             if (r1 != null)
             {
@@ -45,10 +47,19 @@ namespace boin.Review
             {
                 rs.Add(r2);
             }
+
+            // 检查当日总充值
+            var dayRecharge = user.Funding.ToDay.RechargeAmount;
+            var r3 = checkDayRecharge(order.Way, ac.DayMax, dayRecharge);
+            if (r3 != null)
+            {
+                rs.Add(r3);
+            }
+
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
 
-
+        // 检查每次提现金额
         ReviewResult checkOnceMax(string way, decimal max, decimal amount)
         {
             if (way == "银行卡")
@@ -72,11 +83,10 @@ namespace boin.Review
             {
                 return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
             }
-            return (new ReviewResult { Msg = "@单笔限制通过" + max + ":" + amount });
+            return (new ReviewResult { Msg = "@单笔通过:" + amount });
         }
 
-
-
+        // 检查当日提现金额
         ReviewResult checkDayMax(string way, decimal max, decimal amount)
         {
             if (way == "银行卡")
@@ -100,9 +110,35 @@ namespace boin.Review
             {
                 return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
             }
-            return (new ReviewResult { Msg = "@当日限制通过" + max + ":" + amount });
+            return (new ReviewResult { Msg = "@当日通过:" + amount });
         }
 
+        // 检查当日充值金额
+        ReviewResult checkDayRecharge(string way, decimal max, decimal amount)
+        {
+            if (way == "银行卡")
+            {
+                // 检查老用户单笔银行卡限制
+                if (amount > max)
+                {
+                    return (new ReviewResult { Code = 401, Msg = "@卡提日充值限制" + max + ":" + amount });
+                }
+
+            }
+            else if (way == "数字钱包")
+            {
+                // 检查老用户单笔波币限制
+                if (amount > max)
+                {
+                    return (new ReviewResult { Code = 402, Msg = "@币提日充值限制" + max + ":" + amount });
+                }
+            }
+            else
+            {
+                return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
+            }
+            return (new ReviewResult { Msg = "@日充通过:" + amount });
+        }
 
     }
 }

@@ -248,8 +248,7 @@ namespace boin
                 catch (NoSuchElementException) { }
                 catch (ElementClickInterceptedException) { }
                 catch
-                {
-                    throw;
+                {                    throw;
                 }
                 return false;
             });

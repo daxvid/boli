@@ -63,6 +63,7 @@ namespace boin
             {
                 SafeClick(expandItems[i], 10);
             }
+            Thread.Sleep(500);
 
             var orders = ReadOrders(tbody);
             return orders;
@@ -73,7 +74,6 @@ namespace boin
         {
             var allRows = FindElementsByXPath(tbody, (".//tr"));
             var count = allRows.Count;
-            SendMsg("order count:" + count.ToString());
             var orders = new List<Order>(count);
             for (var i = 0; i < count; i++)
             {

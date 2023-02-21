@@ -41,16 +41,8 @@ namespace boin
         // 筹码兑钻石金额
         public decimal ChipToDiamondAmount { get; set; }
 
-        //// 充值记录
-        //public List<Recharge> RechargeLog { get; set; }
-
-        //// 提现记录
-        //public List<Withdraw> WithdrawLog { get; set; }
-
         public FundingDay()
         {
-            //RechargeLog = null;
-            //WithdrawLog = null;
         }
 
         public void ReadFrom(IWebElement tbox)
@@ -61,7 +53,7 @@ namespace boin
             GameProfitLoss = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='游戏损益']/../td[2]")));
             var index = 0;
             // 充值
-            var recharge = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]")).Text;
+            var recharge = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='充值']/../td[2]")));
             index = recharge.IndexOf('\n');
             if (index > 0)
             {
@@ -73,7 +65,7 @@ namespace boin
 
 
             // 提现
-            var withdraw = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]")).Text;
+            var withdraw = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]")));
             index = withdraw.IndexOf('\n');
             if (index > 0)
             {
@@ -84,7 +76,7 @@ namespace boin
             WithdrawAmount = decimal.Parse(withdraw.Substring(index + 1));
 
             // 筹码兑钻石
-            var chipToDiamond = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='筹码兑钻石']/../td[2]")).Text;
+            var chipToDiamond = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='筹码兑钻石']/../td[2]")));
             index = chipToDiamond.IndexOf('\n');
             if (index > 0)
             {
@@ -98,7 +90,7 @@ namespace boin
             // 提充客损
             ChargeCustomerLoss = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提充客损']/../td[2]")));
             // 优惠赠送
-            Offers = tbox.FindElement(By.XPath(".//div/table/tr/td[text()='优惠赠送']/../td[2]")).Text;
+            Offers = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='优惠赠送']/../td[2]")));
             // 返利
             Rebate = Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='返利']/../td[2]")));
         }
@@ -176,9 +168,9 @@ namespace boin
         {
             foreach (var w in WithdrawLog)
             {
-                if (string.IsNullOrEmpty(w.Name) && w.Transfer == "成功")
+                if (string.IsNullOrEmpty(w.Payee) && w.Transfer == "成功")
                 {
-                    return w.Name;
+                    return w.Payee;
                 }
             }
             return string.Empty;
