@@ -95,19 +95,8 @@ namespace boin
 
                 // 注册时间/最后上线
                 var c = ts[7].FindElement(By.XPath(".//div/div/span[1]"));
-                var str = Helper.ReadString(c);
-                var now = DateTime.Now;
-                user.Created = now;
-                for (var year = now.Year; year >= 2022; year--)
-                {
-                    DateTime d = DateTime.ParseExact(year + "/" + str, "yyyy/MM/dd HH:mm:ss", CultureInfo.CurrentCulture);
-                    if (d < now)
-                    {
-                        user.Created = d;
-                        break;
-                    }
-                }
-
+                user.Created = Helper.ReadShortTime(c);
+                
                 span.Msg = "用户:" + user.GameId;
                 return user;
             }

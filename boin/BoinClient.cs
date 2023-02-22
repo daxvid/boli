@@ -145,7 +145,7 @@ namespace boin
             {
                 orderPage.Open();
                 orderPage.Select(cnf.OrderHour);
-                var orders = orderPage.ReadTable();
+                var orders = orderPage.ReadTable(reviewer.Cnf.OrderAmountMax);
                 var r = new List<Order>(orders.Count);
                 foreach (var order in orders)
                 {
@@ -206,6 +206,7 @@ namespace boin
             }
         }
 
+        static int orderCount = 0;
         public List<User> Review(List<Order> orders)
         {
             long wait = 0;
@@ -213,7 +214,8 @@ namespace boin
             for (int i = 0; i < orders.Count; i++)
             {
                 var order = orders[i];
-                var msg = "no:" + (i+1).ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
+                orderCount++;
+                var msg = "user:" + order.GameId + ";order_"+orderCount.ToString()+":" + order.OrderID;
                 using (var span = new Span())
                 {
                     SendMsg(msg);

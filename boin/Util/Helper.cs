@@ -188,6 +188,25 @@ namespace boin.Util
                 throw;
             }
         }
+
+        public static DateTime ReadShortTime(IWebElement e)
+        {
+            var str = Helper.ReadString(e);
+            if (str.IndexOf('/') >= 0)
+            {
+                str = str.Replace("/", "-");
+            }
+            var now = DateTime.Now;
+            for (var year = now.Year; year >= 2022; year--)
+            {
+                DateTime d = DateTime.ParseExact(year + "-" + str, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
+                if (d < now)
+                {
+                    return d;
+                }
+            }
+            return now;
+        }
     }
 }
 

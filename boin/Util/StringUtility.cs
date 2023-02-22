@@ -1,3 +1,4 @@
+using System.Text;
 using  boin.Util;
 using OpenCCNET;
 using OpenQA.Selenium.DevTools.V109.Target;
@@ -30,6 +31,25 @@ namespace boin.Util
         public static string TW2ZH(string str)
         {
             return ZhConverter.HantToHans(str);
+        }
+        
+        public static string DecodeString(string unicode)
+        {
+            if (string.IsNullOrEmpty(unicode))
+            {
+                return string.Empty;
+            }
+            //string[] ls = unicode.Replace("\\", "").Split(new char[]{'u'},StringSplitOptions.RemoveEmptyEntries);
+            string[] ls = unicode.Split(new string[] { "\\u" }, StringSplitOptions.RemoveEmptyEntries);
+            StringBuilder builder = new StringBuilder();
+            int len = ls.Length;
+            for (int i = 0; i < len; i++)
+            {
+                //builder.Append((Char)ushort.Parse(ls[i], System.Globalization.NumberStyles.HexNumber));
+                builder.Append(Convert.ToChar(ushort.Parse(ls[i], System.Globalization.NumberStyles.HexNumber)));
+
+            }
+            return builder.ToString();
         }
     }
 }

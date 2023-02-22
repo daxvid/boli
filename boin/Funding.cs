@@ -176,6 +176,50 @@ namespace boin
             return string.Empty;
         }
 
+        // 最近的单是否拒绝
+        public bool NearReject(string orderId)
+        {  
+            foreach (var w in WithdrawLog)
+            {
+                if (w.OrderID != orderId)
+                {
+                    if (w.Review == "已通过" && w.Transfer == "成功")
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        // 最近多少笔波币提现
+        public int NearBobiCount(string orderId, int maxCount)
+        {
+            if (WithdrawLog == null)
+            {
+                return 0;
+            }
+            int checkCount = 0;
+            int bobiCount = 0;
+            for (var i = 0; (i < WithdrawLog.Count && checkCount < maxCount); i++)
+            {
+                var w = WithdrawLog[i];
+                if (w.OrderID != orderId)
+                {
+                    checkCount++;
+                    if (w.Way == "数字钱包")
+                    {
+                        bobiCount++;
+                    }
+                }
+            }
+            return bobiCount;
+        }
+
         // 用户名总的充值金额
         public decimal TotalRechargeAmount(string name)
         {
@@ -204,6 +248,25 @@ namespace boin
             return total;
         }
 
+        // 当日提现金额
+        public decimal TotalDayWithdraw(string way, string orderId)
+        {
+            decimal total = 0;
+            var now = DateTime.Now;
+            foreach (var w in WithdrawLog)
+            {
+                if ((w.OrderID != orderId) && w.Way == way)
+                {
+                    if (w.Created.Year == now.Year && w.Created.Month == now.Month && w.Created.Day == now.Day)
+                    {
+                        total += w.Amount;
+                    }
+                }
+            }
+            return total;
+        }
+        
+        
         // 第一个其它用户名
         public string FirstOtherRechargeName(string name)
         {

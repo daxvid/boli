@@ -29,8 +29,8 @@ namespace boin
             // //*[@id="Cash"]/div[4]/div/div/div[1]/div/i
             bool b2 = true;
             bool s2 = true;
-            //b2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i");
-            //s2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]");
+            b2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i");
+            s2 = TryClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]");
             return b1 && s1 && b2 && s2;
         }
 
@@ -72,7 +72,7 @@ namespace boin
         // 读取每一项的信息
         private List<Order> ReadOrders(IWebElement tbody)
         {
-            var allRows = FindElementsByXPath(tbody, (".//tr"));
+            var allRows = FindElementsByXPath(tbody, ".//tr");
             var count = allRows.Count;
             var orders = new List<Order>(count);
             for (var i = 0; i < count; i++)
@@ -91,6 +91,68 @@ namespace boin
                     {
                         i += 1;
                     }
+                }
+                var order = Order.Create(row, rowEx);
+                if (order != null)
+                {
+                    orders.Add(order);
+                }
+            }
+            return orders;
+        }
+        
+        public List<Order> ReadTable(int orderAmountMax)
+        {
+            var tablePath = "//*[@id=\"Cash\"]/div[2]/div[1]";
+            var table = FindElementByXPath(tablePath);
+
+            var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+            var tbody = FindElementByXPath(table, bodyPath);
+            // var dicHead = ReadHeadDic(table);
+
+            // // 展开所有列表
+            // // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
+            // var expandPath = "./tr/td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+            // var expandItems = FindElementsByXPath(tbody, expandPath);
+            // for (var i = 0; i < expandItems.Count; i++)
+            // {
+            //     SafeClick(expandItems[i], 10);
+            // }
+            // Thread.Sleep(500);
+
+            var orders = ReadOrders(tbody, orderAmountMax);
+            return orders;
+        }
+
+        // 读取每一项的信息
+        private List<Order> ReadOrders(IWebElement tbody, int orderAmountMax)
+        {
+            // .//tr/td[7]/div/span[number(text())<=4000]
+            // .//tr/td[13]/div/div[text()='--']
+            var path = ".//tr/td[7]/div/span[number(text())<="
+                       +orderAmountMax.ToString()
+                       +"]/../../../td[13]/div/div[text()='--']/../../..";
+            var allRows = FindElementsByXPath(tbody, path);
+            
+            // 展开所有列表
+            // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
+            var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+            foreach (var row in allRows)
+            {
+                TryClickByXPath(row, expandPath,0);
+            }
+            Thread.Sleep(200);
+            
+            var count = allRows.Count;
+            var orders = new List<Order>(count);
+            for (var i = 0; i < count; i++)
+            {
+                // following-sibling::ul[1]
+                var row = allRows[i];
+                var rowEx = FindElementByXPath(row, "./following-sibling::tr[1]/td[@class='ivu-table-expanded-cell']/..");
+                if (rowEx == null)
+                {
+                    throw new NoSuchElementException("not find rowEx");
                 }
                 var order = Order.Create(row, rowEx);
                 if (order != null)

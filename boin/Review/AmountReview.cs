@@ -52,18 +52,24 @@ namespace boin.Review
 
             // 检查当日总充值
             var dayRecharge = user.Funding.ToDay.RechargeAmount;
-            var r3 = checkDayRecharge(order.Way, ac.DayMax, dayRecharge);
+            var r3 = checkDayRecharge(order.Way, ac.DayRecharge, dayRecharge);
             if (r3 != null)
             {
                 rs.Add(r3);
             }
             
-            // 
-
+            // 检查如果玩了某种游戏，当日提现总额限制
+            var dayWithdraw = user.Funding.TotalDayWithdraw(order.Way, order.OrderID) + order.Amount;
+            var r4 = checkDayGames(user, ac.DayMaxGames, dayWithdraw);
+            if (r4 != null)
+            {
+                rs.Add(r4);
+            }
+            
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
 
-        // 检查每次提现金额
+        // 检查每笔提现金额
         ReviewResult checkOnceMax(string way, decimal max, decimal amount)
         {
             if (way == "银行卡")
@@ -144,6 +150,26 @@ namespace boin.Review
             return (new ReviewResult { Msg = "@日充通过:" + amount });
         }
 
+        // 检查如果玩了某种游戏，当日提现总额限制
+        ReviewResult checkDayGames(User user, Dictionary<string, decimal> dayMaxGames, decimal amount)
+        {
+            if ((dayMaxGames != null) && (dayMaxGames.Count > 0))
+            {
+                foreach (var kv in dayMaxGames)
+                {
+                    if (user.GameInfo.PlayGame(string.Empty,kv.Key))
+                    {
+                        // 游戏日提限制
+                        if (amount > kv.Value)
+                        {
+                            var msg = "@游戏日提限制" + kv.Key + ":" + kv.Value + "<" + amount;
+                            return (new ReviewResult { Code = -401, Msg = msg});
+                        }
+                    }
+                }
+            }
+            return (new ReviewResult { Msg = "@游戏日提通过:" + amount });
+        }
     }
 }
 

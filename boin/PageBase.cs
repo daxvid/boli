@@ -223,8 +223,7 @@ namespace boin
         }
 
         protected bool TryClick(By by, int ms = 1000)
-        {
-            var result = wait.Until(driver =>
+        { var result = wait.Until(driver =>
             {
                 try
                 {

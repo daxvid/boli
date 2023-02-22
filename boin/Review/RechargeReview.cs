@@ -46,7 +46,7 @@ namespace boin.Review
             }
             else
             {
-                var name = f.FirstOtherRechargeName(string.Empty);
+                var name = f.FirstOtherRechargeName(order.Payee);
                 if (string.IsNullOrEmpty(name))
                 {
                     rs.Add(new ReviewResult { Code = 0, Msg = "@币充值通过"});

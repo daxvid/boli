@@ -35,7 +35,6 @@ namespace boin
             return t;
         }
 
-
         public List<Withdraw> Select(int maxDay)
         {
             var table = getCurrentTable(1);
@@ -57,7 +56,7 @@ namespace boin
             // table = ivu-modal-content
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
             var tbody = FindElementByXPath(table, bodyPath);
-            var allLogs = ReadLogs(tbody, 1);
+            var allLogs = ReadWithdraws(tbody, 1);
 
             for (var page = 2; page <= maxPage; page++)
             {
@@ -70,7 +69,7 @@ namespace boin
                 table = getCurrentTable(page);
                 tbody = FindElementByXPath(table, bodyPath);
 
-                var logs = ReadLogs(tbody, page);
+                var logs = ReadWithdraws(tbody, page);
                 allLogs.AddRange(logs);
             }
             return allLogs;
@@ -79,6 +78,7 @@ namespace boin
         // 读取每一项日志信息
         private List<Withdraw> ReadLogs(IWebElement tbody, int page)
         {
+            var allRows1 = FindElementsByXPath(tbody, ".//tr");
             // 展开所有列表
             var expandList = FindElementsByXPath(tbody, ".//tr/td/div/div[@class='ivu-table-cell-expand']");
             foreach (var exBtn in expandList)
@@ -106,6 +106,37 @@ namespace boin
                             i += 1;
                         }
                 }
+                if (rowEx == null)
+                {
+                    throw new NoSuchElementException("not find rowEx");
+                }
+                var withdraw = Withdraw.Create(row, rowEx);
+                if (withdraw != null)
+                {
+                    allLogs.Add(withdraw);
+                }
+            }
+            return allLogs;
+        }
+        
+        // 读取每一项日志信息
+        private List<Withdraw> ReadWithdraws(IWebElement tbody, int page)
+        {
+            var allRows = FindElementsByXPath(tbody, ".//tr");
+            // 展开所有列表
+            var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+            foreach (var row in allRows)
+            {
+                TryClickByXPath(row, expandPath,0);
+            }
+            Thread.Sleep(200);
+            
+            var allLogs = new List<Withdraw>();
+            var count = allRows.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var row = allRows[i];
+                var rowEx = FindElementByXPath(row, "./following-sibling::tr[1]/td[@class='ivu-table-expanded-cell']/..");
                 if (rowEx == null)
                 {
                     throw new NoSuchElementException("not find rowEx");

@@ -97,6 +97,7 @@ namespace boin
             {
                 Helper.TryClick(wait, sel);
             }
+            Thread.Sleep(1000);
 
             var allRows = FindElementsByXPath(tbody, ".//tr");
             var count = allRows.Count;

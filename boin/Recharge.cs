@@ -71,8 +71,9 @@ namespace boin
         {
             if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
             {
-                if ((string.IsNullOrEmpty(this.Depositor))
-                    && (this.RechargeChannel.Contains("银联") && this.RechargeChannel.Contains("四方")))
+                var chan = this.RechargeChannel;
+                if (string.IsNullOrEmpty(this.Depositor) && chan.Contains("四方")
+                  && ((chan.Contains("银联") || chan.Contains("卡卡"))))
                 {
                     ThreadPool.QueueUserWorkItem(state =>
                     {
@@ -174,6 +175,10 @@ namespace boin
                     int start = content.IndexOf("\"", index + 6, 16);
                     int end = content.IndexOf("\"", start + 1, 64);
                     name = content.Substring(start + 1, end - start - 1);
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        name = System.Text.RegularExpressions.Regex.Unescape(name);
+                    }
                     Cache.SaveRecharge(orderId, name);
                     return name;
                 }

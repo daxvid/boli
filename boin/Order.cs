@@ -15,7 +15,7 @@ namespace boin
         public string OrderID { get; set; } = string.Empty;
 
         // 创建时间
-        public string Created { get; set; } = string.Empty;
+        public DateTime Created { get; set; }
 
         // 到账时间
         public string TimeToAccount { get; set; } = string.Empty;
@@ -98,7 +98,7 @@ namespace boin
                 }
                 Order order = new Order();
                 order.OrderID = Helper.ReadString(ts[1]); // 订单号
-                order.Created = Helper.ReadString(ts[2]); // 发起时间
+                order.Created = Helper.ReadShortTime(ts[2]); // 发起时间
                 order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
                 order.GameId = Helper.ReadString(ts[4]); // 游戏ID"
                 order.NickName = Helper.ReadString(ts[5]); // 用户昵称
@@ -126,7 +126,7 @@ namespace boin
 
                 Order order = new Order();
                 order.OrderID = Helper.ReadString(head, "订单号", row);
-                order.Created = Helper.ReadString(head, "发起时间", row);
+                //order.Created = Helper.ReadString(head, "发起时间", row);
                 order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
                 order.GameId = Helper.ReadString(head, "游戏ID", row);
                 order.NickName = Helper.ReadString(head, "用户昵称", row);

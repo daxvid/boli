@@ -16,13 +16,14 @@ namespace boin.Review
     //会员游戏『环亚棋牌』『炸金花』—提款任何方式-不可以通过
     //会员使用卡卡充值的姓名，与提款姓名不符-不可以通过
     //波音没绑姓名的话不给予通过
-    //充值和提款两者都超过四万的人工审核
+    //当日充值和提款总额两者都超过四万的人工审核
     //玩百家乐的会员 波币一天不超过3000提款
-    //最近10笔提款内 波币不能超过4笔吗
+    //最近10笔提款内 波币不能超过4笔
+    //前一笔是失败的订单机器人不要通过，让我们人工审核
 
     public class AmountConfig
     {
-        // 当日充值达多少不审
+        // 当日充值达多少人工审核
         public decimal DayRecharge { get; set; }
 
         // 每日最大额度
@@ -75,6 +76,8 @@ namespace boin.Review
 
     public class ReviewConfig
     {
+        public static ReviewConfig Cnf;
+        
         // 新会员银行卡检查条件
         public AmountConfig NewBank { get; set; }
 
@@ -88,13 +91,12 @@ namespace boin.Review
         public AmountConfig OldBobi { get; set; }
 
         // 每笔最大额度
-        public decimal OrderAmountMax { get; set; }
+        public int OrderAmountMax { get; set; }
         
         // 最近10笔提款内 波币不能超过4笔
         public int NearWithdrawCount { get; set; }
         public int BobiMaxCount { get; set; }
         
-
 
         public ReviewConfig()
         {
@@ -122,6 +124,7 @@ namespace boin.Review
             cnf.NewBobi.Init();
             cnf.OldBank.Init();
             cnf.OldBobi.Init();
+            Cnf = cnf;
             return cnf;
         }
 
