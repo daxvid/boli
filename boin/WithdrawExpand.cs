@@ -58,15 +58,15 @@ namespace boin
         // 开户行名称
         public string BankName { get; set; } = string.Empty;
 
-        public bool IsSyncName
-        {
-            get { return Interlocked.Read(ref nameLocker) == 2; }
-        }
+        // public bool IsSyncName
+        // {
+        //     get { return Interlocked.Read(ref nameLocker) == 2; }
+        // }
 
         private long nameLocker = 0;
 
         // 同步银行卡名称
-        protected void syncName()
+        protected void syncBankName()
         {
             if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
             {
@@ -103,7 +103,7 @@ namespace boin
             this.UserError = Helper.GetValue(ex, "用户显示错误：");
             if (readBankInfo)
             {
-                syncName();
+                syncBankName();
             }
         }
 

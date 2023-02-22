@@ -106,6 +106,10 @@ namespace boin
                             i += 1;
                         }
                 }
+                if (rowEx == null)
+                {
+                    throw new NoSuchElementException("not find rowEx");
+                }
                 var withdraw = Withdraw.Create(row, rowEx);
                 if (withdraw != null)
                 {

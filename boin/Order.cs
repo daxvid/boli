@@ -110,8 +110,7 @@ namespace boin
                 order.Operator = Helper.ReadString(ts[11]); //  操作人
                 order.Remark = Helper.ReadString(ts[12]); // 提现备注
                 order.Status = Helper.ReadString(ts[13]); //  操作
-
-                order.ReadExpand(rowEx, true);
+                order.ReadExpand(rowEx, order.Way == "银行卡");
 
                 span.Msg = "订单:" + order.OrderID;
                 return order;
@@ -140,8 +139,8 @@ namespace boin
                 order.Remark = Helper.ReadString(head, "提现备注", row);
                 order.Status = Helper.ReadString(head, "操作", row);
 
-                order.ReadExpand(rowEx, true);
-                order.syncName();
+                order.ReadExpand(rowEx, order.Way == "银行卡");
+                
 
                 span.Msg = "订单:" + order.OrderID;
                 return order;

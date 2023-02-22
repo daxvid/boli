@@ -39,27 +39,33 @@ namespace boin
                         }
                     }
                 }
-                catch (WebDriverTimeoutException)
+                catch (InvalidOperationException e)
                 {
+                    Log.Info(e);
                     Thread.Sleep(1000);
                 }
-                catch (ElementNotInteractableException)
+                catch (WebDriverException e)
                 {
-                    Thread.Sleep(1000);
-                }
-                //catch (NoSuchElementException) { }
-                //catch (ElementClickInterceptedException) { }
-                //catch (InvalidOperationException) { }
-                catch (WebDriverException)
-                {
+                    Log.Info(e);
+                    if (e is InvalidElementStateException ||
+                        e is NotFoundException ||
+                        e is WebDriverTimeoutException ||
+                        e is ElementNotInteractableException ||
+                        e is NoSuchElementException ||
+                        e is ElementClickInterceptedException)
+                    {
+                        Thread.Sleep(1000);
+                    }
+                    SendMsg(e.Message);
+                    SendMsg(e.StackTrace);
                     throw;
                 }
-                catch(Exception err)
+                catch(Exception e)
                 {
-                    SendMsg(err.Message);
-                    SendMsg(err.StackTrace);
+                    SendMsg(e.Message);
+                    SendMsg(e.StackTrace);
+                    Log.Info(e);
                     Thread.Sleep(10000);
-                    throw;
                 }
             }
             return null;

@@ -213,7 +213,7 @@ namespace boin
             for (int i = 0; i < orders.Count; i++)
             {
                 var order = orders[i];
-                var msg = "no:" + i.ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
+                var msg = "no:" + (i+1).ToString() + "; user:" + order.GameId + "; order:" + order.OrderID;
                 using (var span = new Span())
                 {
                     SendMsg(msg);
