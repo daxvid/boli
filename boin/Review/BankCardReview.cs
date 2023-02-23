@@ -65,6 +65,10 @@ namespace boin.Review
                         if (b.Payee == order.Payee || order.Payee == string.Empty)
                         {
                             rs.Add(new ReviewResult { Code = 0, Msg = "@钱包正确:" + b.Payee });
+                            if (string.IsNullOrEmpty(order.Payee)) // 修复钱包姓名
+                            {
+                                order.Payee = b.Payee;
+                            }
                             passName = true;
                         }
                     }

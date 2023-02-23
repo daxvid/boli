@@ -64,3 +64,4 @@ boin/bin/Debug/net7.0/JiebaResource/prob_trans.json
 boin/bin/Debug/net7.0/JiebaResource/stopwords.txt
 boin.sln.DotSettings.user
 boin/obj/project.packagespec.json
+*.png

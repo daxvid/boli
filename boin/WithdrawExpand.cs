@@ -23,19 +23,21 @@ namespace boin
         {
             get
             {
-                switch (cardType)
+                if (cardType != null)
                 {
-                    case "DC":
-                        return "储蓄卡";
-                    case "CC":
-                        return "信用卡";
-                    case "SCC":
-                        return "准贷记卡";
-                    case "PC":
-                        return "预付费卡";
-                    default:
-                        return "未知卡";
+                    switch (cardType.ToUpper())
+                    {
+                        case "DC":
+                            return "储蓄卡";
+                        case "CC":
+                            return "信用卡";
+                        case "SCC":
+                            return "准贷记卡";
+                        case "PC":
+                            return "预付费卡";
+                    }
                 }
+                return "未知卡";
             }
         }
     }

@@ -35,6 +35,7 @@ namespace boin
         // 查询订单
         public void Select(int hour)
         {
+            GoToPage(4, "提现管理");
             // 设置查询时间，12小时以内的订单
             var timeRang = FindElementByXPath("//div[@id='Cash']/div/div[12]/div/div/div/input");
             Helper.SetTimeRang(timeRang, hour);

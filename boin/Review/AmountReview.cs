@@ -162,7 +162,7 @@ namespace boin.Review
                         // 游戏日提限制
                         if (amount > kv.Value)
                         {
-                            var gameName = kv.Key.Replace("all", "");
+                            var gameName = kv.Key;//.Replace("all", "");
                             var msg = "@游戏[" + gameName + "]日提限制:" + kv.Value + "<" + amount;
                             return (new ReviewResult { Code = -401, Msg = msg});
                         }

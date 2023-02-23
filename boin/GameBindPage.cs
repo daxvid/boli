@@ -109,6 +109,7 @@ namespace boin
 
         public GameBind Select(string gameId, string cardNo)
         {
+            GoToPage(1, "绑定管理");
             if (trySelect(gameId, cardNo))
             {
                 var binds = ReadTable(gameId);

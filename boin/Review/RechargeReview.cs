@@ -84,11 +84,11 @@ namespace boin.Review
                 var pair = user.Funding.TotalRechargeByChannel(kv.Key, startTime);
                 if (pair.Item1 > kv.Value[0])
                 {
-                   return new ReviewResult { Code = 400, Msg = "@人工" + kv.Key + ":" + pair.Item1 };
+                   return new ReviewResult { Code = 400, Msg = "@" + kv.Key +  kv.Value[0] +":" + pair.Item1 };
                 }
                 else if (pair.Item2 > kv.Value[1])
                 {
-                    return new ReviewResult { Code = 400, Msg = "@人工" + kv.Key + ":" + pair.Item2 +"笔"};
+                    return new ReviewResult { Code = 400, Msg = "@" + kv.Key + kv.Value[0]+ ":" + pair.Item2 +"笔"};
                 }
             }
 

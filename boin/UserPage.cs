@@ -26,6 +26,7 @@ namespace boin
 
         public User Select(string gameId)
         {
+            GoToPage(1, "用户列表");
             // 设置游戏ID
             var gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
             SetTextElementByXPath(gameIdPath, gameId);

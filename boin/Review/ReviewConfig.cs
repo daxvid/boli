@@ -52,9 +52,16 @@ namespace boin.Review
                 {
                     if (!string.IsNullOrEmpty(ban))
                     {
-                        if (game.Contains(ban) && (k == "all" || k == platform))
+                        if (game.Contains(ban))
                         {
-                            return k + ban;
+                            if (k == "all")
+                            {
+                                return ban;
+                            }
+                            else if (k == platform)
+                            {
+                                return k + ban;
+                            }
                         }
                     }
                 }
