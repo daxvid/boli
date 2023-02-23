@@ -183,14 +183,8 @@ namespace boin
             {
                 if (w.OrderID != orderId)
                 {
-                    if (w.Review == "已通过" && w.Transfer == "成功")
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        return true;
-                    }
+                    var pass = w.Pass();
+                    return (!pass);
                 }
             }
             return false;
@@ -265,9 +259,27 @@ namespace boin
             }
             return total;
         }
+
+        // 最后一笔成功提现的时间
+        public bool LastSuccessWithdrawTime(string orderId,out DateTime time)
+        {
+            foreach (var w in WithdrawLog)
+            {
+                if (w.OrderID != orderId)
+                {
+                    if (w.Pass())
+                    {
+                        time = w.Created;
+                        return true;
+                    }
+                }
+            }
+
+            time = DateTime.Now;
+            return false;
+        }
         
-        
-        // 第一个其它用户名
+        // 第一个其它充值用户名
         public string FirstOtherRechargeName(string name)
         {
             foreach (var r in RechargeLog)
@@ -280,7 +292,7 @@ namespace boin
             return string.Empty;
         }
 
-        // 所有其它用户充值
+        // 所有其它充值用户充值
         public Dictionary<string, decimal> AllOtherRecharge(string name)
         {
             Dictionary<string, decimal> names = new Dictionary<string, decimal>();
@@ -300,6 +312,29 @@ namespace boin
                 }
             }
             return names;
+        }
+
+        // 统计某个渠道从指定时间开始的总充值
+        public Tuple<decimal,int> TotalRechargeByChannel(string chan, DateTime startTime)
+        {
+            decimal total = 0;
+            int count = 0;
+            foreach (var r in RechargeLog)
+            {
+                if (r.RechargeChannel == chan)
+                {
+                    if (r.Created > startTime)
+                    {
+                        total += r.RechargeAmount;
+                        count++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            return new Tuple<decimal,int>(total,count);
         }
     }
 }

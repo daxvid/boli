@@ -131,7 +131,7 @@ namespace boin
             moveToOp(user, i);
             // 点击扩展按钮中的概况
             FindAndClickByXPath(xpath, 2000);
-            user.Funding = Helper.SafeExec(() =>
+            user.Funding = SafeExec(() =>
             {
                 using (FundingPage gl = new FundingPage(driver, cnf, user.GameId))
                 {
@@ -149,7 +149,7 @@ namespace boin
             moveToOp(user, i);
             // 点击扩展按钮中的概况
             FindAndClickByXPath(xpath, 2000);
-            user.GameInfo = Helper.SafeExec(() =>
+            user.GameInfo = SafeExec(() =>
             {
                 using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
                 {

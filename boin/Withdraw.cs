@@ -31,10 +31,10 @@ namespace boin
         // 通道
         public string Way { get; set; } = string.Empty;
 
-        // 审核状态
+        // 审核状态(成功/)
         public string Review { get; set; } = string.Empty;
 
-        // 转账状态
+        // 转账状态(代付中/未发起/成功/失败)
         public string Transfer { get; set; } = string.Empty;
 
         // 操作类型
@@ -46,6 +46,16 @@ namespace boin
 
         public static string[] Heads = new string[] {string.Empty, "订单号" , "发起时间", "到账时间", "游戏ID", "用户昵称", "提现金额",
             "通道", "状态", "转账", "操作类型"};
+
+        public bool Pass()
+        {
+            if (Review == "已通过" && (Transfer == "成功" || Transfer == "代付中"))
+            {
+                return true;
+            }
+
+            return false;
+        }
 
 
         public static Withdraw Create(IWebElement element, IWebElement rowEx)

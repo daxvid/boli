@@ -178,7 +178,7 @@ namespace boin
 
         public User LoadUser(string gameId)
         {
-            var user = Helper.SafeExec(() =>
+            var user = SafeExec(() =>
             {
                 using (var userPage = new UserPage(driver, cnf))
                 {
@@ -192,7 +192,7 @@ namespace boin
 
         public List<GameBind> LoadBinds(string gameId)
         {
-            var binds = Helper.SafeExec(() =>
+            var binds = SafeExec(() =>
             {
                 using (var bindPage = new GameBindPage(driver, cnf))
                 {
@@ -206,7 +206,7 @@ namespace boin
 
         public GameBind LoadBind(string gameId, string cardNo)
         {
-            var bind = Helper.SafeExec(() =>
+            var bind = SafeExec(() =>
             {
                 using (var bindPage = new GameBindPage(driver, cnf))
                 {

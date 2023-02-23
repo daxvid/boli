@@ -20,7 +20,12 @@ namespace boin.Review
     //玩百家乐的会员 波币一天不超过3000提款
     //最近10笔提款内 波币不能超过4笔
     //前一笔是失败的订单机器人不要通过，让我们人工审核
-
+    
+    // 针对充值接口显示『客单充值(不能删)』
+    // 计算日期:上一笔提款日-最新一笔提款日
+    // 金额>2000-人工审核
+    // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
+    
     public class AmountConfig
     {
         // 当日充值达多少人工审核
@@ -97,6 +102,11 @@ namespace boin.Review
         public int NearWithdrawCount { get; set; }
         public int BobiMaxCount { get; set; }
         
+        // 针对充值接口显示『客单充值(不能删)』
+        // 计算日期:上一笔提款日-最新一笔提款日
+        // 金额>2000-人工审核
+        // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
+        public Dictionary<string, List<decimal>> RechargeChannel { get; set; }
 
         public ReviewConfig()
         {

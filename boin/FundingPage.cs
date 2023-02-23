@@ -67,33 +67,46 @@ namespace boin
             var tboxPath = ".//div[@class='tab_box ivu-row']";
             var table = getCurrentTable();
             var tbox = FindElementByXPath(table, tboxPath);
+            
             fund.ReadFrom(tbox);
 
+            const int maxDay = 30;
             if (rechargeMaxDay > 0)
             {
                 //读取充值明细
-                f.RechargeLog = Helper.SafeExec(() =>
+                f.RechargeLog = SafeExec(() =>
                 {
-                    FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a",1000);
+                    FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a", 1000);
                     using (var rg = new RechargePage(driver, cnf, gameId))
                     {
                         var rechargeLogs = rg.Select(rechargeMaxDay);
+                        // 如果没有数据查查询最近30天的数据
+                        if ((rechargeLogs == null || rechargeLogs.Count < 3) && rechargeMaxDay < maxDay)
+                        {
+                            rechargeLogs = rg.Select(maxDay);
+                        }
                         return rechargeLogs;
                     }
                 });
             }
 
             if (withdrawMaxDay > 0)
-            {
+            { 
+                table = getCurrentTable();
+                tbox = FindElementByXPath(table, tboxPath);
+                
                 // 读取提现明细
-                f.WithdrawLog = Helper.SafeExec( ()=>
+                f.WithdrawLog = SafeExec( ()=>
                 {
-                    //var table = getCurrentTable();
-                    //var tbox = FindElementByXPath(table, tboxPath);
                     FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a",1000);
                     using (var wg = new WithdrawPage(driver, cnf, gameId))
                     {
                         var withdrawLogs = wg.Select(withdrawMaxDay);
+                        // 如果没有数据查查询最近30天的数据
+                        if ((withdrawLogs == null || withdrawLogs.Count <= 1) && withdrawMaxDay < maxDay)
+                        {
+                            withdrawLogs = wg.Select(maxDay);
+                        }
                         return withdrawLogs;
                     }
                 });

@@ -37,7 +37,7 @@ namespace boin
         // 充值类型
         public string RechargeType { get; set; } = string.Empty;
 
-        // 充值接口
+        // 充值接口(客单充值(不能删)/)
         public string RechargeChannel { get; set; } = string.Empty;
 
         // VIP期数

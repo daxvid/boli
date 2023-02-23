@@ -384,6 +384,10 @@ namespace boin
             Helper.SendMsg(msg);
         }
 
+        public virtual void SendMsg(Exception err)
+        {
+            Helper.SendMsg(err);
+        }
 
         // 读取列表头
         public static List<Head> ReadHeadList(IWebElement table)
@@ -441,7 +445,55 @@ namespace boin
             Thread.Sleep(ms);
             return true;
         }
+        
+        public T SafeExec<T>(Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
+        {
+            for (var i = 0; i < tryCount; i++)
+            {
+                try
+                {
+                    return fun();
+                }
+                catch (WebDriverException e)
+                {
+                    if (e is InvalidElementStateException ||
+                        e is NotFoundException ||
+                        e is WebDriverTimeoutException ||
+                        e is ElementNotInteractableException ||
+                        e is NoSuchElementException ||
+                        e is ElementClickInterceptedException)
+                    {
+                        Log.Info(e);
+                    }
+                    else
+                    {
+                        SendMsg(e);
+                        throw;
+                    }
+                }
+                catch (InvalidOperationException e)
+                {
+                    Log.Info(e);
+                }
+                catch (Exception e)
+                {
+                    SendMsg(e);
+                    throw;
+                }
+                TakeScreenshot();
+                Thread.Sleep(sleep);
+            }
 
+            return default(T);
+        }
+        
+        public void TakeScreenshot()
+        {
+            string fileName = DateTime.Now.ToString("yyyyMMddHHmmssfff")+".png";
+            ITakesScreenshot ssdriver = driver as ITakesScreenshot;
+            Screenshot screenshot = ssdriver.GetScreenshot();
+            screenshot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+        }
 
     }
 }

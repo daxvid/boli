@@ -17,7 +17,6 @@ namespace boin.Review
             Order order = user.Order;
             List<ReviewResult> rs = new List<ReviewResult>();
             var f = user.Funding;
-
             if (order.Way == "银行卡")
             {
                 // 检查银行卡姓名充值是否一致
@@ -36,7 +35,7 @@ namespace boin.Review
                     }
                     else if (t1 < order.Amount)
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1});
+                        rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 });
                     }
                     else
                     {
@@ -49,16 +48,52 @@ namespace boin.Review
                 var name = f.FirstOtherRechargeName(order.Payee);
                 if (string.IsNullOrEmpty(name))
                 {
-                    rs.Add(new ReviewResult { Code = 0, Msg = "@币充值通过"});
+                    rs.Add(new ReviewResult { Code = 0, Msg = "@币充值通过" });
                 }
                 else
                 {
                     rs.Add(new ReviewResult { Code = -402, Msg = "@其它名字充值:" + name });
                 }
             }
+
+            var rbc = RechargeByChannel(user);
+            if (rbc != null)
+            {
+                rs.Add(rbc);
+            }
+
             return new ReadOnlyCollection<ReviewResult>(rs);
         }
 
+
+        // 针对充值接口显示『客单充值(不能删)』
+        // 计算日期:上一笔提款日-最新一笔提款日
+        // 金额>2000-人工审核
+        // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
+        public ReviewResult RechargeByChannel(User user)
+        {
+            Order order = user.Order;
+            DateTime startTime;
+            if (!user.Funding.LastSuccessWithdrawTime(order.OrderID, out startTime))
+            {
+                startTime = DateTime.Now.AddDays(-21);
+            }
+
+            foreach (var kv in cnf.RechargeChannel)
+            {
+                var pair = user.Funding.TotalRechargeByChannel(kv.Key, startTime);
+                if (pair.Item1 > kv.Value[0])
+                {
+                   return new ReviewResult { Code = 400, Msg = "@人工" + kv.Key + ":" + pair.Item1 };
+                }
+                else if (pair.Item2 > kv.Value[1])
+                {
+                    return new ReviewResult { Code = 400, Msg = "@人工" + kv.Key + ":" + pair.Item2 +"笔"};
+                }
+            }
+
+            return null;
+        }
     }
 }
 
