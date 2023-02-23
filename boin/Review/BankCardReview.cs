@@ -38,13 +38,17 @@ namespace boin.Review
                     {
                         rs.Add(new ReviewResult { Code = -102, Msg = "@卡不正确:" + order.CardNo });
                     }
-                    else if (bankInfo.key != order.CardNo)
-                    {
-                        rs.Add(new ReviewResult { Code = 101, Msg = "@卡需验证:" + order.CardNo });
-                    }
                     else
                     {
-                        rs.Add(new ReviewResult { Code = 0, Msg = "@卡正确:" + order.BankName });
+                        var name = bankInfo.CardTypeName;
+                        if(string.IsNullOrEmpty(name) || name=="未知卡")
+                        {
+                            rs.Add(new ReviewResult { Code = 101, Msg = "@卡需验证:" + order.CardNo });
+                        }
+                        else
+                        {
+                            rs.Add(new ReviewResult  { Code = 0, Msg = "@" + name + ":" + order.BankName });
+                        }
                     }
                     break;
                 }

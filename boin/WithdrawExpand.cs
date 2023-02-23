@@ -18,6 +18,26 @@ namespace boin
         public string stat = string.Empty;
         // 
         public List<Dictionary<string, string>> messages;
+
+        public string CardTypeName
+        {
+            get
+            {
+                switch (cardType)
+                {
+                    case "DC":
+                        return "储蓄卡";
+                    case "CC":
+                        return "信用卡";
+                    case "SCC":
+                        return "准贷记卡";
+                    case "PC":
+                        return "预付费卡";
+                    default:
+                        return "未知卡";
+                }
+            }
+        }
     }
 
     public class WithdrawExpand
