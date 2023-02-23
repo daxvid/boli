@@ -31,9 +31,9 @@ namespace boin
         private IWebElement getCurrentTable(int page)
         {
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var t = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(t, pagePath);
-            return t;
+            var table = FindElementByXPath(path);
+            var pageTag = FindElementByXPath(table, pagePath);
+            return table;
         }
 
         public List<Recharge> Select(int maxDay)
@@ -44,7 +44,7 @@ namespace boin
                 var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
                 Helper.SetDayRang(dayRang, maxDay);
                 // 点击查询按钮;
-                TryClickByXPath(table, ".//div/button[1]/span[text()='查询']", 1000);
+                FindAndClickByXPath(table, ".//div/button[1]/span[text()='查询']", 1000);
                 table = getCurrentTable(1);
             }
 

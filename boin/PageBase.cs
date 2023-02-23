@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reflection.Emit;
 using boin.Bot;
 using boin.Review;
+using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -16,7 +17,8 @@ namespace boin
         protected int maxPage = 4;
         protected AppConfig cnf;
 
-        public static readonly ReadOnlyCollection<IWebElement> EmptyElements = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
+        public static readonly ReadOnlyCollection<IWebElement> EmptyElements =
+            new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
         public PageBase(ChromeDriver driver, AppConfig cnf)
         {
@@ -42,6 +44,7 @@ namespace boin
                     {
                         return false;
                     }
+
                     if (es.Count == 1)
                     {
                         r = es[0];
@@ -54,11 +57,10 @@ namespace boin
                         throw new MoreSuchElementException(by, "set text", es);
                     }
                 }
-                catch (NoSuchElementException) { }
-                catch
+                catch (NoSuchElementException)
                 {
-                    throw;
                 }
+
                 return false;
             });
             return r;
@@ -81,6 +83,7 @@ namespace boin
                     {
                         return false;
                     }
+
                     if (es.Count == 1)
                     {
                         r = es[0];
@@ -93,11 +96,10 @@ namespace boin
                         throw new MoreSuchElementException(by, "set text", es);
                     }
                 }
-                catch (NoSuchElementException) { }
-                catch
+                catch (NoSuchElementException)
                 {
-                    throw;
                 }
+
                 return false;
             });
             return r;
@@ -120,6 +122,7 @@ namespace boin
                     {
                         return false;
                     }
+
                     if (es.Count == 1)
                     {
                         r = es[0];
@@ -130,11 +133,10 @@ namespace boin
                         throw new MoreSuchElementException(by, "find", es);
                     }
                 }
-                catch (NoSuchElementException) { }
-                catch
+                catch (NoSuchElementException)
                 {
-                    throw;
                 }
+
                 return false;
             });
             return r;
@@ -157,6 +159,7 @@ namespace boin
                     {
                         return false;
                     }
+
                     if (es.Count == 1)
                     {
                         r = es[0];
@@ -167,11 +170,10 @@ namespace boin
                         throw new MoreSuchElementException(by, "find", es);
                     }
                 }
-                catch (NoSuchElementException) { }
-                catch
+                catch (NoSuchElementException)
                 {
-                    throw;
                 }
+
                 return false;
             });
             return r;
@@ -191,7 +193,10 @@ namespace boin
                     var es = driver.FindElements(by);
                     return es;
                 }
-                catch (NoSuchElementException) { }
+                catch (NoSuchElementException)
+                {
+                }
+
                 return EmptyElements;
             });
             return result;
@@ -211,88 +216,129 @@ namespace boin
                     var es = e.FindElements(by);
                     return es;
                 }
-                catch (NoSuchElementException) { }
+                catch (NoSuchElementException)
+                {
+                }
+
                 return EmptyElements;
             });
             return result;
         }
 
-        protected bool TryClickByXPath(string path, int ms = 1000)
+        // protected bool TryClickByXPath(string path, int ms = 1000)
+        // {
+        //     return TryClick(By.XPath(path), ms);
+        // }
+        //
+        // protected bool TryClick(By by, int ms = 1000)
+        // {
+        //     var result = wait.Until(driver =>
+        //     {
+        //         try
+        //         {
+        //             var es = driver.FindElements(by);
+        //             if (es.Count == 0)
+        //             {
+        //                 return false;
+        //             }
+        //
+        //             if (es.Count == 1)
+        //             {
+        //                 var c = es[0];
+        //                 c.Click();
+        //                 Thread.Sleep(ms);
+        //                 return true;
+        //             }
+        //             else
+        //             {
+        //                 throw new MoreSuchElementException(by, "click", es);
+        //             }
+        //         }
+        //         catch (NoSuchElementException)
+        //         {
+        //         }
+        //         catch (ElementClickInterceptedException)
+        //         {
+        //         }
+        //
+        //         return false;
+        //     });
+        //     return result;
+        // }
+        //
+        // protected bool TryClickByXPath(IWebElement e, string path, int ms = 1000)
+        // {
+        //     return TryClick(e, By.XPath(path), ms);
+        // }
+        //
+        // protected bool TryClick(IWebElement e, By by, int ms = 1000)
+        // {
+        //     var result = wait.Until(driver =>
+        //     {
+        //         try
+        //         {
+        //             var es = e.FindElements(by);
+        //             if (es.Count == 0)
+        //             {
+        //                 return false;
+        //             }
+        //
+        //             if (es.Count == 1)
+        //             {
+        //                 var c = es[0];
+        //                 c.Click();
+        //                 Thread.Sleep(ms);
+        //                 return true;
+        //             }
+        //             else
+        //             {
+        //                 throw new MoreSuchElementException(by, "click", es);
+        //             }
+        //         }
+        //         catch (NoSuchElementException)
+        //         {
+        //         }
+        //         catch (ElementClickInterceptedException)
+        //         {
+        //         }
+        //
+        //         return false;
+        //     });
+        //     return result;
+        // }
+
+        protected void FindAndClickByXPath(string path, int ms)
         {
-            return TryClick(By.XPath(path), ms);
+            FindAndClick(By.XPath(path), ms);
         }
 
-        protected bool TryClick(By by, int ms = 1000)
-        { var result = wait.Until(driver =>
+        protected void FindAndClick(By by, int ms)
+        {
+            wait.Until(driver =>
             {
-                try
-                {
-                    var es = driver.FindElements(by);
-                    if (es.Count == 0)
-                    {
-                        return false;
-                    }
-                    if (es.Count == 1)
-                    {
-                        var c = es[0];
-                        c.Click();
-                        Thread.Sleep(ms);
-                        return true;
-                    }
-                    else
-                    {
-                        throw new MoreSuchElementException(by, "click", es);
-                    }
-                }
-                catch (NoSuchElementException) { }
-                catch (ElementClickInterceptedException) { }
-                catch
-                {                    throw;
-                }
-                return false;
+                var btn = driver.FindElement(by);
+                btn.Click();
+                Thread.Sleep(ms);
+                return true;
             });
-            return result;
         }
 
-        protected bool TryClickByXPath(IWebElement e, string path, int ms = 1000)
+        protected void FindAndClickByXPath(IWebElement e, string path, int ms)
         {
-            return TryClick(e, By.XPath(path), ms);
+             FindAndClick(e, By.XPath(path), ms);
         }
 
-        protected bool TryClick(IWebElement e, By by, int ms = 1000)
+        protected void FindAndClick(IWebElement e, By by, int ms)
         {
-            var result = wait.Until(driver =>
+            wait.Until(driver =>
             {
-                try
-                {
-                    var es = e.FindElements(by);
-                    if (es.Count == 0)
-                    {
-                        return false;
-                    }
-                    if (es.Count == 1)
-                    {
-                        var c = es[0];
-                        c.Click();
-                        Thread.Sleep(ms);
-                        return true;
-                    }
-                    else
-                    {
-                        throw new MoreSuchElementException(by, "click", es);
-                    }
-                }
-                catch (NoSuchElementException) { }
-                catch (ElementClickInterceptedException) { }
-                catch
-                {
-                    throw;
-                }
-                return false;
+                var btn = e.FindElement(by);
+                btn.Click();
+                Thread.Sleep(ms);
+                return true;
             });
-            return result;
         }
-
+        
         protected bool SafeClick(IWebElement btn, int ms = 0)
         {
             if (btn.Enabled)
@@ -305,18 +351,22 @@ namespace boin
                         Thread.Sleep(ms);
                         return true;
                     }
-                    catch (ElementClickInterceptedException) { }
+                    catch (ElementClickInterceptedException)
+                    {
+                    }
+
                     return false;
                 });
             }
+
             return true;
         }
 
-        protected bool GoToPage(int index, string itme)
+        protected bool GoToPage(int index, string item)
         {
-            var v1 = TryClick(By.CssSelector("nav li:nth-child(" + index + ")"));
-            var v2 = TryClick(By.LinkText(itme));
-            return v1 && v2;
+            FindAndClick(By.CssSelector("nav li:nth-child(" + index + ")"),100);
+            FindAndClick(By.LinkText(item),100);
+            return true;
         }
 
         public virtual bool Open()
@@ -331,8 +381,7 @@ namespace boin
 
         public virtual void SendMsg(string msg)
         {
-            Console.WriteLine(msg);
-            TelegramBot.SendMsg(msg);
+            Helper.SendMsg(msg);
         }
 
 
@@ -350,6 +399,7 @@ namespace boin
                     listHead.Add(new Head { Name = value, Tag = tag });
                 }
             }
+
             return listHead;
         }
 
@@ -366,6 +416,7 @@ namespace boin
                     dicHead.Add(key, tag);
                 }
             }
+
             return dicHead;
         }
 
@@ -377,17 +428,20 @@ namespace boin
         protected bool GoToNextPage(IWebElement table, int ms = 500)
         {
             // 检查是否有下一页
-            var nextPage = FindElementByXPath(table, ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
+            var nextPage = FindElementByXPath(table,
+                ".//button/span/i[@class='ivu-icon ivu-icon-ios-arrow-forward']/../..");
             var next = nextPage.Enabled;
             if (!next)
             {
                 return false;
             }
+
             nextPage.Click();
             //TODO: 检查是否加载完成
             Thread.Sleep(ms);
             return true;
         }
+
 
     }
 }

@@ -24,73 +24,49 @@ namespace boin
             return GoToPage(1, "绑定管理");
         }
 
-        public List<GameBind> Select(string gameid)
+        public List<GameBind> Select(string gameId)
         {
-            while (true)
+            int t = trySelect(gameId);
+            if (t >= 0)
             {
-                try
+                if (t == 0)
                 {
-                    int t = trySelect(gameid);
-                    if (t >= 0)
-                    {
-                        if (t == 0)
-                        {
-                            return new List<GameBind>();
-                        }
-                        var binds = ReadTable(gameid);
-                        return binds;
-                    }
+                    return new List<GameBind>();
                 }
-                catch (WebDriverTimeoutException)
-                {
-                    Thread.Sleep(1000);
-                }
-                catch (ElementNotInteractableException) { }
-                catch (WebDriverException)
-                {
-                    throw;
-                }
-                catch (Exception err)
-                {
-                    SendMsg(err.Message);
-                    SendMsg(err.StackTrace);
-                    Thread.Sleep(10000);
-                    throw;
-                }
+
+                var binds = ReadTable(gameId);
+                return binds;
             }
-            return null;
+
+            return new List<GameBind>();
         }
 
-        private int trySelect(string gameid)
+        private int trySelect(string gameId)
         {
             // 设置游戏ID
             // //*[@id="GameBindList"]/div[1]/div[2]/input
             var gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
-            SetTextElementByXPath(gameIdPath, gameid);
+            SetTextElementByXPath(gameIdPath, gameId);
             // 点击查询按钮
             // //*[@id="GameBindList"]/div[1]/button/span
             var btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
-            if (TryClickByXPath(btnPath, 2000))
+            FindAndClickByXPath(btnPath, 1000);
+            // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
+            var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
+            if (FindElementsByXPath(pathNone).Count == 1)
             {
-                // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
-                var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
-                if (FindElementsByXPath(pathNone).Count == 1)
-                {
-                    return 0;
-                }
-
-                // 等待查询结果
-                // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[2]/div/div/div/a/span
-                // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[2]/div/div/div/a/span
-                var path = "//div[@id='GameBindList']/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[2]/div/div/div/a/span";
-                path += "[contains(text(),'" + gameid + "')]";
-                var t = FindElementsByXPath(path);
-                return t.Count;
+                return 0;
             }
-            return -1;
+            // 等待查询结果
+            // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[2]/div/div/div/a/span
+            // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[2]/div/div/div/a/span
+            var path = "//div[@id='GameBindList']/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[2]/div/div/div/a/span";
+            path += "[contains(text(),'" + gameId + "')]";
+            var t = FindElementsByXPath(path);
+            return t.Count;
         }
 
-        public List<GameBind> ReadTable(string gameid)
+        public List<GameBind> ReadTable(string gameId)
         {
             var table = FindElementByXPath("//div[@id='GameBindList']/div[2]/div[1]/div[2]/table");
             var tbody = FindElementByXPath(table, ".//tbody[@class='ivu-table-tbody']");
@@ -131,48 +107,25 @@ namespace boin
             return Binds;
         }
 
-        public GameBind Select(string gameid, string cardNo)
+        public GameBind Select(string gameId, string cardNo)
         {
-            while (true)
+            if (trySelect(gameId, cardNo))
             {
-                try
+                var binds = ReadTable(gameId);
+                if (binds.Count > 0)
                 {
-                    if (trySelect(gameid, cardNo))
-                    {
-                        var binds = ReadTable(gameid);
-                        if (binds.Count > 0)
-                        {
-                            return binds[0];
-                        }
-                    }
-                    return null;
-                }
-                catch (WebDriverTimeoutException)
-                {
-                    Thread.Sleep(1000);
-                }
-                catch (ElementNotInteractableException) { }
-                catch (WebDriverException)
-                {
-                    throw;
-                }
-                catch (Exception err)
-                {
-                    SendMsg(err.Message);
-                    SendMsg(err.StackTrace);
-                    Thread.Sleep(10000);
-                    throw;
+                    return binds[0];
                 }
             }
             return null;
         }
 
-        private bool trySelect(string gameid, string cardNo)
+        private bool trySelect(string gameId, string cardNo)
         {
             // 设置游戏ID
             // //*[@id="GameBindList"]/div[1]/div[2]/input
             var gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
-            SetTextElementByXPath(gameIdPath, gameid);
+            SetTextElementByXPath(gameIdPath, gameId);
 
             // 设置账号
             // //*[@id="GameBindList"]/div[1]/div[4]/input
@@ -182,30 +135,28 @@ namespace boin
             // 点击查询按钮
             // //*[@id="GameBindList"]/div[1]/button/span
             var btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
-            if (TryClickByXPath(btnPath, 2000))
+            FindAndClickByXPath(btnPath, 1000);
+            
+            // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
+            var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
+            if (FindElementsByXPath(pathNone).Count == 1)
             {
-                // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
-                var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
-                if (FindElementsByXPath(pathNone).Count == 1)
-                {
-                    return false;
-                }
-
-                // 等待查询结果
-                // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[6]/div/span
-                var path = "//div[@id='GameBindList']/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[6]/div/span";
-                path += "[text()='" + cardNo + "']";
-                var t = FindElementByXPath(path);
-                var gid = Helper.ReadString(t);
-                if (gid == cardNo)
-                {
-                    return true;
-                }
+                return false;
             }
+
+            // 等待查询结果
+            // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[6]/div/span
+            var path = "//div[@id='GameBindList']/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[6]/div/span";
+            path += "[text()='" + cardNo + "']";
+            var t = FindElementByXPath(path);
+            var gid = Helper.ReadString(t);
+            if (gid == cardNo)
+            {
+                return true;
+            }
+
             return false;
         }
-
-
-
+        
     }
 }

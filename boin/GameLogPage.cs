@@ -29,9 +29,9 @@ namespace boin
         private IWebElement getCurrentTable(int page)
         {
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var t = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(t, pagePath);
-            return t;
+            var table = FindElementByXPath(path);
+            var pageTag = FindElementByXPath(table, pagePath);
+            return table;
         }
 
         // 查询用户游戏日志
@@ -41,14 +41,16 @@ namespace boin
             var table = getCurrentTable(1);
             if (hour > 0)
             {
-                var timeRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                var timeRang = FindElementByXPath(table,
+                    ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
                 Helper.SetTimeRang(timeRang, hour);
                 // 点击查询按钮;
-                TryClickByXPath(table, ".//button/span[text()='查询']", 1000);
+                FindAndClickByXPath(table, ".//button/span[text()='查询']", 1000);
             }
 
             // 读取用户查询出的输赢情况
-            var spath = ".//div[@class='countSty']/span[@class='total_item' and contains(text(),'下注金额：')]/../span";
+            var spath =
+                ".//div[@class='countSty']/span[@class='total_item' and contains(text(),'下注金额：')]/../span";
             var items = FindElementsByXPath(table, spath);
 
             info.TotalBet = Helper.ReadBetDecimal(items[0]);

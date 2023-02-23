@@ -77,7 +77,7 @@ namespace boin
 
             // 登录按钮
             // //*[@id="logins"]/div/form/div[4]/div/button
-            TryClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button");
+            FindAndClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button",1000);
 
             try
             {
@@ -178,35 +178,48 @@ namespace boin
 
         public User LoadUser(string gameId)
         {
-            using (var userPage = new UserPage(driver, cnf))
+            var user = Helper.SafeExec(() =>
             {
-                userPage.Open();
-                var user = userPage.Select(gameId);
-                return user;
-            }
+                using (var userPage = new UserPage(driver, cnf))
+                {
+                    userPage.Open();
+                    var user = userPage.Select(gameId);
+                    return user;
+                }
+            });
+            return user;
         }
 
         public List<GameBind> LoadBinds(string gameId)
         {
-            using (var bindPage = new GameBindPage(driver, cnf))
+            var binds = Helper.SafeExec(() =>
             {
-                bindPage.Open();
-                var binds = bindPage.Select(gameId);
-                return binds;
-            }
+                using (var bindPage = new GameBindPage(driver, cnf))
+                {
+                    bindPage.Open();
+                    var binds = bindPage.Select(gameId);
+                    return binds;
+                }
+            });
+            return binds;
         }
 
         public GameBind LoadBind(string gameId, string cardNo)
         {
-            using (var bindPage = new GameBindPage(driver, cnf))
+            var bind = Helper.SafeExec(() =>
             {
-                bindPage.Open();
-                var bind = bindPage.Select(gameId, cardNo);
-                return bind;
-            }
+                using (var bindPage = new GameBindPage(driver, cnf))
+                {
+                    bindPage.Open();
+                    var bind = bindPage.Select(gameId, cardNo);
+                    return bind;
+                }
+            });
+            return bind;
         }
 
         static int orderCount = 0;
+
         public List<User> Review(List<Order> orders)
         {
             long wait = 0;
@@ -215,7 +228,8 @@ namespace boin
             {
                 var order = orders[i];
                 orderCount++;
-                var msg = "user:" + order.GameId + ";order_"+orderCount.ToString()+":" + order.OrderID;
+                var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
+                          orderCount.ToString() + ":" + order.OrderID;
                 using (var span = new Span())
                 {
                     SendMsg(msg);
@@ -239,17 +253,21 @@ namespace boin
                                     Review(user);
                                     break;
                                 }
+
                                 Thread.Sleep(1);
                             }
+
                             Interlocked.Decrement(ref wait);
                         });
                     }
                 }
             }
+
             while (Interlocked.Read(ref wait) > 0)
             {
                 Thread.Sleep(1);
             }
+
             return users;
         }
 

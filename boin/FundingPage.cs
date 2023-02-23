@@ -28,8 +28,8 @@ namespace boin
 
         private IWebElement getCurrentTable()
         {
-            var result = FindElementByXPath(path);
-            return result;
+            var table = FindElementByXPath(path);
+            return table;
         }
 
         public Funding Select()
@@ -49,20 +49,16 @@ namespace boin
             fund.Balance = Helper.ReadBetDecimal(balTxt);
 
             //今日(默认)
-            TryClickByXPath(tbox, ".//div/div[text()='今日' and contains(@class,'tab_sty')]");
+            FindAndClickByXPath(tbox, ".//div/div[text()='今日' and contains(@class,'tab_sty')]",500);
             FillRechargeAndWithdraw(fund, fund.ToDay, cnf.RechargeMaxDay, cnf.WithdrawMaxDay);
 
             // 昨日
-            if (TryClickByXPath(tbox, ".//div/div[text()='昨日' and contains(@class,'tab_sty')]"))
-            {
-                FillRechargeAndWithdraw(fund, fund.Yesterday, 0, 0);
-            }
+            FindAndClickByXPath(tbox, ".//div/div[text()='昨日' and contains(@class,'tab_sty')]",500);
+            FillRechargeAndWithdraw(fund, fund.Yesterday, 0, 0);
 
             // 近2月
-            if (TryClickByXPath(tbox, ".//div/div[text()='近期（2个月）' and contains(@class,'tab_sty')]"))
-            {
-                FillRechargeAndWithdraw(fund, fund.Nearly2Months, 0, 0);
-            }
+            FindAndClickByXPath(tbox, ".//div/div[text()='近期（2个月）' and contains(@class,'tab_sty')]",500);
+            FillRechargeAndWithdraw(fund, fund.Nearly2Months, 0, 0);
             return fund;
         }
 
@@ -76,26 +72,31 @@ namespace boin
             if (rechargeMaxDay > 0)
             {
                 //读取充值明细
-                if (TryClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a"))
+                f.RechargeLog = Helper.SafeExec(() =>
                 {
+                    FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a",1000);
                     using (var rg = new RechargePage(driver, cnf, gameId))
                     {
-                        var recharegeLogs = rg.Select(rechargeMaxDay);
-                        f.RechargeLog = recharegeLogs;
+                        var rechargeLogs = rg.Select(rechargeMaxDay);
+                        return rechargeLogs;
                     }
-                }
+                });
             }
+
             if (withdrawMaxDay > 0)
             {
                 // 读取提现明细
-                table = getCurrentTable();
-                tbox = FindElementByXPath(table, tboxPath);
-                TryClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a");
-                using (var wg = new WithdrawPage(driver, cnf, gameId))
+                f.WithdrawLog = Helper.SafeExec( ()=>
                 {
-                    var withdrawLogs = wg.Select(withdrawMaxDay);
-                    f.WithdrawLog = withdrawLogs;
-                }
+                    //var table = getCurrentTable();
+                    //var tbox = FindElementByXPath(table, tboxPath);
+                    FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a",1000);
+                    using (var wg = new WithdrawPage(driver, cnf, gameId))
+                    {
+                        var withdrawLogs = wg.Select(withdrawMaxDay);
+                        return withdrawLogs;
+                    }
+                });
             }
         }
 

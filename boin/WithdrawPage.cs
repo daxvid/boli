@@ -30,9 +30,9 @@ namespace boin
         private IWebElement getCurrentTable(int page)
         {
             var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var t = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(t, pagePath);
-            return t;
+            var table = FindElementByXPath(path);
+            var pageTag = FindElementByXPath(table, pagePath);
+            return table;
         }
 
         public List<Withdraw> Select(int maxDay)
@@ -43,7 +43,7 @@ namespace boin
                 var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
                 Helper.SetDayRang(dayRang, maxDay);
                 // 点击查询按钮;
-                TryClickByXPath(table, ".//button/span[text()='查询']", 1000);
+                FindAndClickByXPath(table, ".//button/span[text()='查询']", 1000);
                 table = getCurrentTable(1);
             }
 
@@ -98,27 +98,31 @@ namespace boin
                 {
                     continue;
                 }
+
                 if (i + 1 < count)
                 {
-                        rowEx = allRows[i + 1].FindElement(By.XPath(".//td[@class='ivu-table-expanded-cell']"));
-                        if (rowEx != null)
-                        {
-                            i += 1;
-                        }
+                    rowEx = allRows[i + 1].FindElement(By.XPath(".//td[@class='ivu-table-expanded-cell']"));
+                    if (rowEx != null)
+                    {
+                        i += 1;
+                    }
                 }
+
                 if (rowEx == null)
                 {
                     throw new NoSuchElementException("not find rowEx");
                 }
+
                 var withdraw = Withdraw.Create(row, rowEx);
                 if (withdraw != null)
                 {
                     allLogs.Add(withdraw);
                 }
             }
+
             return allLogs;
         }
-        
+
         // 读取每一项日志信息
         private List<Withdraw> ReadWithdraws(IWebElement tbody, int page)
         {
@@ -127,7 +131,7 @@ namespace boin
             var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
             foreach (var row in allRows)
             {
-                TryClickByXPath(row, expandPath,0);
+                FindAndClickByXPath(row, expandPath,0);
             }
             Thread.Sleep(200);
             

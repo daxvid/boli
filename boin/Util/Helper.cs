@@ -3,7 +3,7 @@ using System.Globalization;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using boin.Bot;
 
 namespace boin.Util
 {
@@ -206,6 +206,62 @@ namespace boin.Util
                 }
             }
             return now;
+        }
+        
+        
+        public static T SafeExec<T>(Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
+        {
+            for (var i = 0; i < tryCount; i++)
+            {
+                try
+                {
+                    return fun();
+                }
+                catch (WebDriverException e)
+                {
+                    if (e is InvalidElementStateException ||
+                        e is NotFoundException ||
+                        e is WebDriverTimeoutException ||
+                        e is ElementNotInteractableException ||
+                        e is NoSuchElementException ||
+                        e is ElementClickInterceptedException)
+                    {
+                        Log.Info(e);
+                    }
+                    else
+                    {
+                        SendMsg(e);
+                        throw;
+                    }
+                }
+                catch (InvalidOperationException e)
+                {
+                    Log.Info(e);
+                }
+                catch (Exception e)
+                {
+                    SendMsg(e);
+                    throw;
+                }
+                Thread.Sleep(sleep);
+            }
+
+            return default(T);
+        }
+        
+        
+        public static void SendMsg(string msg)
+        {
+            Console.WriteLine(msg);
+            TelegramBot.SendMsg(msg);
+        }
+
+        public static void SendMsg(Exception err)
+        {
+            Console.WriteLine(err.Message);
+            Console.WriteLine(err.StackTrace);
+            TelegramBot.SendMsg(err.Message);
+            TelegramBot.SendMsg(err.StackTrace);
         }
     }
 }
