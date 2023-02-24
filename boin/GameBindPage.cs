@@ -23,6 +23,14 @@ namespace boin
         {
             return GoToPage(1, "绑定管理");
         }
+        
+        public override bool Close()
+        {
+            var path = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'绑定管理')]/i";
+            // 关闭窗口
+            FindAndClickByXPath(path,100);
+            return base.Close();
+        }
 
         public List<GameBind> Select(string gameId)
         {
@@ -109,7 +117,6 @@ namespace boin
 
         public GameBind Select(string gameId, string cardNo)
         {
-            GoToPage(1, "绑定管理");
             if (trySelect(gameId, cardNo))
             {
                 var binds = ReadTable(gameId);

@@ -338,6 +338,20 @@ namespace boin
                 return true;
             });
         }
+        public bool SafeClose(IWebElement table)
+        {
+            var result = wait.Until(driver =>
+            {
+                try
+                {
+                    table.FindElement(By.XPath(".//a/i[@class='ivu-icon ivu-icon-ios-close']")).Click();
+                    return true;
+                }
+                catch (WebDriverException) { }
+                return false;
+            });
+            return result;
+        }
         
         protected bool SafeClick(IWebElement btn, int ms = 0)
         {
@@ -448,6 +462,7 @@ namespace boin
         
         public T SafeExec<T>(Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
         {
+            Exception ex = null;
             for (var i = 0; i < tryCount; i++)
             {
                 try
@@ -456,6 +471,7 @@ namespace boin
                 }
                 catch (WebDriverException e)
                 {
+                    ex = e;
                     TakeScreenshot(e);
                     if (e is InvalidElementStateException ||
                         e is NotFoundException ||
@@ -471,19 +487,20 @@ namespace boin
                 }
                 catch (SystemException e)
                 {
+                    ex = e;
                     TakeScreenshot(e);
                     Log.Info(e);
                 }
                 catch (Exception e)
                 {
+                    ex = e;
                     TakeScreenshot(e);
                     SendMsg(e);
                     throw;
                 }
                 Thread.Sleep(sleep);
             }
-
-            return default(T);
+            throw ex;
         }
 
         public void TakeScreenshot(Exception e)

@@ -55,6 +55,9 @@ namespace boin
         public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
         public GameBind Bind { get; set; }
+        
+        // 是否已处理
+        public bool Processed { get; set; } 
 
         public Order()
         {

@@ -18,15 +18,22 @@ namespace boin
         {
         }
 
-
         public override bool Open()
         {
             return GoToPage(1, "用户列表");
         }
+        
+        public override bool Close()
+        {
+            var path = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'用户列表')]/i";
+            // 关闭窗口
+            FindAndClickByXPath(path,100);
+            return base.Close();
+        }
+
 
         public User Select(string gameId)
         {
-            GoToPage(1, "用户列表");
             // 设置游戏ID
             var gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
             SetTextElementByXPath(gameIdPath, gameId);
@@ -128,18 +135,15 @@ namespace boin
         private void readFunding(User user, int i)
         {
             var xpath = "(//div[@id='timeListBox']/div/div[2]/button[3]/span[text()='概况']/..)[" +
-                        (i + 1).ToString() +  "]";
+                        (i + 1).ToString() + "]";
             moveToOp(user, i);
             // 点击扩展按钮中的概况
             FindAndClickByXPath(xpath, 2000);
-            user.Funding = SafeExec(() =>
+            using (FundingPage gl = new FundingPage(driver, cnf, user.GameId))
             {
-                using (FundingPage gl = new FundingPage(driver, cnf, user.GameId))
-                {
-                    var funding = gl.Select();
-                    return funding;
-                }
-            });
+                var funding = gl.Select();
+                user.Funding = funding;
+            }
         }
 
         // 注单(游戏)
@@ -150,14 +154,11 @@ namespace boin
             moveToOp(user, i);
             // 点击扩展按钮中的概况
             FindAndClickByXPath(xpath, 2000);
-            user.GameInfo = SafeExec(() =>
+            using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
             {
-                using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
-                {
-                    var gameInfo = gl.Select(cnf.GameLogMaxHour);
-                    return gameInfo;
-                }
-            });
+                var gameInfo = gl.Select(cnf.GameLogMaxHour);
+                user.GameInfo = gameInfo;
+            }
         }
 
         private bool moveToOp(User user, int i)

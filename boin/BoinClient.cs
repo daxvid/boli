@@ -120,60 +120,72 @@ namespace boin
             ThreadPool.QueueUserWorkItem(state =>
             {
                 while (true)
-                {   // run
+                {
+                    // run
                     var orders = LoadOrders();
-                    var passOrders = new List<Order>(orders.Count);
-                    foreach (var order in orders)
-                    {
-                        if (reviewer.Review(order))
-                        {
-                            passOrders.Add(order);
-                        }
-                        else
-                        {
-                            order.ReviewMsg = "fail";
-                            SendMsg(order.ReviewNote());
-                        }
-                    }
-                    Review(passOrders);
+                    SendMsg("order count:" + orders.Count);
+                    ReviewOrders(orders);
                 }
             });
         }
 
+        private void ReviewOrders(List<Order> orders)
+        {
+            foreach (var order in orders)
+            {
+                if (reviewer.Review(order))
+                {
+                    var user = LoadUser(order);
+                    ReviewUser(user);
+                }
+                else
+                {
+                    order.Processed = true;
+                    order.ReviewMsg = "fail";
+                    SendMsg(order.ReviewNote());
+                }
+            }
+            // 等待所有订单处理结束
+            WaitOrders(orders);
+        }
+
+        private static void WaitOrders(List<Order> orders)
+        {
+            foreach (var order in orders)
+            {
+                while (order.Processed == false)
+                {
+                    Thread.Sleep((1000));
+                }
+            }
+        }
+
         public List<Order> LoadOrders()
         {
-            using (var orderPage = new OrderPage(driver, cnf))
+            var orders = SafeExec(() =>
             {
-                orderPage.Open();
-                orderPage.Select(cnf.OrderHour);
-                var orders = orderPage.ReadTable(reviewer.Cnf.OrderAmountMax);
-                var r = new List<Order>(orders.Count);
-                foreach (var order in orders)
+                using (var orderPage = new OrderPage(driver, cnf))
                 {
-                    // 过滤已经处理过的订单
-                    var msg = Cache.GetOrder(order.OrderID);
-                    if (!string.IsNullOrEmpty(msg))
-                    {
-                        continue;
-                    }
-                    // 已经备注的订单不处理
-                    if (!string.IsNullOrEmpty(order.Remark))
-                    {
-                        continue;
-                    }
-                    // 过滤金额，只处理5000以下的订单
-                    if (order.Amount > reviewer.Cnf.OrderAmountMax)
-                    {
-                        continue;
-                    }
+                    orderPage.Open();
+                    var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
+                    return orders;
+                }
+            },1000,60);
+            
+            var newOrders = new List<Order>();
+            foreach (var order in orders)
+            {
+                // 过滤已经处理过的订单
+                var msg = Cache.GetOrder(order.OrderID);
+                if (string.IsNullOrEmpty(msg))
+                {
                     // 查询绑定
                     var bind = LoadBind(order.GameId, order.CardNo);
                     order.Bind = bind;
-                    r.Add(order);
+                    newOrders.Add(order);
                 }
-                SendMsg("order count:" + r.Count.ToString());
-                return r;
             }
+            return newOrders;
         }
 
 
@@ -187,7 +199,7 @@ namespace boin
                     var user = userPage.Select(gameId);
                     return user;
                 }
-            });
+            }, 1000, 60);
             return user;
         }
 
@@ -201,7 +213,7 @@ namespace boin
                     var binds = bindPage.Select(gameId);
                     return binds;
                 }
-            });
+            },1000, 60);
             return binds;
         }
 
@@ -215,64 +227,38 @@ namespace boin
                     var bind = bindPage.Select(gameId, cardNo);
                     return bind;
                 }
-            });
+            },1000,30);
             return bind;
         }
 
         static int orderCount = 0;
 
-        public List<User> Review(List<Order> orders)
+        public bool ReviewUser(User user)
         {
-            long wait = 0;
-            List<User> users = new List<User>();
-            for (int i = 0; i < orders.Count; i++)
+            while (true)
             {
-                var order = orders[i];
-                orderCount++;
-                var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
-                          orderCount.ToString() + ":" + order.OrderID;
-                using (var span = new Span())
+                if (user.Funding.IsSyncName)
                 {
-                    SendMsg(msg);
-                    span.Msg = msg;
-                    var user = LoadUser(order.GameId);
-                    user.Order = order;
-                    users.Add(user);
-                    if (user.Funding.IsSyncName)
-                    {
-                        Review(user);
-                    }
-                    else
-                    {
-                        Interlocked.Increment(ref wait);
-                        ThreadPool.QueueUserWorkItem(state =>
-                        {
-                            while (true)
-                            {
-                                if (user.Funding.IsSyncName)
-                                {
-                                    Review(user);
-                                    break;
-                                }
-
-                                Thread.Sleep(1);
-                            }
-
-                            Interlocked.Decrement(ref wait);
-                        });
-                    }
+                    return Review(user);
                 }
-            }
-
-            while (Interlocked.Read(ref wait) > 0)
-            {
                 Thread.Sleep(1);
             }
-
-            return users;
         }
 
-
+        public User LoadUser(Order order)
+        {
+            orderCount++;
+            var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
+                orderCount.ToString() + ":" + order.OrderID;
+            using (var span = new Span())
+            {
+                SendMsg(msg);
+                span.Msg = msg;
+                var user = LoadUser(order.GameId);
+                user.Order = order;
+                return user;
+            }
+        }
         private bool Review(User user)
         {
             bool success = reviewer.Review(user);
@@ -306,6 +292,8 @@ namespace boin
             var msg = user.ReviewNote();
             Cache.SaveOrder(user.Order.OrderID, msg);
             SendMsg(msg);
+            
+            user.Order.Processed = true;
             return success;
         }
 

@@ -14,9 +14,16 @@ namespace boin
 
         public override bool Open()
         {
-            GoToPage(4, "提现管理");
-            SetItem();
-            return true;
+            return GoToPage(4, "提现管理");
+        }
+        
+        public override bool Close()
+        {
+            // //*[@id="layout"]/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[2]/i
+            var path = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'提现管理')]/i";
+            // 关闭窗口
+            FindAndClickByXPath(path,100);
+            return base.Close();
         }
 
         private void SetItem()
@@ -33,15 +40,24 @@ namespace boin
         }
 
         // 查询订单
-        public void Select(int hour)
+        public List<Order> Select(int hour, int orderAmountMax)
         {
-            GoToPage(4, "提现管理");
+            SetItem();
             // 设置查询时间，12小时以内的订单
             var timeRang = FindElementByXPath("//div[@id='Cash']/div/div[12]/div/div/div/input");
             Helper.SetTimeRang(timeRang, hour);
             // 点击查询
             // //*[@id="Cash"]/div[1]/div[13]/button[1]/span
             FindAndClickByXPath("//div[@id='Cash']/div[1]/div[13]/button[1]/span[text()='查询']", 2000);
+            
+            var tablePath = "//*[@id=\"Cash\"]/div[2]/div[1]";
+            var table = FindElementByXPath(tablePath);
+
+            var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+            var tbody = FindElementByXPath(table, bodyPath);
+
+            var orders = ReadOrders(tbody, orderAmountMax);
+            return orders;
         }
 
         public List<Order> ReadTable()
@@ -96,18 +112,6 @@ namespace boin
                     orders.Add(order);
                 }
             }
-            return orders;
-        }
-        
-        public List<Order> ReadTable(int orderAmountMax)
-        {
-            var tablePath = "//*[@id=\"Cash\"]/div[2]/div[1]";
-            var table = FindElementByXPath(tablePath);
-
-            var bodyPath = ".//tbody[@class='ivu-table-tbody']";
-            var tbody = FindElementByXPath(table, bodyPath);
-
-            var orders = ReadOrders(tbody, orderAmountMax);
             return orders;
         }
 

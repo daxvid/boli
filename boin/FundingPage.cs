@@ -23,7 +23,7 @@ namespace boin
         {
             // 关闭窗口
             var table = FindElementByXPath(path);
-            return Helper.SafeClose(driver, table);
+            return SafeClose(table);
         }
 
         private IWebElement getCurrentTable()
@@ -87,7 +87,7 @@ namespace boin
                         }
                         return rechargeLogs;
                     }
-                });
+                },1000, 30);
             }
 
             if (withdrawMaxDay > 0)
@@ -109,7 +109,7 @@ namespace boin
                         }
                         return withdrawLogs;
                     }
-                });
+                },1000,30);
             }
         }
 

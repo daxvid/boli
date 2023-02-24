@@ -28,16 +28,16 @@
     <PackageReference Include="TwoStepsAuthenticator.NetCore" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="RestSharp" Version="108.0.3" />
-    <PackageReference Include="Telegram.BotAPI" Version="6.5.0" />
-    <PackageReference Include="YamlDotNet" Version="13.0.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.90" />
+    <PackageReference Include="Telegram.BotAPI" Version="6.5.1" />
+    <PackageReference Include="YamlDotNet" Version="13.0.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>
   <ItemGroup>
     <None Update="app.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="review.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -66,3 +66,4 @@ boin.sln.DotSettings.user
 boin/obj/project.packagespec.json
 *.png
 boin/review.yaml
+*.txt

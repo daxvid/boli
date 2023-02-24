@@ -115,31 +115,14 @@ namespace boin.Util
                         btn.Click();
                         return true;
                     }
-                    catch (ElementClickInterceptedException) { }
+                    catch (WebDriverException) { }
                     return false;
                 });
             }
             return true;
         }
 
-        public static bool SafeClose(ChromeDriver driver, IWebElement table)
-        {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-            var result = wait.Until(driver =>
-            {
-                try
-                {
-                    table.FindElement(By.XPath(".//a/i[@class='ivu-icon ivu-icon-ios-close']")).Click();
-                    return true;
-                }
-                catch (NoSuchElementException) { }
-                catch (ElementClickInterceptedException) { }
-                //catch (ElementNotInteractableException) { }
-                //catch (InvalidOperationException) { }
-                return false;
-            });
-            return result;
-        }
+
 
         public static decimal ReadBetDecimal(IWebElement e)
         {

@@ -23,7 +23,7 @@ namespace boin
         {
             // 关闭窗口
             var table = FindElementByXPath(path);
-            return Helper.SafeClose(driver, table);
+            return SafeClose(table);
         }
 
         private IWebElement getCurrentTable(int page)
