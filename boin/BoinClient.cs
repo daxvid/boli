@@ -86,7 +86,7 @@ namespace boin
                 if (txt.Contains("登入成功"))
                 {
                     SendMsg("登入成功:" + cnf.UserName);
-                    TakeScreenshot();
+                    TakeScreenshot(null);
                     return true;
                 }
             }

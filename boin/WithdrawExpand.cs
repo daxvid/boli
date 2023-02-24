@@ -96,11 +96,21 @@ namespace boin
                 {
                     ThreadPool.QueueUserWorkItem(state =>
                     {
-                        //var bankName =  GetRechargeName(this.CardNo);
                         var info = BankUtil.GetBankInfo(this.CardNo);
                         this.BankCardInfo = info;
-                        this.BankName = BankUtil.GetNameOfBank(info.bank);
+                        var bankName = BankUtil.GetNameOfBank(info.bank);
+                        // if (bankName == info.bank)
+                        // {
+                        //     bankName = BankUtil.GetNameOfBankCard(this.CardNo);
+                        //     if (string.IsNullOrEmpty(bankName))
+                        //     {
+                        //         bankName = info.bank;
+                        //     }
+                        // }
+
+                        this.BankName = bankName;
                         Interlocked.Increment(ref nameLocker);
+                        
                     });
                 }
                 else

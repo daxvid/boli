@@ -153,16 +153,9 @@ namespace boin.Util
 
         public static decimal ReadDecimal(IWebElement e)
         {
-            try
-            {
-                var txt = ReadString(e);
-                decimal r = decimal.Parse(txt);
-                return r;
-            }
-            catch
-            {
-                throw;
-            }
+            var txt = ReadString(e);
+            decimal r = decimal.Parse(txt);
+            return r;
         }
 
         public static string ReadString(IWebElement e)
@@ -177,16 +170,9 @@ namespace boin.Util
 
         public static DateTime ReadDateTime(IWebElement e)
         {
-            try
-            {
-                var txt = ReadString(e);
-                var r = DateTime.ParseExact(txt, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
-                return r;
-            }
-            catch
-            {
-                throw;
-            }
+            var txt = ReadString(e);
+            var r = DateTime.ParseExact(txt, "yyyy-MM-dd HH:mm:ss", CultureInfo.CurrentCulture);
+            return r;
         }
 
         public static DateTime ReadShortTime(IWebElement e)

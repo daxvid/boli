@@ -456,12 +456,10 @@ namespace boin
                 }
                 catch (WebDriverException e)
                 {
+                    TakeScreenshot(e);
                     if (e is InvalidElementStateException ||
                         e is NotFoundException ||
-                        e is WebDriverTimeoutException ||
-                        e is ElementNotInteractableException ||
-                        e is NoSuchElementException ||
-                        e is ElementClickInterceptedException)
+                        e is WebDriverTimeoutException)
                     {
                         Log.Info(e);
                     }
@@ -471,28 +469,39 @@ namespace boin
                         throw;
                     }
                 }
-                catch (InvalidOperationException e)
+                catch (SystemException e)
                 {
+                    TakeScreenshot(e);
                     Log.Info(e);
                 }
                 catch (Exception e)
                 {
+                    TakeScreenshot(e);
                     SendMsg(e);
                     throw;
                 }
-                TakeScreenshot();
                 Thread.Sleep(sleep);
             }
 
             return default(T);
         }
-        
-        public void TakeScreenshot()
+
+        public void TakeScreenshot(Exception e)
         {
-            string fileName = DateTime.Now.ToString("yyyyMMddHHmmssfff")+".png";
+            string dir = Path.Join(Environment.CurrentDirectory, "log");
+            if (!Path.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+            string t = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            if (e != null)
+            {
+                string[] strs = { e.Message, e.StackTrace, e.ToString() };
+                File.WriteAllLines(Path.Join(dir, t + ".txt"), strs);
+            }
             ITakesScreenshot ssdriver = driver as ITakesScreenshot;
             Screenshot screenshot = ssdriver.GetScreenshot();
-            screenshot.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+            screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
         }
 
     }
