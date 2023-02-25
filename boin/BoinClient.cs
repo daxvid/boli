@@ -11,6 +11,10 @@ namespace boin
         ReviewManager reviewer;
         TimeAuthenticator authenticator;
 
+        private UserPage userPage;
+        private OrderPage orderPage;
+        private GameBindPage bindPage;
+
         public BoinClient(AppConfig cnf) : base(newDriver(cnf.Headless), cnf)
         {
             this.cnf = cnf;
@@ -19,6 +23,10 @@ namespace boin
             Cache.Init(cnf.Redis);
         }
 
+        public override void Dispose()
+        {
+            driver.Quit();
+        }
 
         static ChromeDriver newDriver(bool headless)
         {
@@ -49,15 +57,17 @@ namespace boin
             SetTextElementByXPath(namePath, cnf.UserName);
 
             // //*[@id="logins"]/div/form/div[2]/div/div/input
-            var pwdPath = "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
+            var pwdPath =
+                "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
             SetTextElementByXPath(pwdPath, cnf.Password);
-            for (var i = 1; i < 1000; i++)
+            for (var i = 1; i < 100; i++)
             {
                 if (login(i))
                 {
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -69,15 +79,10 @@ namespace boin
             // //*[@id="logins"]/div/form/div[3]/div/div/input
             var glPath = "//div[@id=\"logins\"]/div/form/div[3]/div/div/input";
             var googlePwd = SetTextElementByXPath(glPath, code);
-            //if (i <= 1) // test error 
-            //{
-            //    googlePwd.Clear();
-            //    googlePwd.SendKeys("234678");
-            //}
 
             // 登录按钮
             // //*[@id="logins"]/div/form/div[4]/div/button
-            FindAndClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button",1000);
+            FindAndClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button", 1000);
 
             try
             {
@@ -93,40 +98,46 @@ namespace boin
             catch (WebDriverTimeoutException)
             {
                 SendMsg("登入超时:" + cnf.UserName + "_" + i.ToString());
+                Thread.Sleep(1000 * i);
             }
+
             return false;
         }
 
-
+        void initPage()
+        {
+            bindPage = new GameBindPage(driver, cnf);
+            userPage = new UserPage(driver, cnf);
+            orderPage = new OrderPage(driver, cnf);
+            orderPage.InitItem();
+        }
+        
         public void Run()
         {
-            //{   //test1
-            //    Recharge.GetRechargeName("OR1676436469554825");
-            //}
-            //{   // test2
-            //    var testCard = "6222801251011210972";
-            //    //var c = BankUtil.Chenk(testCard);
-            //    var d = BankUtil.GetBankInfo(testCard);
-            //}
-
-            this.Login();
-
-            //{   // test3
-            //    var userPage2 = new UserPage(driver);
-            //    userPage2.Open();
-            //    userPage2.Select("325961309");   // 325961309
-            //}
-
-            ThreadPool.QueueUserWorkItem(state =>
+            if (!this.Login())
             {
-                while (true)
+                return;
+            }
+
+            initPage();
+
+            while (true)
+            {
+                // run
+                try
                 {
-                    // run
                     var orders = LoadOrders();
                     SendMsg("order count:" + orders.Count);
                     ReviewOrders(orders);
                 }
-            });
+                catch (WebDriverException e)
+                {
+                    bindPage.Close();
+                    userPage.Close();
+                    orderPage.Close();
+                    initPage();
+                }
+            }
         }
 
         private void ReviewOrders(List<Order> orders)
@@ -145,6 +156,7 @@ namespace boin
                     SendMsg(order.ReviewNote());
                 }
             }
+
             // 等待所有订单处理结束
             WaitOrders(orders);
         }
@@ -164,14 +176,11 @@ namespace boin
         {
             var orders = SafeExec(() =>
             {
-                using (var orderPage = new OrderPage(driver, cnf))
-                {
-                    orderPage.Open();
-                    var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
-                    return orders;
-                }
-            },1000,60);
-            
+                orderPage.Open();
+                var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
+                return orders;
+            }, 1000, 60);
+
             var newOrders = new List<Order>();
             foreach (var order in orders)
             {
@@ -185,6 +194,7 @@ namespace boin
                     newOrders.Add(order);
                 }
             }
+
             return newOrders;
         }
 
@@ -193,41 +203,21 @@ namespace boin
         {
             var user = SafeExec(() =>
             {
-                using (var userPage = new UserPage(driver, cnf))
-                {
-                    userPage.Open();
-                    var user = userPage.Select(gameId);
-                    return user;
-                }
+                userPage.Open();
+                var user = userPage.Select(gameId);
+                return user;
             }, 1000, 60);
             return user;
-        }
-
-        public List<GameBind> LoadBinds(string gameId)
-        {
-            var binds = SafeExec(() =>
-            {
-                using (var bindPage = new GameBindPage(driver, cnf))
-                {
-                    bindPage.Open();
-                    var binds = bindPage.Select(gameId);
-                    return binds;
-                }
-            },1000, 60);
-            return binds;
         }
 
         public GameBind LoadBind(string gameId, string cardNo)
         {
             var bind = SafeExec(() =>
             {
-                using (var bindPage = new GameBindPage(driver, cnf))
-                {
-                    bindPage.Open();
-                    var bind = bindPage.Select(gameId, cardNo);
-                    return bind;
-                }
-            },1000,30);
+                bindPage.Open();
+                var bind = bindPage.Select(gameId, cardNo);
+                return bind;
+            }, 1000, 30);
             return bind;
         }
 
@@ -241,6 +231,7 @@ namespace boin
                 {
                     return Review(user);
                 }
+
                 Thread.Sleep(1);
             }
         }
@@ -259,6 +250,7 @@ namespace boin
                 return user;
             }
         }
+
         private bool Review(User user)
         {
             bool success = reviewer.Review(user);
@@ -274,6 +266,7 @@ namespace boin
                         break;
                     }
                 }
+
                 if (pass)
                 {
                     user.ReviewMsg = "pass";
@@ -289,18 +282,13 @@ namespace boin
                 // 可以拒绝
                 user.ReviewMsg = "fail";
             }
+
             var msg = user.ReviewNote();
             Cache.SaveOrder(user.Order.OrderID, msg);
             SendMsg(msg);
-            
+
             user.Order.Processed = true;
             return success;
         }
-
-        public void Quit()
-        {
-            driver.Quit();
-        }
-
     }
 }

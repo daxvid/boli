@@ -8,31 +8,12 @@ using boin.Util;
 namespace boin
 {
     // 提现记录
-    public class WithdrawPage : PageBase
+    public class WithdrawPage : PopPage
     {
-        string gameId;
-        string path;
-        public WithdrawPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
+        public WithdrawPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+            "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span")
         {
             this.maxPage = cnf.WithdrawMaxPage;
-            this.gameId = gameId;
-            this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-
-        }
-
-        public override bool Close()
-        {
-            // 关闭窗口
-            var table = FindElementByXPath(path);
-            return SafeClose(table);
-        }
-
-        private IWebElement getCurrentTable(int page)
-        {
-            var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var table = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(table, pagePath);
-            return table;
         }
 
         public List<Withdraw> Select(int maxDay)
@@ -40,7 +21,8 @@ namespace boin
             var table = getCurrentTable(1);
             if (maxDay > 0)
             {
-                var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                var dayRang = FindElementByXPath(table,
+                    ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
                 Helper.SetDayRang(dayRang, maxDay);
                 // 点击查询按钮;
                 FindAndClickByXPath(table, ".//button/span[text()='查询']", 1000);
@@ -72,6 +54,7 @@ namespace boin
                 var logs = ReadWithdraws(tbody, page);
                 allLogs.AddRange(logs);
             }
+
             return allLogs;
         }
 
@@ -128,29 +111,34 @@ namespace boin
         {
             var allRows = FindElementsByXPath(tbody, ".//tr");
             // 展开所有列表
-            var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+            var expandPath =
+                "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
             foreach (var row in allRows)
             {
-                FindAndClickByXPath(row, expandPath,0);
+                FindAndClickByXPath(row, expandPath, 0);
             }
+
             Thread.Sleep(200);
-            
+
             var allLogs = new List<Withdraw>();
             var count = allRows.Count;
             for (var i = 0; i < count; i++)
             {
                 var row = allRows[i];
-                var rowEx = FindElementByXPath(row, "./following-sibling::tr[1]/td[@class='ivu-table-expanded-cell']/..");
+                var rowEx = FindElementByXPath(row,
+                    "./following-sibling::tr[1]/td[@class='ivu-table-expanded-cell']/..");
                 if (rowEx == null)
                 {
                     throw new NoSuchElementException("not find rowEx");
                 }
+
                 var withdraw = Withdraw.Create(row, rowEx);
                 if (withdraw != null)
                 {
                     allLogs.Add(withdraw);
                 }
             }
+
             return allLogs;
         }
     }

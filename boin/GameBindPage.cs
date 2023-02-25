@@ -11,25 +11,11 @@ using boin.Util;
 
 namespace boin
 {
-    public class GameBindPage : PageBase
+    public class GameBindPage : LablePage
     {
 
-        public GameBindPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf)
+        public GameBindPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf, 1, "绑定管理")
         {
-        }
-
-
-        public override bool Open()
-        {
-            return GoToPage(1, "绑定管理");
-        }
-        
-        public override bool Close()
-        {
-            var path = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'绑定管理')]/i";
-            // 关闭窗口
-            FindAndClickByXPath(path,100);
-            return base.Close();
         }
 
         public List<GameBind> Select(string gameId)
@@ -65,6 +51,7 @@ namespace boin
             {
                 return 0;
             }
+
             // 等待查询结果
             // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[2]/div/div/div/a/span
             // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[2]/div/div/div/a/span
@@ -91,6 +78,7 @@ namespace boin
                     SafeClick(exBtn, 5);
                 }
             }
+
             Thread.Sleep(200);
 
             var binds = readBinds(tbody);
@@ -112,6 +100,7 @@ namespace boin
                     Binds.Add(bind);
                 }
             }
+
             return Binds;
         }
 
@@ -125,6 +114,7 @@ namespace boin
                     return binds[0];
                 }
             }
+
             return null;
         }
 
@@ -144,7 +134,7 @@ namespace boin
             // //*[@id="GameBindList"]/div[1]/button/span
             var btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
             FindAndClickByXPath(btnPath, 1000);
-            
+
             // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
             var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
             if (FindElementsByXPath(pathNone).Count == 1)
@@ -165,6 +155,6 @@ namespace boin
 
             return false;
         }
-        
+
     }
 }

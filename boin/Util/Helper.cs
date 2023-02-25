@@ -185,10 +185,12 @@ namespace boin.Util
 
         public static void SendMsg(Exception err)
         {
-            Console.WriteLine(err.Message);
-            Console.WriteLine(err.StackTrace);
-            TelegramBot.SendMsg(err.Message);
-            TelegramBot.SendMsg(err.StackTrace);
+            var s = err.ToString();
+            var t = err.StackTrace;
+            Console.WriteLine(s);
+            Console.WriteLine(t);
+            TelegramBot.SendMsg(s);
+            TelegramBot.SendMsg(t);
         }
     }
 }

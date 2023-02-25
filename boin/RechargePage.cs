@@ -7,33 +7,14 @@ using boin.Util;
 
 namespace boin
 {
-	// 充值记录
-	public class RechargePage : PageBase
+    // 充值记录
+    public class RechargePage : PopPage
     {
 
-        string gameId;
-        string path;
-        public RechargePage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
+        public RechargePage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+            "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span")
         {
             this.maxPage = cnf.RechargeMaxPage;
-            this.gameId = gameId;
-            this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-
-        }
-
-        public override bool Close()
-        {
-            // 关闭窗口
-            var table = FindElementByXPath(path);
-            return SafeClose(table);
-        }
-
-        private IWebElement getCurrentTable(int page)
-        {
-            var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var table = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(table, pagePath);
-            return table;
         }
 
         public List<Recharge> Select(int maxDay)
@@ -41,7 +22,8 @@ namespace boin
             var table = getCurrentTable(1);
             if (maxDay > 0)
             {
-                var dayRang = FindElementByXPath(table, ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
+                var dayRang = FindElementByXPath(table,
+                    ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
                 Helper.SetDayRang(dayRang, maxDay);
                 // 点击查询按钮;
                 FindAndClickByXPath(table, ".//div/button[1]/span[text()='查询']", 1000);
@@ -49,13 +31,15 @@ namespace boin
             }
 
             // 在线充值次数/后台充值次数/等
-            var items = FindElementsByXPath(table, ".//div[@class='countSty']/span[contains(text(),'在线充值次数：')]/../span");
+            var items = FindElementsByXPath(table,
+                ".//div[@class='countSty']/span[contains(text(),'在线充值次数：')]/../span");
             List<string> onlineRechargeList = new List<string>();
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 var value = Helper.ReadString(item);
                 onlineRechargeList.Add(value);
             }
+
             return ReadRechargeLog(table);
         }
 
@@ -64,7 +48,7 @@ namespace boin
         {
             // table = ivu-modal-content
             var bodyPath = ".//tbody[@class='ivu-table-tbody']";
-            var tbody = FindElementByXPath(table,bodyPath);
+            var tbody = FindElementByXPath(table, bodyPath);
             var bodys = new List<IWebElement>() { tbody };
             var tables = new List<IWebElement>() { table };
             var allLogs = ReadLogs(tbody, 1);
@@ -78,13 +62,14 @@ namespace boin
                 }
 
                 table = getCurrentTable(page);
-                tbody = FindElementByXPath(table,bodyPath);
+                tbody = FindElementByXPath(table, bodyPath);
                 bodys.Add(tbody);
                 tables.Add(table);
 
                 var logs = ReadLogs(tbody, page);
                 allLogs.AddRange(logs);
             }
+
             return allLogs;
         }
 
@@ -92,11 +77,12 @@ namespace boin
         private List<Recharge> ReadLogs(IWebElement tbody, int page)
         {
             // 点开所有的查询按钮
-            var selBtns =  FindElementsByXPath(tbody,".//td/div/div/div/button/span[contains(text(),'查询')]/..");
+            var selBtns = FindElementsByXPath(tbody, ".//td/div/div/div/button/span[contains(text(),'查询')]/..");
             foreach (var sel in selBtns)
             {
                 Helper.TryClick(wait, sel);
             }
+
             Thread.Sleep(1000);
 
             var allRows = FindElementsByXPath(tbody, ".//tr");
@@ -111,6 +97,7 @@ namespace boin
                     logs.Add(log);
                 }
             }
+
             return logs;
         }
     }

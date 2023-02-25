@@ -1,6 +1,6 @@
 ﻿namespace boin;
 using boin.Bot;
-using boin.Review;
+using boin.Util;
 
 class Program
 {
@@ -10,20 +10,29 @@ class Program
 
         TelegramBot.Instance.Run(cnf);
 
-        BoinClient client = new BoinClient(cnf);
-        client.Run();
-
-        // while(true){
-        //     Thread.Sleep(1000);
-        // }
-        
-        var s = Console.ReadKey(true).KeyChar;
-        while (Char.ToLower(s) != 'q')
+        while (true)
         {
-            s = Console.ReadKey(true).KeyChar;
-            Console.Write(s);
+            using (BoinClient client = new BoinClient(cnf))
+            {
+                try
+                {
+                    client.Run();
+                }
+                catch (Exception err)
+                {
+                    try
+                    {
+                        client.TakeScreenshot(err);
+                        Helper.SendMsg(err);
+                    }
+                    catch
+                    {
+                    }
+                    Thread.Sleep(30 * 1000);
+                }
+            }
         }
-        client.Quit();
+
     }
 }
 

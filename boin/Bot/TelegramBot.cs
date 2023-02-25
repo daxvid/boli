@@ -65,7 +65,10 @@ namespace boin.Bot
                         if (update.Message != null && update.Message.Chat != null)
                         {
                             long chatId = update.Message.Chat.Id; // Target chat Id
-                            client.SendMessage(chatId, "ok" + chatId.ToString());
+                            try
+                            {
+                                client.SendMessage(chatId, "ok" + chatId.ToString());
+                            }catch{}
                         }
                     }
                     var offset = updates.Last().UpdateId + 1;

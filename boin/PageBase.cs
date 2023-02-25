@@ -225,88 +225,6 @@ namespace boin
             return result;
         }
 
-        // protected bool TryClickByXPath(string path, int ms = 1000)
-        // {
-        //     return TryClick(By.XPath(path), ms);
-        // }
-        //
-        // protected bool TryClick(By by, int ms = 1000)
-        // {
-        //     var result = wait.Until(driver =>
-        //     {
-        //         try
-        //         {
-        //             var es = driver.FindElements(by);
-        //             if (es.Count == 0)
-        //             {
-        //                 return false;
-        //             }
-        //
-        //             if (es.Count == 1)
-        //             {
-        //                 var c = es[0];
-        //                 c.Click();
-        //                 Thread.Sleep(ms);
-        //                 return true;
-        //             }
-        //             else
-        //             {
-        //                 throw new MoreSuchElementException(by, "click", es);
-        //             }
-        //         }
-        //         catch (NoSuchElementException)
-        //         {
-        //         }
-        //         catch (ElementClickInterceptedException)
-        //         {
-        //         }
-        //
-        //         return false;
-        //     });
-        //     return result;
-        // }
-        //
-        // protected bool TryClickByXPath(IWebElement e, string path, int ms = 1000)
-        // {
-        //     return TryClick(e, By.XPath(path), ms);
-        // }
-        //
-        // protected bool TryClick(IWebElement e, By by, int ms = 1000)
-        // {
-        //     var result = wait.Until(driver =>
-        //     {
-        //         try
-        //         {
-        //             var es = e.FindElements(by);
-        //             if (es.Count == 0)
-        //             {
-        //                 return false;
-        //             }
-        //
-        //             if (es.Count == 1)
-        //             {
-        //                 var c = es[0];
-        //                 c.Click();
-        //                 Thread.Sleep(ms);
-        //                 return true;
-        //             }
-        //             else
-        //             {
-        //                 throw new MoreSuchElementException(by, "click", es);
-        //             }
-        //         }
-        //         catch (NoSuchElementException)
-        //         {
-        //         }
-        //         catch (ElementClickInterceptedException)
-        //         {
-        //         }
-        //
-        //         return false;
-        //     });
-        //     return result;
-        // }
-
         protected void FindAndClickByXPath(string path, int ms)
         {
             FindAndClick(By.XPath(path), ms);
@@ -325,7 +243,7 @@ namespace boin
 
         protected void FindAndClickByXPath(IWebElement e, string path, int ms)
         {
-             FindAndClick(e, By.XPath(path), ms);
+            FindAndClick(e, By.XPath(path), ms);
         }
 
         protected void FindAndClick(IWebElement e, By by, int ms)
@@ -338,21 +256,26 @@ namespace boin
                 return true;
             });
         }
+
+
         public bool SafeClose(IWebElement table)
         {
             var result = wait.Until(driver =>
             {
                 try
                 {
-                    table.FindElement(By.XPath(".//a/i[@class='ivu-icon ivu-icon-ios-close']")).Click();
+                    FindAndClickByXPath(table, ".//a/i[@class='ivu-icon ivu-icon-ios-close']", 1000);
                     return true;
                 }
-                catch (WebDriverException) { }
+                catch (WebDriverException)
+                {
+                }
+
                 return false;
             });
             return result;
         }
-        
+
         protected bool SafeClick(IWebElement btn, int ms = 0)
         {
             if (btn.Enabled)
@@ -378,8 +301,8 @@ namespace boin
 
         protected bool GoToPage(int index, string item)
         {
-            FindAndClick(By.CssSelector("nav li:nth-child(" + index + ")"),100);
-            FindAndClick(By.LinkText(item),100);
+            FindAndClick(By.CssSelector("nav li:nth-child(" + index + ")"), 100);
+            FindAndClick(By.LinkText(item), 100);
             return true;
         }
 
@@ -438,7 +361,7 @@ namespace boin
             return dicHead;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Close();
         }
@@ -459,7 +382,7 @@ namespace boin
             Thread.Sleep(ms);
             return true;
         }
-        
+
         public T SafeExec<T>(Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
         {
             Exception ex = null;
@@ -498,8 +421,10 @@ namespace boin
                     SendMsg(e);
                     throw;
                 }
+
                 Thread.Sleep(sleep);
             }
+
             throw ex;
         }
 
@@ -510,12 +435,14 @@ namespace boin
             {
                 Directory.CreateDirectory(dir);
             }
+
             string t = DateTime.Now.ToString("yyyyMMddHHmmssfff");
             if (e != null)
             {
                 string[] strs = { e.Message, e.StackTrace, e.ToString() };
                 File.WriteAllLines(Path.Join(dir, t + ".txt"), strs);
             }
+
             ITakesScreenshot ssdriver = driver as ITakesScreenshot;
             Screenshot screenshot = ssdriver.GetScreenshot();
             screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);

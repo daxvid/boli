@@ -9,27 +9,17 @@ using boin.Util;
 namespace boin
 {
     // 资金概况
-    public class FundingPage : PageBase
+    public class FundingPage : PopPage
     {
-        string gameId;
-        string path;
-        public FundingPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
+        public FundingPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+            "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div")
         {
-            this.gameId = gameId;
-            this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
-        }
-
-        public override bool Close()
-        {
-            // 关闭窗口
-            var table = FindElementByXPath(path);
-            return SafeClose(table);
         }
 
         private IWebElement getCurrentTable()
         {
-            var table = FindElementByXPath(path);
-            return table;
+            //mainTable = FindElementByXPath(path);
+            return mainTable;
         }
 
         public Funding Select()

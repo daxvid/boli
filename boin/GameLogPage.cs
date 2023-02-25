@@ -8,30 +8,12 @@ using boin.Util;
 namespace boin
 {
     // 用户游戏日志
-    public class GameLogPage : PageBase
+    public class GameLogPage : PopPage
     {
-        string gameId;
-        string path;
-        public GameLogPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
+        public GameLogPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+            "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span")
         {
             this.maxPage = cnf.GameLogMaxPage;
-            this.gameId = gameId;
-            this.path = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-        }
-
-        public override bool Close()
-        {
-            // 关闭窗口
-            var table = FindElementByXPath(path);
-            return SafeClose(table);
-        }
-
-        private IWebElement getCurrentTable(int page)
-        {
-            var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-            var table = FindElementByXPath(path);
-            var pageTag = FindElementByXPath(table, pagePath);
-            return table;
         }
 
         // 查询用户游戏日志
@@ -76,11 +58,13 @@ namespace boin
                 {
                     break;
                 }
+
                 table = getCurrentTable(page);
-                tbody = FindElementByXPath(table,bodyPath);
+                tbody = FindElementByXPath(table, bodyPath);
                 var logs = ReadLogs(tbody, page);
                 allLogs.AddRange(logs);
             }
+
             return allLogs;
         }
 
@@ -99,6 +83,7 @@ namespace boin
                     logs.Add(log);
                 }
             }
+
             return logs;
         }
     }
