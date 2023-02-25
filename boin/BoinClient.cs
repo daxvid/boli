@@ -111,7 +111,7 @@ namespace boin
             orderPage = new OrderPage(driver, cnf);
             orderPage.InitItem();
         }
-        
+
         public void Run()
         {
             if (!this.Login())
@@ -121,6 +121,7 @@ namespace boin
 
             initPage();
 
+            int zeroCount = 0;
             while (true)
             {
                 // run
@@ -128,10 +129,20 @@ namespace boin
                 {
                     var orders = LoadOrders();
                     SendMsg("order count:" + orders.Count);
-                    ReviewOrders(orders);
+                    if (orders.Count > 0)
+                    {
+                        zeroCount = 0;
+                        ReviewOrders(orders);
+                    }
+                    else
+                    {
+                        Thread.Sleep((zeroCount > 30 ? 30 : zeroCount) * 2000);
+                        zeroCount++;
+                    }
                 }
                 catch (WebDriverException e)
                 {
+                    zeroCount = 0;
                     bindPage.Close();
                     userPage.Close();
                     orderPage.Close();
