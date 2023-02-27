@@ -28,17 +28,21 @@ GameLogMaxPage: 8
 # 游戏记录最多小时
 GameLogMaxHour: 36
 
+# 最大锁定单数
+OrderMaxLock: 1
+
 # 审核配置文件
 ReviewFile: review.yaml
 
 # 充值查询地址
-RechargeHost: http://
+RechargeHost: http:
 
 # Chrome
-Headless: true
+Headless: false
 
 # redis
 Redis: localhost
+
 
 #########################review.yaml#######################################
 

@@ -67,7 +67,7 @@ namespace boin
         private long nameLocker = 0;
 
         // 同步姓名
-        private void syncName()
+        public void SyncName(string host)
         {
             if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
             {
@@ -77,7 +77,7 @@ namespace boin
                 {
                     ThreadPool.QueueUserWorkItem(state =>
                     {
-                        var depositor = GetRechargeName(this.OutsideOrderId);
+                        var depositor = GetRechargeName(host, this.OutsideOrderId);
                         this.Depositor = depositor;
                         Interlocked.Increment(ref nameLocker);
                     });
@@ -118,8 +118,6 @@ namespace boin
                 log.Created = Helper.ReadDateTime(ts[11]); // 时间
                 log.Mark = Helper.ReadString(ts[12]); // 说明
 
-                log.syncName();
-
                 span.Msg = "充值:" + log.OrderId;
                 return log;
             }
@@ -146,18 +144,15 @@ namespace boin
                 log.VipPeriod = Helper.ReadString(head, "VIP期数", row);
                 log.Created = Helper.ReadTime(head, "时间", row);
                 log.Mark = Helper.ReadString(head, "说明", row);
-
-                log.syncName();
-
+                
                 span.Msg = "充值:" + log.OrderId;
                 return log;
             }
         }
 
-        public static string RechargeHost = "";
-        public static string GetRechargeName(string orderId)
+        public static string GetRechargeName(string host, string orderId)
         {
-            var url = RechargeHost + orderId;
+            var url = host + orderId;
             try
             {
                 var name = Cache.GetRecharge(orderId);

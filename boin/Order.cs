@@ -99,8 +99,17 @@ namespace boin
                 {
                     throw new ArgumentException("Order Create");
                 }
+
+                var orderId = Helper.ReadString(ts[1]);
+                // 过滤已经处理过的订单
+                var msg = Cache.GetOrder(orderId);
+                if (!string.IsNullOrEmpty(msg))
+                {
+                    return null;
+                }
+                
                 Order order = new Order();
-                order.OrderID = Helper.ReadString(ts[1]); // 订单号
+                order.OrderID = orderId; // 订单号
                 order.Created = Helper.ReadShortTime(ts[2]); // 发起时间
                 order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
                 order.GameId = Helper.ReadString(ts[4]); // 游戏ID"

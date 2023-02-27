@@ -196,9 +196,11 @@ namespace boin
             foreach (var order in orders)
             {
                 // 过滤已经处理过的订单
-                var msg = Cache.GetOrder(order.OrderID);
-                if (string.IsNullOrEmpty(msg))
+                //var msg = Cache.GetOrder(order.OrderID);
+                //if (string.IsNullOrEmpty(msg))
                 {
+                    // 锁定订单
+                    
                     // 查询绑定
                     var bind = LoadBind(order.GameId, order.CardNo);
                     order.Bind = bind;
@@ -265,10 +267,10 @@ namespace boin
         private bool Review(User user)
         {
             bool success = reviewer.Review(user);
+            bool pass = success;
             // 通过
             if (success)
             {
-                bool pass = true;
                 foreach (var v in user.ReviewResult)
                 {
                     if (v.Code > 0)
@@ -294,12 +296,21 @@ namespace boin
                 user.ReviewMsg = "fail";
             }
 
+            if (pass)
+            {
+                orderPage.Pass(user.Order);
+            }
+            else
+            {
+                orderPage.Unlock(user.Order);
+            }
+
             var msg = user.ReviewNote();
             Cache.SaveOrder(user.Order.OrderID, msg);
             SendMsg(msg);
 
             user.Order.Processed = true;
-            return success;
+            return pass;
         }
     }
 }

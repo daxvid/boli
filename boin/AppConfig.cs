@@ -38,6 +38,9 @@ namespace boin
 
         // 游戏记录最多小时
         public int GameLogMaxHour { get; set; }
+        
+        // 最大锁定单数
+        public int OrderMaxLock { get; set; }
 
         // 审核配置文件
         public string ReviewFile { get; set; }

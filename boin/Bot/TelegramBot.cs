@@ -44,10 +44,15 @@ namespace boin.Bot
                     }
                     catch
                     {
-                        client = new BotClient(cnf.BotToken);
-                        this.api = client;
-                        SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
-                        update(client);
+                        try
+                        {
+                            client = new BotClient(cnf.BotToken);
+                            this.api = client;
+                            SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
             });

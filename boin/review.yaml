@@ -57,7 +57,7 @@ OldBobi:
         百家乐: 3000
 
 # 单笔最大额度
-OrderAmountMax: 5000
+OrderAmountMax: 2000
     
 # 最近10笔提款内 波币不能超过4笔
 NearWithdrawCount: 10
