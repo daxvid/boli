@@ -61,7 +61,7 @@ public class FundingPage : PopPage
         if (rechargeMaxDay > 0)
         {
             //读取充值明细
-            f.RechargeLog = SafeExec(() =>
+            f.RechargeLog = Helper.SafeExec(driver,() =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a", 1000);
                 using (var rg = new RechargePage(driver, cnf, gameId))
@@ -84,7 +84,7 @@ public class FundingPage : PopPage
             tbox = FindElementByXPath(table, tboxPath);
 
             // 读取提现明细
-            f.WithdrawLog = SafeExec(() =>
+            f.WithdrawLog = Helper.SafeExec(driver,() =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a", 1000);
                 using (var wg = new WithdrawPage(driver, cnf, gameId))

@@ -364,69 +364,9 @@ namespace boin
             return true;
         }
 
-        public T SafeExec<T>(Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
-        {
-            Exception ex = null;
-            for (var i = 0; i < tryCount; i++)
-            {
-                try
-                {
-                    return fun();
-                }
-                catch (WebDriverException e)
-                {
-                    ex = e;
-                    TakeScreenshot(e);
-                    if (e is InvalidElementStateException ||
-                        e is NotFoundException ||
-                        e is WebDriverTimeoutException)
-                    {
-                        Log.Info(e);
-                    }
-                    else
-                    {
-                        SendMsg(e);
-                        throw;
-                    }
-                }
-                catch (SystemException e)
-                {
-                    ex = e;
-                    TakeScreenshot(e);
-                    Log.Info(e);
-                }
-                catch (Exception e)
-                {
-                    ex = e;
-                    TakeScreenshot(e);
-                    SendMsg(e);
-                    throw;
-                }
-
-                Thread.Sleep(sleep);
-            }
-
-            throw ex;
-        }
-
         public void TakeScreenshot(Exception e)
         {
-            string dir = Path.Join(Environment.CurrentDirectory, "log");
-            if (!Path.Exists(dir))
-            {
-                Directory.CreateDirectory(dir);
-            }
-
-            string t = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-            if (e != null)
-            {
-                string[] strs = { e.Message, e.StackTrace, e.ToString() };
-                File.WriteAllLines(Path.Join(dir, t + ".txt"), strs);
-            }
-
-            ITakesScreenshot ssdriver = driver as ITakesScreenshot;
-            Screenshot screenshot = ssdriver.GetScreenshot();
-            screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
+            Helper.TakeScreenshot(driver,e);
         }
 
     }

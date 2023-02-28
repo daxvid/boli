@@ -6,26 +6,31 @@ using TwoStepsAuthenticator;
 
 namespace boin;
 
-public class BoinClient : PageBase
+public class BoinClient:IDisposable
 {
+    public ChromeDriver driver;
+    
     ReviewManager reviewer;
     TimeAuthenticator authenticator;
 
+    private LoginPage loginPage;
     private UserPage userPage;
     private OrderPage orderPage;
     private GameBindPage bindPage;
+    private AppConfig cnf;
     private AuthConfig authCnf;
 
-    public BoinClient(AppConfig cnf, AuthConfig authCnf) : base(newDriver(cnf.Headless), cnf)
+    public BoinClient(AppConfig cnf, AuthConfig authCnf)
     {
         this.cnf = cnf;
         this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
         this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
+        this.driver = newDriver(cnf.Headless);
         Cache.Init(authCnf.Redis);
     }
 
-    public override void Dispose()
+    public void Dispose()
     {
         driver.Quit();
     }
@@ -48,64 +53,16 @@ public class BoinClient : PageBase
         //var session = ((IDevTools)driver).GetDevToolsSession();
         return driver;
     }
-
-
-    // 登录
-    public bool Login()
+    public void SendMsg(string msg)
     {
-        driver.Navigate().GoToUrl(authCnf.Home);
-        // //*[@id="logins"]/div/form/div[1]/div/div/input
-        var namePath = "//div[@id=\"logins\"]/div/form/div[1]/div/div/input[@type='text' and @placeholder='请输入账号']";
-        SetTextElementByXPath(namePath, authCnf.UserName);
-
-        // //*[@id="logins"]/div/form/div[2]/div/div/input
-        var pwdPath =
-            "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
-        SetTextElementByXPath(pwdPath, authCnf.Password);
-        for (var i = 1; i < 100; i++)
-        {
-            if (login(i))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        Helper.SendMsg(msg);
     }
 
-
-    private bool login(int i)
+    public void SendMsg(Exception err)
     {
-        // google认证
-        var code = authenticator.GetCode(authCnf.GoogleKey);
-        // //*[@id="logins"]/div/form/div[3]/div/div/input
-        var glPath = "//div[@id=\"logins\"]/div/form/div[3]/div/div/input";
-        var googlePwd = SetTextElementByXPath(glPath, code);
-
-        // 登录按钮
-        // //*[@id="logins"]/div/form/div[4]/div/button
-        FindAndClickByXPath("//div[@id=\"logins\"]/div/form/div[4]/div/button", 1000);
-
-        try
-        {
-            var e = FindElementByXPath("//*[@id='b_home_notice']/h1");
-            var txt = Helper.ReadString(e);
-            if (txt.Contains("登入成功"))
-            {
-                SendMsg("登入成功:" + authCnf.UserName);
-                TakeScreenshot(null);
-                return true;
-            }
-        }
-        catch (WebDriverTimeoutException)
-        {
-            SendMsg("登入超时:" + authCnf.UserName + "_" + i.ToString());
-            Thread.Sleep(1000 * i);
-        }
-
-        return false;
+        Helper.SendMsg(err);
     }
-
+    
     void initPage()
     {
         bindPage = new GameBindPage(driver, cnf);
@@ -116,7 +73,8 @@ public class BoinClient : PageBase
 
     public void Run()
     {
-        if (!this.Login())
+        loginPage = new LoginPage(driver, cnf, authCnf);
+        if (!loginPage.Login())
         {
             return;
         }
@@ -188,7 +146,7 @@ public class BoinClient : PageBase
         {
             try
             {
-                var orders = SafeExec(() =>
+                var orders = Helper.SafeExec(driver,() =>
                 {
                     orderPage.Open();
                     var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
@@ -212,7 +170,7 @@ public class BoinClient : PageBase
         {
             try
             {
-                var user = SafeExec(() =>
+                var user = Helper.SafeExec(driver,() =>
                 {
                     userPage.Open();
                     var user = userPage.Select(gameId);
@@ -234,7 +192,7 @@ public class BoinClient : PageBase
         {
             try
             {
-                var bind = SafeExec(() =>
+                var bind = Helper.SafeExec(driver,() =>
                 {
                     bindPage.Open();
                     var bind = bindPage.Select(gameId, cardNo);

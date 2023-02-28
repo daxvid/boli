@@ -23,7 +23,7 @@ class Program
                 {
                     try
                     {
-                        client.TakeScreenshot(err);
+                        Helper.TakeScreenshot(client.driver ,err);
                         Helper.SendMsg(err);
                     }
                     catch
