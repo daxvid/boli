@@ -56,7 +56,7 @@ public class User
     public string ReviewNote()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.Append(Order.OrderID).Append(":").AppendLine(ReviewMsg);
+        sb.Append(Order.OrderId).Append(":").AppendLine(ReviewMsg);
         sb.Append("game:").AppendLine(this.GameId);
         if (ReviewResult != null)
         {

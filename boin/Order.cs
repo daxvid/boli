@@ -9,7 +9,7 @@ namespace boin;
 public class Order : WithdrawExpand
 {
     // 订单号
-    public string OrderID { get; set; } = string.Empty;
+    public string OrderId { get; set; } = string.Empty;
 
     // 创建时间
     public DateTime Created { get; set; }
@@ -66,7 +66,7 @@ public class Order : WithdrawExpand
         sb.Append("card:").AppendLine(this.CardNo);
         if (!string.IsNullOrEmpty(ReviewMsg))
         {
-            sb.Append(OrderID).Append(":").AppendLine(ReviewMsg);
+            sb.Append(OrderId).Append(":").AppendLine(ReviewMsg);
         }
 
         if (ReviewResult != null)
@@ -112,7 +112,7 @@ public class Order : WithdrawExpand
             }
 
             Order order = new Order();
-            order.OrderID = orderId; // 订单号
+            order.OrderId = orderId; // 订单号
             order.Created = Helper.ReadShortTime(ts[2]); // 发起时间
             order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
             order.GameId = Helper.ReadString(ts[4]); // 游戏ID"
@@ -127,7 +127,7 @@ public class Order : WithdrawExpand
             order.Status = Helper.ReadString(ts[13]); //  操作
             order.ReadExpand(rowEx, order.Way == "银行卡");
 
-            span.Msg = "订单:" + order.OrderID;
+            span.Msg = "订单:" + order.OrderId;
             return order;
         }
     }
@@ -140,7 +140,7 @@ public class Order : WithdrawExpand
             var tdList = element.FindElements(By.XPath(".//td"));
 
             Order order = new Order();
-            order.OrderID = Helper.ReadString(head, "订单号", row);
+            order.OrderId = Helper.ReadString(head, "订单号", row);
             //order.Created = Helper.ReadString(head, "发起时间", row);
             order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
             order.GameId = Helper.ReadString(head, "游戏ID", row);
@@ -157,7 +157,7 @@ public class Order : WithdrawExpand
             order.ReadExpand(rowEx, order.Way == "银行卡");
 
 
-            span.Msg = "订单:" + order.OrderID;
+            span.Msg = "订单:" + order.OrderId;
             return order;
         }
     }

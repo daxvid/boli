@@ -16,19 +16,6 @@ public class AmountReview : IReviewUser
         this.cnf = cnf;
     }
 
-    //public ReadOnlyCollection<ReviewResult> Review(Order order)
-    //{
-    //    List<ReviewResult> rs = new List<ReviewResult>();
-    //    var ac = cnf.GetAmountConfig(order.Way, false);
-    //    var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
-    //    if (r1 != null)
-    //    {
-    //        rs.Add(r1);
-    //    }
-    //    return new ReadOnlyCollection<ReviewResult>(rs);
-    //}
-
-
     public ReadOnlyCollection<ReviewResult> Review(User user)
     {
         List<ReviewResult> rs = new List<ReviewResult>();
@@ -62,7 +49,7 @@ public class AmountReview : IReviewUser
         }
 
         // 检查如果玩了某种游戏，当日提现总额限制
-        var dayWithdraw = user.Funding.TotalDayWithdraw(order.Way, order.OrderID) + order.Amount;
+        var dayWithdraw = user.Funding.TotalDayWithdraw(order.Way, order.OrderId) + order.Amount;
         var r4 = checkDayGames(user, ac.DayMaxGames, dayWithdraw);
         if (r4 != null)
         {
@@ -80,7 +67,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔银行卡限制
             if (amount > max)
             {
-                return (new ReviewResult { Code = -201, Msg = "@卡单笔限制" + max + ":" + amount });
+                return (new ReviewResult { Code = 201, Msg = "@卡单笔限制" + max + ":" + amount });
             }
 
         }
@@ -89,12 +76,12 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔波币限制
             if (amount > max)
             {
-                return (new ReviewResult { Code = -202, Msg = "@币单笔限制" + max + ":" + amount });
+                return (new ReviewResult { Code = 202, Msg = "@币单笔限制" + max + ":" + amount });
             }
         }
         else
         {
-            return (new ReviewResult { Code = -203, Msg = "@未知的通道:" + way });
+            return (new ReviewResult { Code = 203, Msg = "@未知的通道:" + way });
         }
 
         return (new ReviewResult { Msg = "@单笔通过:" + amount });
@@ -108,7 +95,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔银行卡限制
             if (amount > max)
             {
-                return (new ReviewResult { Code = -201, Msg = "@卡当日限制" + max + ":" + amount });
+                return (new ReviewResult { Code = 201, Msg = "@卡当日限制" + max + ":" + amount });
             }
 
         }
@@ -117,7 +104,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔波币限制
             if (amount > max)
             {
-                return (new ReviewResult { Code = -202, Msg = "@币当日限制" + max + ":" + amount });
+                return (new ReviewResult { Code = 202, Msg = "@币当日限制" + max + ":" + amount });
             }
         }
         else

@@ -94,16 +94,21 @@ public class OrderPage : LablePage
         return orders;
     }
 
-
-    private bool lockOrder(Order order)
+    private string makePath(string orderId)
     {
-        this.Open();
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[02]/div/span
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button/span
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[4]/td[14]/div/div/div/div/div/button/span
         string td14Path = "//div[@id='Cash']/div[2]/div[1]/div[2]/table/tbody/tr/td[02]/div/span[text()='" +
-                          order.OrderID +
+                          orderId +
                           "']/../../../td[14]/div/div/div/div/div";
+        return td14Path;
+    }
+
+    private bool lockOrder(Order order)
+    {
+        this.Open();
+        string td14Path = makePath( order.OrderId);
         var td14 = FindElementByXPath(td14Path);
         try
         {
@@ -121,7 +126,7 @@ public class OrderPage : LablePage
                     hit = td14.Text.Trim();
                 }
 
-                Console.WriteLine(order.OrderID + hit);
+                Console.WriteLine(order.OrderId + hit);
                 if (hit.StartsWith("审核"))
                 {
                     return true;
@@ -145,11 +150,7 @@ public class OrderPage : LablePage
     public bool Pass(Order order)
     {
         this.Open();
-        string td14Path = "//div[@id='Cash']/div[2]/div[1]/div[2]/table/tbody/tr/td[02]/div/span[text()='" +
-                          order.OrderID +
-                          "']/../../../td[14]/div/div/div/div/div";
-
-        string reviewBtn = td14Path + "/button[1]/span[text()='审核']";
+        string reviewBtn = makePath(order.OrderId) + "/button[1]/span[text()='审核']";
         FindAndClickByXPath(reviewBtn, 4000);
         bool pass = false;
         try
@@ -174,12 +175,8 @@ public class OrderPage : LablePage
     public bool Unlock(Order order)
     {
         this.Open();
-        string td14Path = "//div[@id='Cash']/div[2]/div[1]/div[2]/table/tbody/tr/td[02]/div/span[text()='" +
-                          order.OrderID +
-                          "']/../../../td[14]/div/div/div/div/div";
-
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[3]/span
-        string reviewBtn = td14Path + "/button[3]/span[text()='解锁']";
+        string reviewBtn =  makePath(order.OrderId)  + "/button[3]/span[text()='解锁']";
         FindAndClickByXPath(reviewBtn, 4000);
         return true;
     }

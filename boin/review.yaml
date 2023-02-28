@@ -4,7 +4,7 @@ NewBank:
     # 当日充值达多少不审
     DayRecharge: 40000
     # 当日提款不超过100000
-    DayMax: 40000
+    DayMax: 10000
     # 单笔提款不超过50000
     OnceMax: 30000
     # 禁玩游戏
@@ -17,7 +17,7 @@ OldBank:
     # 当日充值达多少不审
     DayRecharge: 40000
     # 当日提款不超过500000
-    DayMax: 40000
+    DayMax: 10000
     # 单笔提款不超过50000
     OnceMax: 30000
     # 禁玩游戏

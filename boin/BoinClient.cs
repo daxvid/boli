@@ -246,7 +246,7 @@ public class BoinClient : PageBase
     {
         orderCount++;
         var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
-            orderCount.ToString() + ":" + order.OrderID;
+            orderCount.ToString() + ":" + order.OrderId;
         using (var span = new Span())
         {
             SendMsg(msg);
@@ -299,7 +299,7 @@ public class BoinClient : PageBase
         }
 
         var msg = user.ReviewNote();
-        Cache.SaveOrder(user.Order.OrderID, msg);
+        Cache.SaveOrder(user.Order.OrderId, msg);
         SendMsg(msg);
 
         user.Order.Processed = true;

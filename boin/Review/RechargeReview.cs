@@ -25,7 +25,7 @@ public class RechargeReview : IReviewUser
             if (t2 > 0)
             {
                 var name = f.FirstOtherRechargeName(order.Payee);
-                rs.Add(new ReviewResult { Code = -401, Msg = "@其它名字充值:" + name });
+                rs.Add(new ReviewResult { Code = 401, Msg = "@其它名字充值:" + name });
             }
             else
             {
@@ -75,7 +75,7 @@ public class RechargeReview : IReviewUser
     {
         Order order = user.Order;
         DateTime startTime;
-        if (!user.Funding.LastSuccessWithdrawTime(order.OrderID, out startTime))
+        if (!user.Funding.LastSuccessWithdrawTime(order.OrderId, out startTime))
         {
             startTime = DateTime.Now.AddDays(-21);
         }

@@ -14,6 +14,7 @@ public class PopPage : PageBase
     {
         this.gameId = gameId;
         this.path = path + "[text()='游戏ID：" + gameId + "']/../../../../..";
+        // 
         mainTable = FindElementByXPath(this.path);
         closeBtn = FindElementByXPath(mainTable,".//a[@class='ivu-modal-close']/i");
         // this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
