@@ -49,8 +49,8 @@ public class ReviewPage : PageBase
     {
         // 支付商家内容（飞天代付）
         // /html/body/div[7]/div[2]/div/  div/div[3]/div/div[1]/span[2]/div/div[1]/div/span
-        var hit = Helper.ReadString(FindElementByXPath(mainTable,
-            "./div[3]/div/div[1]/span[2]/div/div[1]/div/span"));
+        var hitPath = "./div[3]/div/div[1]/span[2]/div/div[1]/div/span";
+        var hit = Helper.ReadString(FindElementByXPath(mainTable, hitPath));
         if (hit == "请选择")
         {
             // TODO：选择代付商家
@@ -63,8 +63,7 @@ public class ReviewPage : PageBase
             FindAndClickByXPath(mainTable, "./div[3]/div/div[1]/span[2]/div/div[2]/ul[2]/li", 10);
         }
 
-        hit = Helper.ReadString(FindElementByXPath(mainTable,
-            "./div[3]/div/div[1]/span[2]/div/div[1]/div/span"));
+        hit = Helper.ReadString(FindElementByXPath(mainTable, hitPath));
         if (string.IsNullOrEmpty(hit) || hit == "请选择")
         {
             return false;

@@ -6,7 +6,7 @@ NewBank:
     # 当日提款不超过100000
     DayMax: 10000
     # 单笔提款不超过50000
-    OnceMax: 30000
+    OnceMax: 10000
     # 禁玩游戏
     BanGames: 
         all: [炸金花]
@@ -19,7 +19,7 @@ OldBank:
     # 当日提款不超过500000
     DayMax: 10000
     # 单笔提款不超过50000
-    OnceMax: 30000
+    OnceMax: 10000
     # 禁玩游戏
     BanGames:
         环亚棋牌: [ 炸金花 ]

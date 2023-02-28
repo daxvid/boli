@@ -57,12 +57,20 @@ public class ReviewHintPage : PageBase
         // /html/body/div[32]/div/div/div/div[2]/div[2]/button/span/span
         // /html/body/div[80]/div/div/div/div[2]/div[2]/button/span/span 
 
-        var amount = Helper.ReadDecimal(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[1]"));
-        var cardNo = Helper.ReadString(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[2]"));
-        if (order.CardNo != cardNo || order.Amount != amount)
+        try
         {
-            return false;
+            var amount = Helper.ReadDecimal(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[1]"));
+            var cardNo = Helper.ReadString(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[2]"));
+            if (order.CardNo != cardNo || order.Amount != amount)
+            {
+                return false;
+            }
         }
+        catch (Exception err)
+        {
+            Console.WriteLine(err);
+            return false;
+        } 
 
         // 点击确认按钮
         FindAndClickByXPath(mainTable, "./div[2]/div[2]/button/span/span", 1000);
