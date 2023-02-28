@@ -122,22 +122,30 @@ public class BoinClient : PageBase
         initPage();
 
         int zeroCount = 0;
+        DateTime heartbeatTime = DateTime.Now;
         while (true)
         {
             // run
             try
             {
                 var orders = LoadOrders();
-                SendMsg("order count:" + orders.Count);
+                //SendMsg("order count:" + orders.Count);
                 if (orders.Count > 0)
                 {
                     zeroCount = 0;
                     ReviewOrders(orders);
+                    heartbeatTime = DateTime.Now;
                 }
                 else
                 {
-                    Thread.Sleep((zeroCount > 30 ? 30 : zeroCount) * 2000);
+                    Thread.Sleep((zeroCount > 20 ? 20 : zeroCount) * 1000);
                     zeroCount++;
+                    var now = DateTime.Now;
+                    if ((now - heartbeatTime).TotalSeconds >= 60)
+                    {
+                        heartbeatTime = now;
+                        SendMsg("time:" + now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    }
                 }
             }
             catch (WebDriverException e)

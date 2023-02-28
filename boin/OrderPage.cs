@@ -125,8 +125,6 @@ public class OrderPage : LablePage
                     td14 = FindElementByXPath(td14Path);
                     hit = td14.Text.Trim();
                 }
-
-                Console.WriteLine(order.OrderId + hit);
                 if (hit.StartsWith("审核"))
                 {
                     return true;
