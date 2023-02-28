@@ -125,36 +125,33 @@ public class BoinClient : PageBase
         DateTime heartbeatTime = DateTime.Now;
         while (true)
         {
-            // run
-            try
+            var orders = LoadOrders();
+            var newOrders = new List<Order>();
+            foreach (var order in orders)
             {
-                var orders = LoadOrders();
-                //SendMsg("order count:" + orders.Count);
-                if (orders.Count > 0)
-                {
-                    zeroCount = 0;
-                    ReviewOrders(orders);
-                    heartbeatTime = DateTime.Now;
-                }
-                else
-                {
-                    Thread.Sleep((zeroCount > 20 ? 20 : zeroCount) * 1000);
-                    zeroCount++;
-                    var now = DateTime.Now;
-                    if ((now - heartbeatTime).TotalSeconds >= 60)
-                    {
-                        heartbeatTime = now;
-                        SendMsg("ok:" + now.ToString("HH:mm:ss"));
-                    }
-                }
+                // 查询绑定
+                var bind = LoadBind(order.GameId, order.CardNo);
+                order.Bind = bind;
+                newOrders.Add(order);
             }
-            catch (WebDriverException e)
+
+            //SendMsg("order count:" + orders.Count);
+            if (newOrders.Count > 0)
             {
                 zeroCount = 0;
-                bindPage.Close();
-                userPage.Close();
-                orderPage.Close();
-                initPage();
+                ReviewOrders(newOrders);
+                heartbeatTime = DateTime.Now;
+            }
+            else
+            {
+                Thread.Sleep((zeroCount > 20 ? 20 : zeroCount) * 1000);
+                zeroCount++;
+                var now = DateTime.Now;
+                if ((now - heartbeatTime).TotalSeconds >= 60)
+                {
+                    heartbeatTime = now;
+                    SendMsg(now.ToString("ok[HH:mm:ss]"));
+                }
             }
         }
     }
@@ -193,46 +190,70 @@ public class BoinClient : PageBase
 
     public List<Order> LoadOrders()
     {
-        var orders = SafeExec(() =>
+        while (true)
         {
-            orderPage.Open();
-            var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
-            return orders;
-        }, 1000, 60);
-
-        var newOrders = new List<Order>();
-        foreach (var order in orders)
-        {
-            // 查询绑定
-            var bind = LoadBind(order.GameId, order.CardNo);
-            order.Bind = bind;
-            newOrders.Add(order);
+            try
+            {
+                var orders = SafeExec(() =>
+                {
+                    orderPage.Open();
+                    var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
+                    return orders;
+                }, 1000, 60);
+                return orders;
+            }
+            catch (WebDriverException e)
+            {
+                orderPage.Close();
+                orderPage = new OrderPage(driver, cnf);
+                orderPage.InitItem();
+            }
         }
-
-        return newOrders;
     }
 
 
     public User LoadUser(string gameId)
     {
-        var user = SafeExec(() =>
+        while (true)
         {
-            userPage.Open();
-            var user = userPage.Select(gameId);
-            return user;
-        }, 1000, 60);
-        return user;
+            try
+            {
+                var user = SafeExec(() =>
+                {
+                    userPage.Open();
+                    var user = userPage.Select(gameId);
+                    return user;
+                }, 1000, 60);
+                return user;
+            }
+            catch (WebDriverException e)
+            {
+                userPage.Close();
+                userPage = new UserPage(driver, cnf);
+            }
+        }
     }
 
     public GameBind LoadBind(string gameId, string cardNo)
     {
-        var bind = SafeExec(() =>
+        while (true)
         {
-            bindPage.Open();
-            var bind = bindPage.Select(gameId, cardNo);
-            return bind;
-        }, 1000, 30);
-        return bind;
+            try
+            {
+                var bind = SafeExec(() =>
+                {
+                    bindPage.Open();
+                    var bind = bindPage.Select(gameId, cardNo);
+                    return bind;
+                }, 1000, 30);
+                return bind;
+            }
+            catch (WebDriverException e)
+            {
+                bindPage.Close();
+                bindPage = new GameBindPage(driver, cnf);
+            }
+        }
     }
 
     static int orderCount = 0;
