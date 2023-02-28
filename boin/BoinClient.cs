@@ -11,7 +11,6 @@ public class BoinClient:IDisposable
     public ChromeDriver driver;
     
     ReviewManager reviewer;
-    TimeAuthenticator authenticator;
 
     private LoginPage loginPage;
     private UserPage userPage;
@@ -25,7 +24,6 @@ public class BoinClient:IDisposable
         this.cnf = cnf;
         this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
-        this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
         this.driver = newDriver(cnf.Headless);
         Cache.Init(authCnf.Redis);
     }
@@ -43,7 +41,7 @@ public class BoinClient:IDisposable
         {
             // 为Chrome配置无头模式
             op.AddArgument("--headless");
-            op.AddArgument("window-size=1920,1080");
+            op.AddArgument("window-size=1920,1440");
         }
 
         //op.AddAdditionalChromeOption("excludeSwitches", new string[] { "enable-automation"});
@@ -121,7 +119,11 @@ public class BoinClient:IDisposable
             {
                 order.Processed = true;
                 order.ReviewMsg = "fail";
-                SendMsg(order.ReviewNote());
+                
+                orderPage.Unlock(order);
+                var msg = order.ReviewNote();
+                Cache.SaveOrder(order.OrderId, msg);
+                SendMsg(msg);
             }
         }
 
