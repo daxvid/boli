@@ -26,10 +26,10 @@ public class TelegramBot
         get { return instance; }
     }
 
-    AppConfig cnf;
+    AuthConfig cnf;
     BotClient api;
 
-    public void Run(AppConfig cnf)
+    public void Run(AuthConfig cnf)
     {
         this.cnf = cnf;
         var client = new BotClient(cnf.BotToken);

@@ -20,6 +20,9 @@
     <None Remove="Page\" />
     <None Remove="Util\" />
     <None Remove="StackExchange.Redis" />
+    <None Update="auth.yaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="OpenCCNET" Version="1.0.2" />

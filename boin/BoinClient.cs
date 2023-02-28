@@ -14,13 +14,15 @@ public class BoinClient : PageBase
     private UserPage userPage;
     private OrderPage orderPage;
     private GameBindPage bindPage;
+    private AuthConfig authCnf;
 
-    public BoinClient(AppConfig cnf) : base(newDriver(cnf.Headless), cnf)
+    public BoinClient(AppConfig cnf, AuthConfig authCnf) : base(newDriver(cnf.Headless), cnf)
     {
         this.cnf = cnf;
+        this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
         this.authenticator = new TwoStepsAuthenticator.TimeAuthenticator();
-        Cache.Init(cnf.Redis);
+        Cache.Init(authCnf.Redis);
     }
 
     public override void Dispose()
@@ -51,15 +53,15 @@ public class BoinClient : PageBase
     // 登录
     public bool Login()
     {
-        driver.Navigate().GoToUrl(cnf.Home);
+        driver.Navigate().GoToUrl(authCnf.Home);
         // //*[@id="logins"]/div/form/div[1]/div/div/input
         var namePath = "//div[@id=\"logins\"]/div/form/div[1]/div/div/input[@type='text' and @placeholder='请输入账号']";
-        SetTextElementByXPath(namePath, cnf.UserName);
+        SetTextElementByXPath(namePath, authCnf.UserName);
 
         // //*[@id="logins"]/div/form/div[2]/div/div/input
         var pwdPath =
             "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
-        SetTextElementByXPath(pwdPath, cnf.Password);
+        SetTextElementByXPath(pwdPath, authCnf.Password);
         for (var i = 1; i < 100; i++)
         {
             if (login(i))
@@ -75,7 +77,7 @@ public class BoinClient : PageBase
     private bool login(int i)
     {
         // google认证
-        var code = authenticator.GetCode(cnf.GoogleKey);
+        var code = authenticator.GetCode(authCnf.GoogleKey);
         // //*[@id="logins"]/div/form/div[3]/div/div/input
         var glPath = "//div[@id=\"logins\"]/div/form/div[3]/div/div/input";
         var googlePwd = SetTextElementByXPath(glPath, code);
@@ -90,14 +92,14 @@ public class BoinClient : PageBase
             var txt = Helper.ReadString(e);
             if (txt.Contains("登入成功"))
             {
-                SendMsg("登入成功:" + cnf.UserName);
+                SendMsg("登入成功:" + authCnf.UserName);
                 TakeScreenshot(null);
                 return true;
             }
         }
         catch (WebDriverTimeoutException)
         {
-            SendMsg("登入超时:" + cnf.UserName + "_" + i.ToString());
+            SendMsg("登入超时:" + authCnf.UserName + "_" + i.ToString());
             Thread.Sleep(1000 * i);
         }
 

@@ -1,0 +1,28 @@
+﻿
+# 查询最近多少小时的订单
+OrderHour: 12
+
+# 提现最多读取页数
+WithdrawMaxPage: 2
+# 提现最多天数
+WithdrawMaxDay: 3
+
+# 充值最多读取页数
+RechargeMaxPage: 5
+# 充值最多天数
+RechargeMaxDay: 3
+
+# 游戏记录最多读取页数
+GameLogMaxPage: 8
+# 游戏记录最多小时
+GameLogMaxHour: 36
+
+# 最大锁定单数
+OrderMaxLock: 1
+
+# 审核配置文件
+ReviewFile: review.yaml
+
+# Chrome
+Headless: false
+
