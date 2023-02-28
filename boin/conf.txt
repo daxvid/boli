@@ -1,120 +1,16 @@
-#########################app.yaml#######################################
 # Login
 Home: http://
 UserName: abc
-Password: abc
-GoogleKey: abc
+Password: gfgafgf
+GoogleKey: gfagdsgfewf
 
 # Telegram
-BotToken: 1234434:DGgr2433fgrg
-# test:
-ChatIds: [-4543543]
-
-# 查询最近多少小时的订单
-OrderHour: 12
-
-# 提现最多读取页数
-WithdrawMaxPage: 2
-# 提现最多天数
-WithdrawMaxDay: 3
-
-# 充值最多读取页数
-RechargeMaxPage: 5
-# 充值最多天数
-RechargeMaxDay: 3
-
-# 游戏记录最多读取页数
-GameLogMaxPage: 8
-# 游戏记录最多小时
-GameLogMaxHour: 36
-
-# 最大锁定单数
-OrderMaxLock: 1
-
-# 审核配置文件
-ReviewFile: review.yaml
+BotToken: 54654545:fgbdfbfdbdfsbfgdngfnsfdgdfg
+# test: 544645654
+ChatIds: [-354654634]
 
 # 充值查询地址
-RechargeHost: http:
-
-# Chrome
-Headless: false
+RechargeHost: http://
 
 # redis
 Redis: localhost
-
-
-#########################review.yaml#######################################
-
-# 新会员银行卡检查条件
-NewBank:
-    # 当日充值达多少不审
-    DayRecharge: 40000
-    # 当日提款不超过100000
-    DayMax: 40000
-    # 单笔提款不超过50000
-    OnceMax: 30000
-    # 禁玩游戏
-    BanGames: 
-        all: [炸金花]
-        XX棋牌: [炸金花]
-
-# 老会员银行卡检查条件
-OldBank:
-    # 当日充值达多少不审
-    DayRecharge: 40000
-    # 当日提款不超过500000
-    DayMax: 40000
-    # 单笔提款不超过50000
-    OnceMax: 30000
-    # 禁玩游戏
-    BanGames:
-        XX棋牌: [ 炸金花 ]
-
-# 新会员波币检查条件
-NewBobi:
-    # 当日充值达多少不审
-    DayRecharge: 40000
-    # 当日提款不超过3000
-    DayMax: 6000
-    # 单笔不超过3000
-    OnceMax: 3000
-    # 禁玩游戏
-    BanGames:
-        all: [炸金花]
-        XX棋牌: [炸金花]
-    # 玩百家乐的会员 波币一天不超过3000提款
-    DayMaxGames:
-        百家乐: 3000
-
-# 老会员波币检查条件
-OldBobi:
-    # 当日充值达多少不审
-    DayRecharge: 40000
-    # 老会员波币当日提款不超过6000
-    DayMax: 6000
-    # 波币提款单笔不超过3000
-    OnceMax: 3000
-    # 禁玩游戏
-    BanGames:
-        all: [炸金花]
-        XX棋牌: [炸金花]
-    # 玩百家乐的会员 波币一天不超过3000提款
-    DayMaxGames:
-        百家乐: 3000
-
-# 单笔最大额度
-OrderAmountMax: 5000
-    
-# 最近10笔提款内 波币不能超过4笔
-NearWithdrawCount: 10
-BobiMaxCount: 4
-    
-    
-# 针对充值接口显示『客单充值(不能删)』
-# 计算日期:上一笔提款日-最新一笔提款日
-# 金额>2000-人工审核
-# 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
-RechargeChannel:
-    客单充值(不能删): [2000,3]
-    

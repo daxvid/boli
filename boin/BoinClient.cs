@@ -128,20 +128,11 @@ public class BoinClient : PageBase
         while (true)
         {
             var orders = LoadOrders();
-            var newOrders = new List<Order>();
-            foreach (var order in orders)
-            {
-                // 查询绑定
-                var bind = LoadBind(order.GameId, order.CardNo);
-                order.Bind = bind;
-                newOrders.Add(order);
-            }
-
             //SendMsg("order count:" + orders.Count);
-            if (newOrders.Count > 0)
+            if (orders.Count > 0)
             {
                 zeroCount = 0;
-                ReviewOrders(newOrders);
+                ReviewOrders(orders);
                 heartbeatTime = DateTime.Now;
             }
             else
@@ -162,6 +153,7 @@ public class BoinClient : PageBase
     {
         foreach (var order in orders)
         {
+            order.Bind = LoadBind(order.GameId, order.CardNo);
             if (reviewer.Review(order))
             {
                 var user = LoadUser(order);
