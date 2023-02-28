@@ -130,7 +130,7 @@ public class GameBindPage : LablePage
         FindAndClickByXPath(btnPath, 1000);
 
         // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
-        var pathNone = "div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
+        var pathNone = "//div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
         if (FindElementsByXPath(pathNone).Count == 1)
         {
             return false;

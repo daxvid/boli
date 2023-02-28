@@ -144,7 +144,7 @@ public class BoinClient : PageBase
                     if ((now - heartbeatTime).TotalSeconds >= 60)
                     {
                         heartbeatTime = now;
-                        SendMsg("time:" + now.ToString("yyyy-MM-dd HH:mm:ss"));
+                        SendMsg("ok:" + now.ToString("HH:mm:ss"));
                     }
                 }
             }
