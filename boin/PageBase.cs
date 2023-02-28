@@ -257,25 +257,6 @@ namespace boin
             });
         }
 
-
-        public bool SafeClose(IWebElement table)
-        {
-            var result = wait.Until(driver =>
-            {
-                try
-                {
-                    FindAndClickByXPath(table, ".//a/i[@class='ivu-icon ivu-icon-ios-close']", 1000);
-                    return true;
-                }
-                catch (WebDriverException)
-                {
-                }
-
-                return false;
-            });
-            return result;
-        }
-
         protected bool SafeClick(IWebElement btn, int ms = 0)
         {
             if (btn.Enabled)

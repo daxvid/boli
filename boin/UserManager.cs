@@ -1,11 +1,10 @@
 ﻿using System;
-namespace boin
+namespace boin;
+
+public class UserManager
 {
-	public class UserManager
+	public UserManager()
 	{
-		public UserManager()
-		{
-		}
 	}
 }
 

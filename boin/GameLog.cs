@@ -2,8 +2,8 @@
 using OpenQA.Selenium;
 using boin.Util;
 
-namespace boin
-{
+namespace boin;
+
     // 游戏日志
     public class GameLog
     {
@@ -126,37 +126,34 @@ namespace boin
         }
     }
 
-    public class GameInfo
+public class GameInfo
+{
+    // 下注金额
+    public decimal TotalBet { get; set; }
+
+    // 中奖金额
+    public decimal TotalWin { get; set; }
+
+    // 有效下注金额
+    public decimal TotalValidBet { get; set; }
+
+    public List<GameLog> GameLogs { get; set; }
+
+    public bool PlayGame(string platform, string game)
     {
-        // 下注金额
-        public decimal TotalBet { get; set; }
-
-        // 中奖金额
-        public decimal TotalWin { get; set; }
-
-        // 有效下注金额
-        public decimal TotalValidBet { get; set; }
-
-        public List<GameLog> GameLogs { get; set; }
-        
-        public bool PlayGame(string platform, string game)
+        if (GameLogs == null)
         {
-            if (GameLogs == null)
-            {
-                return false;
-            }
-
-            foreach (var log in GameLogs)
-            {
-                if (log.IsMatch(platform, game))
-                {
-                    return true;
-                }
-            }
-
             return false;
         }
 
+        foreach (var log in GameLogs)
+        {
+            if (log.IsMatch(platform, game))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
-

@@ -22,10 +22,6 @@ public class LablePage : PageBase
     
     public override bool Close()
     {
-        // var path1 = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'用户列表')]/i";
-        // var path2 = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'绑定管理')]/i";
-        // var path3 = "//div[@id='layout']/div/div[2]/div[2]/div/div/div/div[1]/div[1]/div/div[1]/div/div/div/div/div[contains(text(),'提现管理')]/i";
-
         if (closed)
         {
             return false;
