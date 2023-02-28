@@ -94,7 +94,7 @@ namespace boin
                 var log = Recharge.Create(row);
                 if (log != null)
                 {
-                    log.SyncName(cnf.RechargeHost);
+                    log.SyncName();
                     logs.Add(log);
                 }
             }

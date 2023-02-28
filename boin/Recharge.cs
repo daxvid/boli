@@ -9,7 +9,9 @@ namespace boin
     // 充值
     public class Recharge
     {
-
+        //  四方查询地址
+        public static string RechargeHost;
+        
         // 游戏ID	
         public string GameId { get; set; } = string.Empty;
 
@@ -67,7 +69,7 @@ namespace boin
         private long nameLocker = 0;
 
         // 同步姓名
-        public void SyncName(string host)
+        public void SyncName()
         {
             if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
             {
@@ -77,7 +79,7 @@ namespace boin
                 {
                     ThreadPool.QueueUserWorkItem(state =>
                     {
-                        var depositor = GetRechargeName(host, this.OutsideOrderId);
+                        var depositor = GetRechargeName(this.OutsideOrderId);
                         this.Depositor = depositor;
                         Interlocked.Increment(ref nameLocker);
                     });
@@ -150,13 +152,13 @@ namespace boin
             }
         }
 
-        public static string GetRechargeName(string host, string orderId)
+        public static string GetRechargeName(string orderId)
         {
-            var url = host + orderId;
+            var url = RechargeHost + orderId;
             try
             {
-                var name = Cache.GetRecharge(orderId);
-                if (name != null)
+                string name = Cache.GetRecharge(orderId);
+                if (!string.IsNullOrEmpty(name))
                 {
                     return name;
                 }

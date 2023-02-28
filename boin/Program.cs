@@ -7,7 +7,7 @@ class Program
     static void Main(string[] args)
     {
         AppConfig cnf = AppConfig.FromYamlFile("app.yaml");
-
+        Recharge.RechargeHost = cnf.RechargeHost;
         TelegramBot.Instance.Run(cnf);
 
         while (true)
