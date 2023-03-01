@@ -36,15 +36,15 @@ public class FundingPage : PopPage
         fund.Balance = Helper.ReadBetDecimal(balTxt);
 
         //今日(默认)
-        FindAndClickByXPath(tbox, ".//div/div[text()='今日' and contains(@class,'tab_sty')]", 500);
+        FindAndClickByXPath(tbox, ".//div/div[text()='今日' and starts-with(@class,'tab_sty')]", 500);
         FillRechargeAndWithdraw(fund, fund.ToDay, cnf.RechargeMaxDay, cnf.WithdrawMaxDay);
 
         // 昨日
-        FindAndClickByXPath(tbox, ".//div/div[text()='昨日' and contains(@class,'tab_sty')]", 500);
+        FindAndClickByXPath(tbox, ".//div/div[text()='昨日' and starts-with(@class,'tab_sty')]", 500);
         FillRechargeAndWithdraw(fund, fund.Yesterday, 0, 0);
 
         // 近2月
-        FindAndClickByXPath(tbox, ".//div/div[text()='近期（2个月）' and contains(@class,'tab_sty')]", 500);
+        FindAndClickByXPath(tbox, ".//div/div[text()='近期（2个月）' and starts-with(@class,'tab_sty')]", 500);
         FillRechargeAndWithdraw(fund, fund.Nearly2Months, 0, 0);
         return fund;
     }
