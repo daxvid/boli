@@ -25,6 +25,9 @@ public class User
     // 设备
     public string Device { get; set; } = string.Empty;
 
+    // 用户备注(如果包含 冻结/排查 时暂不审单)
+    public string Remark { get; set; } = string.Empty;
+    
     // 注册时间
     public DateTime Created { get; set; }
 

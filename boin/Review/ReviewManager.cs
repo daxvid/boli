@@ -16,6 +16,7 @@ public class ReviewManager
 
         orderReviews.Add(new BankCardReview(cnf));
 
+        userReviews.Add(new UserReview(cnf));
         userReviews.Add(new BankCardReview(cnf));
         userReviews.Add(new AmountReview(cnf));
         userReviews.Add(new WithdrwReview(cnf));

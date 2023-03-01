@@ -102,6 +102,8 @@ public class UserPage : LablePage
         Int64 gid;
         if (Int64.TryParse(user.GameId, out gid))
         {
+            // 编辑(读取用户备注)
+            readUserEdit(user, i);
             // 注单(游戏)
             readGameLog(user, i);
             // 概况(资金)
@@ -146,6 +148,21 @@ public class UserPage : LablePage
             user.GameInfo = gameInfo;
         }
     }
+    
+    // 编辑,查看备注
+    private void readUserEdit(User user, int i)
+    {
+        var xpath = "(//div[@id='timeListBox']/div/div[1]/button[1]/span[text()='编辑']/..)[" +
+                    (i + 1).ToString() + "]";
+        moveToOp(user, i);
+        // 点击扩展按钮中的概况
+        FindAndClickByXPath(xpath, 2000);
+        using (UserEditPage ue = new UserEditPage(driver, cnf, user.GameId))
+        {
+            user.Remark = ue.ReadRemark();
+        }
+    }
+    
 
     private bool moveToOp(User user, int i)
     {

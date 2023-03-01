@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 
 namespace boin.Review;
 
-    // 游戏审核
+// 游戏审核
 public class GameReview : IReviewUser
 {
     ReviewConfig cnf;

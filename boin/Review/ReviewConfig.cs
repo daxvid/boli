@@ -117,6 +117,9 @@ public class ReviewConfig
     // 金额>2000-人工审核
     // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
     public Dictionary<string, List<decimal>> RechargeChannel { get; set; }
+    
+    // 备注中包含以下关键字，暂时不审核
+    public List<string> RemarkKeys { get; set; }
 
     public ReviewConfig()
     {
