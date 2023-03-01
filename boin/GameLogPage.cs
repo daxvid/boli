@@ -30,7 +30,7 @@ public class GameLogPage : PopPage
 
         // 读取用户查询出的输赢情况
         var spath =
-            ".//div[@class='countSty']/span[@class='total_item' and contains(text(),'下注金额：')]/../span";
+            ".//div[@class='countSty']/span[@class='total_item' and starts-with(text(),'下注金额：')]/../span";
         var items = FindElementsByXPath(table, spath);
 
         info.TotalBet = Helper.ReadBetDecimal(items[0]);

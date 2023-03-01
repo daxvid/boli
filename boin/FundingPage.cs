@@ -32,7 +32,7 @@ public class FundingPage : PopPage
         Funding fund = new Funding();
 
         // 余额
-        var balTxt = FindElementByXPath(table, ".//div/div/div/div[contains(text(),'余额：')]");
+        var balTxt = FindElementByXPath(table, ".//div/div/div/div[starts-with(text(),'余额：')]");
         fund.Balance = Helper.ReadBetDecimal(balTxt);
 
         //今日(默认)

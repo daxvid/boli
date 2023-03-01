@@ -31,7 +31,7 @@ public class RechargePage : PopPage
 
         // 在线充值次数/后台充值次数/等
         var items = FindElementsByXPath(table,
-            ".//div[@class='countSty']/span[contains(text(),'在线充值次数：')]/../span");
+            ".//div[@class='countSty']/span[starts-with(text(),'在线充值次数：')]/../span");
         List<string> onlineRechargeList = new List<string>();
         foreach (var item in items)
         {

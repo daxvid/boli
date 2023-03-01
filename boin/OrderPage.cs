@@ -113,33 +113,33 @@ public class OrderPage : LablePage
     private bool lockOrder(Order order)
     {
         this.Open();
-        string td14Path = makePath( order.OrderId);
+        string td14Path = makePath(order.OrderId);
         var td14 = FindElementByXPath(td14Path);
         try
         {
-            string lockPath = "./button/span[text()='锁定']";
-            var lockBtns = FindElementsByXPath(td14, lockPath);
-            if (lockBtns.Count == 1)
+            string lockPath = "./button[1]/span[text()='锁定' or text()='审核']";
+            var lockBtn = FindElementByXPath(td14, lockPath);
+            var hit = lockBtn.Text;
+            if (hit == "审核")
             {
-                lockBtns[0].Click();
+                return true;
+            }
+
+            if (hit == "锁定")
+            {
+                lockBtn.Click();
                 // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[1]/span
-                string hit = "锁定";
-                while (hit == "锁定")
+                for (int i = 0; (i < 100 && hit == "锁定"); i++)
                 {
                     Thread.Sleep(1000);
                     td14 = FindElementByXPath(td14Path);
                     hit = td14.Text.Trim();
                 }
+
                 if (hit.StartsWith("审核"))
                 {
                     return true;
                 }
-            }
-            else if (lockBtns.Count == 0)
-            {
-                string reviewBtn = "./button[1]/span[text()='审核']";
-                var reVeviewBtns = FindElementsByXPath(td14, reviewBtn);
-                return reVeviewBtns.Count == 1;
             }
         }
         catch (Exception err)
@@ -179,7 +179,7 @@ public class OrderPage : LablePage
     {
         this.Open();
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[3]/span
-        string reviewBtn =  makePath(order.OrderId)  + "/button[3]/span[text()='解锁']";
+        string reviewBtn = makePath(order.OrderId) + "/button[3]/span[text()='解锁']";
         FindAndClickByXPath(reviewBtn, 4000);
         return true;
     }

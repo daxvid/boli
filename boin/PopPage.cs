@@ -25,8 +25,8 @@ public class PopPage : PageBase
 
     protected IWebElement getCurrentTable(int page)
     {
-        // var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
-        var pagePath = ".//div/span[@class='marginRight' and contains(text(),'第" + page.ToString() + "页')]";
+        // var pagePath = ".//div/span[@class='marginRight' and text()='第" + page.ToString() + "页']";
+        var pagePath = ".//div/span[@class='marginRight' and text()='第" + page.ToString() + "页']";
         var table = FindElementByXPath(path); // mainTable
         var pageTag = FindElementByXPath(table, pagePath);
         return mainTable;
