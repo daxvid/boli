@@ -51,13 +51,14 @@ public class OrderPage : LablePage
     {
         // .//tr/td[7]/div/span[number(text())<=4000]
         // .//tr/td[13]/div/div[text()='--']
-        // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button/span[锁定]
+        // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[1]/span[审核]
+        // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[1]/span[锁定]
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[14]/div/div/div/div/div/button/span
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button/span
         var path = ".//tr/td[7]/div/span[number(text())<="
                    + orderAmountMax.ToString()
                    + "]/../../../td[13]/div/div[text()='--']/../../../" +
-                   "td[14]/div/div/div/div/div/button/span[text()='锁定']/../../../../../../../..";
+                   "td[14]/div/div/div/div/div/button[1]/span[text()='锁定' or text()='审核']/../../../../../../../..";
         var allRows = FindElementsByXPath(tbody, path);
 
         // 展开所有列表
