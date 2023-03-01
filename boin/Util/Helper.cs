@@ -214,10 +214,10 @@ public class Helper
             Directory.CreateDirectory(dir);
         }
 
-        string t = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+        string t = DateTime.Now.ToString("yyMMddHHmmssfff");
         if (e != null)
         {
-            string[] strs = { e.Message, e.StackTrace, e.ToString() };
+            string[] strs = { e.ToString(),  e.StackTrace };
             File.WriteAllLines(Path.Join(dir, t + ".txt"), strs);
         }
 
