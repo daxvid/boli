@@ -7,7 +7,7 @@ namespace boin;
 public class Withdraw : WithdrawExpand
 {
     // 订单号
-    public string OrderID { get; set; } = string.Empty;
+    public string OrderId { get; set; } = string.Empty;
 
     // 发起时间
     public DateTime Created { get; set; }
@@ -69,7 +69,7 @@ public class Withdraw : WithdrawExpand
             }
 
             Withdraw order = new Withdraw();
-            order.OrderID = Helper.ReadString(ts[1]); // 订单号
+            order.OrderId = Helper.ReadString(ts[1]); // 订单号
             order.Created = Helper.ReadDateTime(ts[2]); // 发起时间
             order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
             order.GameId = Helper.ReadString(ts[4]); // 游戏ID
@@ -82,7 +82,7 @@ public class Withdraw : WithdrawExpand
 
             order.ReadExpand(rowEx, false);
 
-            span.Msg = "提现:" + order.OrderID;
+            span.Msg = "提现:" + order.OrderId;
             return order;
         }
     }
@@ -94,7 +94,7 @@ public class Withdraw : WithdrawExpand
             var row = Helper.Ele2Dic(element);
 
             Withdraw order = new Withdraw();
-            order.OrderID = Helper.ReadString(head, "订单号", row);
+            order.OrderId = Helper.ReadString(head, "订单号", row);
             //order.Created = Helper.ReadString(head, "发起时间", row);
             order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
             order.GameId = Helper.ReadString(head, "游戏ID", row);
@@ -107,7 +107,7 @@ public class Withdraw : WithdrawExpand
 
             order.ReadExpand(rowEx, false);
 
-            span.Msg = "提现:" + order.OrderID;
+            span.Msg = "提现:" + order.OrderId;
             return order;
         }
     }

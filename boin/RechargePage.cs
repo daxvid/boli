@@ -79,7 +79,10 @@ public class RechargePage : PopPage
         var selBtns = FindElementsByXPath(tbody, ".//td/div/div/div/button/span[contains(text(),'查询')]/..");
         foreach (var sel in selBtns)
         {
-            Helper.TryClick(wait, sel);
+            if (sel.Enabled && sel.Displayed)
+            {
+                SafeClick(sel, 5);
+            }
         }
 
         Thread.Sleep(1000);

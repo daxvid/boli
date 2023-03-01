@@ -25,7 +25,7 @@ public class WithdrwReview : IReviewUser
         Order order = user.Order;
         List<ReviewResult> rs = new List<ReviewResult>();
         //最新两笔提款名字不一致-不可以通过
-        var nearName = user.Funding.NearBankName();
+        var nearName = user.Funding.NearBankName(order.OrderId, order.Way);
         if (order.Way == "银行卡")
         {
             if (nearName == order.Payee || string.IsNullOrEmpty(nearName))
@@ -34,16 +34,27 @@ public class WithdrwReview : IReviewUser
             }
             else
             {
-                rs.Add(new ReviewResult { Code = 200, Msg = "@名字不一致:" + nearName });
+                rs.Add(new ReviewResult { Code = 200, Msg = "@名字不同:" + nearName });
             }
         }
         else if (order.Way == "数字钱包")
         {
-            // 最近10笔提款内 波币不能超过4笔
-            var countBobi = user.Funding.NearBobiCount(order.OrderId, ReviewConfig.Cnf.NearWithdrawCount);
-            if (countBobi > ReviewConfig.Cnf.BobiMaxCount)
+            if (string.IsNullOrEmpty(nearName))
             {
-                rs.Add(new ReviewResult { Code = -402, Msg = "@币次数超限:" + countBobi.ToString() });
+                rs.Add(new ReviewResult { Code = 201, Msg = "@首笔人工:" + order.Payee });
+            }
+            else if (nearName != order.Payee)
+            {
+                rs.Add(new ReviewResult { Code = 202, Msg = "@名字不同:" + nearName });
+            }
+            else
+            {
+                // 最近10笔提款内 波币不能超过4笔
+                var countBobi = user.Funding.NearBobiCount(order.OrderId, ReviewConfig.Cnf.NearWithdrawCount);
+                if (countBobi > ReviewConfig.Cnf.BobiMaxCount)
+                {
+                    rs.Add(new ReviewResult { Code = -402, Msg = "@币笔数超限:" + countBobi.ToString() });
+                }
             }
         }
 

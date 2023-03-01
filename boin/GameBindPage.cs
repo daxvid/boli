@@ -64,9 +64,8 @@ public class GameBindPage : LablePage
         // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[4]/td[5]/div/div/div/button/span
         // //*[@id="GameBindList"]/div[2]/div[1]/div[2]/table/tbody/tr[5]/td[5]/div/div/div/button/span
         var expandList = FindElementsByXPath(tbody, ".//td[5]/div/div/div/button/span[text()='查看实名']");
-        for (var i = 0; i < expandList.Count; i++)
+        foreach (var exBtn in expandList)
         {
-            var exBtn = expandList[i];
             if (exBtn.Enabled && exBtn.Displayed)
             {
                 SafeClick(exBtn, 5);

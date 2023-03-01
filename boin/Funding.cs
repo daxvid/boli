@@ -169,13 +169,16 @@ public class Funding
     }
 
     // 最近提现的名字
-    public string NearBankName()
+    public string NearBankName(string orderId, string way)
     {
         foreach (var w in WithdrawLog)
         {
-            if (string.IsNullOrEmpty(w.Payee) && w.Transfer == "成功")
+            if (w.OrderId != orderId)
             {
-                return w.Payee;
+                if (w.Way == way && w.Transfer == "成功" && (!string.IsNullOrEmpty(w.Payee)) )
+                {
+                    return w.Payee;
+                }
             }
         }
 
@@ -187,7 +190,7 @@ public class Funding
     {
         foreach (var w in WithdrawLog)
         {
-            if (w.OrderID != orderId)
+            if (w.OrderId != orderId)
             {
                 var pass = w.Pass();
                 return (!pass);
@@ -210,7 +213,7 @@ public class Funding
         for (var i = 0; (i < WithdrawLog.Count && checkCount < maxCount); i++)
         {
             var w = WithdrawLog[i];
-            if (w.OrderID != orderId)
+            if (w.OrderId != orderId)
             {
                 checkCount++;
                 if (w.Way == "数字钱包")
@@ -260,7 +263,7 @@ public class Funding
         var now = DateTime.Now;
         foreach (var w in WithdrawLog)
         {
-            if ((w.OrderID != orderId) && w.Way == way)
+            if ((w.OrderId != orderId) && w.Way == way)
             {
                 if (w.Created.Year == now.Year && w.Created.Month == now.Month && w.Created.Day == now.Day)
                 {
@@ -277,7 +280,7 @@ public class Funding
     {
         foreach (var w in WithdrawLog)
         {
-            if (w.OrderID != orderId)
+            if (w.OrderId != orderId)
             {
                 if (w.Pass())
                 {

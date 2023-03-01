@@ -58,29 +58,28 @@ public class BankCardReview : IReviewInterface
         }
         else if (order.Way == "数字钱包")
         {
-            // 波音没绑姓名的话不给予通过
+            // 波币没绑姓名的话不给予通过
             bool passName = false;
             var b = order.Bind;
             if (b != null)
             {
                 if (b.CardNo == order.CardNo && (!string.IsNullOrEmpty(b.Payee)))
                 {
-                    if (b.Payee == order.Payee || order.Payee == string.Empty)
+                    // 修复钱包姓名
+                    if (string.IsNullOrEmpty(order.Payee)) 
+                    {
+                        order.Payee = b.Payee;
+                    }
+                    if (b.Payee == order.Payee)
                     {
                         rs.Add(new ReviewResult { Code = 0, Msg = "@钱包正确:" + b.Payee });
-                        if (string.IsNullOrEmpty(order.Payee)) // 修复钱包姓名
-                        {
-                            order.Payee = b.Payee;
-                        }
-
                         passName = true;
                     }
                 }
             }
-
             if (!passName)
             {
-                rs.Add(new ReviewResult { Code = 0, Msg = "@钱包未认证:" + order.CardNo });
+                rs.Add(new ReviewResult { Code = 100, Msg = "@钱包未认证:" + order.CardNo });
             }
         }
         else
