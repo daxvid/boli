@@ -187,9 +187,9 @@ public class BankUtil
     }
 
     // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=6222801251011210972
-    // {"cardType"]="DC","bank"]="CCB","key"]="6222801251011210972","messages"]=[],"validated"]=true,"stat"]="ok"}
+    // {"cardType":"DC","bank":"CCB","key":"6222801251011210972","messages":[],"validated":true,"stat":"ok"}
     // https://ccdcapi.alipay.com/validateAndCacheCardInfo.json?_input_charset=utf-8&cardBinCheck=true&cardNo=621669750004140425
-    // {"messages"]=[{"errorCodes"]="CARD_BIN_NOT_MATCH","name"]="cardNo"}],"validated"]=false,"stat"]="ok","key"]="621669750004140425"}
+    // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
     public static BankCardInfo GetBankInfo(string cardNo)
     {
         string url = aliUrl + cardNo;

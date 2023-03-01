@@ -217,10 +217,15 @@ public class Helper
         string t = DateTime.Now.ToString("yyMMddHHmmssfff");
         if (e != null)
         {
-            string[] strs = { e.ToString(),  e.StackTrace };
-            File.WriteAllLines(Path.Join(dir, t + ".txt"), strs);
+            if (e is WebDriverException)
+            {
+                File.WriteAllText(Path.Join(dir, t + ".txt"), e.ToString());
+            }
+            else
+            {
+                File.WriteAllLines(Path.Join(dir, t + ".txt"),  new string[]{ e.ToString(), e.StackTrace });
+            }
         }
-
         ITakesScreenshot ssdriver = driver as ITakesScreenshot;
         Screenshot screenshot = ssdriver.GetScreenshot();
         screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
