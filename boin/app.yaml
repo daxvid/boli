@@ -1,19 +1,19 @@
 ﻿
 # 查询最近多少小时的订单
-OrderHour: 12
+OrderHour: 24
 
 # 提现最多读取页数
-WithdrawMaxPage: 2
+WithdrawMaxPage: 1
 # 提现最多天数
 WithdrawMaxDay: 3
 
 # 充值最多读取页数
-RechargeMaxPage: 5
+RechargeMaxPage: 3
 # 充值最多天数
 RechargeMaxDay: 3
 
 # 游戏记录最多读取页数
-GameLogMaxPage: 8
+GameLogMaxPage: 3
 # 游戏记录最多小时
 GameLogMaxHour: 36
 
