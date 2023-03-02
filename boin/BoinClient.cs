@@ -65,7 +65,7 @@ public class BoinClient:IDisposable
     {
         bindPage = new GameBindPage(driver, cnf);
         userPage = new UserPage(driver, cnf);
-        orderPage = new OrderPage(driver, cnf);
+        orderPage = new OrderPage(driver, cnf, reviewer.Cnf.OrderAmountMax);
         orderPage.InitItem();
     }
 
@@ -120,7 +120,7 @@ public class BoinClient:IDisposable
                 order.Processed = true;
                 order.ReviewMsg = "fail";
                 
-                orderPage.Unlock(order);
+                orderPage.Unlock(order.OrderId);
                 var msg = order.ReviewNote();
                 Cache.SaveOrder(order.OrderId, msg);
                 SendMsg(msg);
@@ -151,7 +151,7 @@ public class BoinClient:IDisposable
                 var orders = Helper.SafeExec(driver,() =>
                 {
                     orderPage.Open();
-                    var orders = orderPage.Select(cnf.OrderHour, reviewer.Cnf.OrderAmountMax);
+                    var orders = orderPage.Select(cnf.OrderHour);
                     return orders;
                 }, 1000, 60);
                 return orders;
@@ -159,7 +159,7 @@ public class BoinClient:IDisposable
             catch (WebDriverException e)
             {
                 orderPage.Close();
-                orderPage = new OrderPage(driver, cnf);
+                orderPage = new OrderPage(driver, cnf, reviewer.Cnf.OrderAmountMax);
                 orderPage.InitItem();
             }
         }
@@ -278,7 +278,7 @@ public class BoinClient:IDisposable
         }
         else
         {
-            orderPage.Unlock(user.Order);
+            orderPage.Unlock(user.Order.OrderId);
         }
 
         var msg = user.ReviewNote();

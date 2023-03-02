@@ -209,19 +209,7 @@ namespace boin
 
         protected ReadOnlyCollection<IWebElement> FindElements(IWebElement e, By by)
         {
-            var result = wait.Until(driver =>
-            {
-                try
-                {
-                    var es = e.FindElements(by);
-                    return es;
-                }
-                catch (NoSuchElementException)
-                {
-                }
-
-                return EmptyElements;
-            });
+            var result = wait.Until(driver => e.FindElements(by));
             return result;
         }
 
@@ -272,7 +260,6 @@ namespace boin
                     catch (ElementClickInterceptedException)
                     {
                     }
-
                     return false;
                 });
             }
