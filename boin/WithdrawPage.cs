@@ -108,8 +108,7 @@ public class WithdrawPage : PopPage
     {
         var allRows = FindElementsByXPath(tbody, ".//tr");
         // 展开所有列表
-        var expandPath =
-            "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+        var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']";
         foreach (var row in allRows)
         {
             FindAndClickByXPath(row, expandPath, 0);

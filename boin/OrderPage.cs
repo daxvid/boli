@@ -24,8 +24,11 @@ public class OrderPage : LablePage
 
         // 选择200条记录
         // //*[@id="Cash"]/div[4]/div/div/div[1]/div/i
-        // FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i", 100);
-        // FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]", 100);
+        FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i", 100);
+        // //*[@id="Cash"]/div[4]/div/div/div[2]/ul[2]/li[5]
+        // //*[@id="Cash"]/div[4]/div/div/div[2]/ul[2]/li[6]
+        // 10/20/30/60/100/200
+        FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]", 100);
     }
 
     // 查询订单
@@ -43,41 +46,59 @@ public class OrderPage : LablePage
 
         var bodyPath = ".//tbody[@class='ivu-table-tbody']";
         var tbody = FindElementByXPath(table, bodyPath);
-
+        
+        // 锁定一批
         lockOrders(tbody);
+        
+        // 处理等待审核的单
         var orders = ReadOrders(tbody);
         return orders;
     }
 
-
+    private int waitOrders(IWebElement tbody)
+    {
+        // 查询出已经锁定的还没有处理的单数
+        var waitPath = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']";
+        var waitRows = FindElementsByXPath(tbody, waitPath);
+        return waitRows.Count;
+    }
+    
     // 锁定订单
     private int lockOrders(IWebElement tbody)
     {
+        int count = waitOrders(tbody);
+        if (count > 0)
+        {
+            return count;
+        }
+        
+        // 查询出可以锁定的单
         // td[7]/div/span[number(text())<=4000]
         // td[13]/div/div[text()='--']
         // td[14]/div/div/div/div/div/button[1]/span[锁定]
         var path = ".//tr/td[7]/div/span[number(text())<="+ orderAmountMax.ToString() + "]/../../../" +
                    "td[13]/div/div[text()='--']/../../../" +
-                   "td[14]/div/div/div/div/div/button[1]/span[text()='锁定']";
-        var lockBtns = FindElementsByXPath(tbody, path);
-        int count = 0;
-        for (int i = lockBtns.Count - 1; (i >= 0 && count <= cnf.OrderMaxLock); i--)
+                   "td[14]/div/div/div/div/div/button[1]/span[text()='锁定']/../../../../../../../..";
+        var allRows = FindElementsByXPath(tbody, path);
+        // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[14]/td[2]/div
+
+        for (var i = allRows.Count - 1; (i >= 0 && count <= cnf.OrderMaxLock); i--)
         {
-            var btn = lockBtns[i];
-            if (btn.Enabled)
+            var row = allRows[i];
+            try
             {
-                try
+                var orderId = Helper.ReadString(FindElementByXPath(row, "./td[2]/div"));
+                // 过滤已经处理过的订单
+                var msg = Cache.GetOrder(orderId);
+                if (string.IsNullOrEmpty(msg))
                 {
-                    btn.Click();
+                    FindAndClickByXPath(row, "./td[14]/div/div/div/div/div/button[1]/span[text()='锁定']", 10);
                     count++;
-                    Thread.Sleep(20);
-                }
-                catch(Exception err)
-                {
-                    Console.WriteLine((err));
                 }
             }
+            catch{}
         }
+        Console.WriteLine("lockOrders:"+ allRows.Count.ToString()+"_"+ count);
         Thread.Sleep(1000);
         return count;
     }
@@ -88,20 +109,19 @@ public class OrderPage : LablePage
         var path = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']/../../../../../../../..";
         var allRows = FindElementsByXPath(tbody, path);
 
+        // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[30]/td[1]/div/div/i
+        // 未展开 <div class="ivu-table-cell-expand"><i class="ivu-icon ivu-icon-ios-arrow-forward"></i></div>
+        // 已展开 <div class="ivu-table-cell-expand ivu-table-cell-expand-expanded"><i class="ivu-icon ivu-icon-ios-arrow-forward"></i></div>
         // 展开所有列表
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
-        var expandPath =
-            "./td[1]/div/div[@class='ivu-table-cell-expand']/i[@class='ivu-icon ivu-icon-ios-arrow-forward']";
+        var expandPath = "./td[1]/div/div";
         foreach (var row in allRows)
         {
-            var exBtn = FindElementsByXPath(row, expandPath);
-            if (exBtn.Count > 0)
+            var exBtn = FindElementByXPath(row, expandPath);
+            var className = exBtn.GetAttribute("class");
+            if (className == "ivu-table-cell-expand")
             {
-                SafeClick(exBtn[0]);
-            }
-            else
-            {
-                Console.WriteLine((exBtn.Count));
+                exBtn.Click();
             }
         }
 
@@ -121,10 +141,7 @@ public class OrderPage : LablePage
             }
 
             var order = Order.Create(row, rowEx);
-            if (order != null)
-            {
-                orders.Add(order);
-            }
+            orders.Add(order);
         }
 
         return orders;

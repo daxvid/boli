@@ -104,13 +104,6 @@ public class Order : WithdrawExpand
             }
 
             var orderId = Helper.ReadString(ts[1]);
-            // 过滤已经处理过的订单
-            var msg = Cache.GetOrder(orderId);
-            if (!string.IsNullOrEmpty(msg))
-            {
-                return null;
-            }
-
             Order order = new Order();
             order.OrderId = orderId; // 订单号
             order.Created = Helper.ReadShortTime(ts[2]); // 发起时间
