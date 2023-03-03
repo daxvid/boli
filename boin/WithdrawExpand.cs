@@ -86,12 +86,7 @@ public class WithdrawExpand
 
     // 开户行名称
     public string BankName { get; set; } = string.Empty;
-
-    // public bool IsSyncName
-    // {
-    //     get { return Interlocked.Read(ref nameLocker) == 2; }
-    // }
-
+    
     private long nameLocker = 0;
 
     // 同步银行卡名称
@@ -105,17 +100,7 @@ public class WithdrawExpand
                 {
                     var info = BankUtil.GetBankInfo(this.CardNo);
                     this.BankCardInfo = info;
-                    var bankName = BankUtil.GetNameOfBank(info.bank);
-                    // if (bankName == info.bank)
-                    // {
-                    //     bankName = BankUtil.GetNameOfBankCard(this.CardNo);
-                    //     if (string.IsNullOrEmpty(bankName))
-                    //     {
-                    //         bankName = info.bank;
-                    //     }
-                    // }
-
-                    this.BankName = bankName;
+                    this.BankName = BankUtil.GetNameOfBank(info.bank);
                     Interlocked.Increment(ref nameLocker);
 
                 });

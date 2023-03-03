@@ -28,7 +28,7 @@ public class LoginPage: PageBase
         var pwdPath =
             "//div[@id=\"logins\"]/div/form/div[2]/div/div/input[@type='password' and @placeholder='请输入密码']";
         SetTextElementByXPath(pwdPath, _authCnf.Password);
-        for (var i = 1; i < 100; i++)
+        for (var i = 1; i < 1000; i++)
         {
             if (login(i))
             {
@@ -65,7 +65,7 @@ public class LoginPage: PageBase
         catch (WebDriverTimeoutException)
         {
             SendMsg("登入超时:" + _authCnf.UserName + "_" + i.ToString());
-            Thread.Sleep(1000 * i);
+            Thread.Sleep( (i>60?60:i)*1000);
         }
 
         return false;

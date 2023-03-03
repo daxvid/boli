@@ -150,6 +150,17 @@ public class Helper
         decimal r = decimal.Parse(txt);
         return r;
     }
+    
+    public static decimal ReadDecimalOrDefault(IWebElement e, decimal def=0)
+    {
+        var txt = ReadString(e);
+        decimal r;
+        if (!decimal.TryParse(txt, out r))
+        {
+            r = def;
+        }
+        return r;
+    }
 
     public static string ReadString(IWebElement e)
     {
@@ -189,6 +200,22 @@ public class Helper
 
         return now;
     }
+    
+    static readonly List<char> hexSet = new List<char>() 
+        { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f' };  
+    // 判断十六进制字符串hex是否正确
+    public static bool IsHexadecimal(string hex) 
+    {
+        foreach (char item in hex)
+        {
+            if (hexSet.Contains<char>(item) == false)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    
 
     public static void SendMsg(string msg)
     {

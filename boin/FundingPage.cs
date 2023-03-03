@@ -25,10 +25,6 @@ public class FundingPage : PopPage
         var table = getCurrentTable();
         var tbox = FindElementByXPath(table, tboxPath);
 
-        //// 点击刷新按钮;
-        //var sub = FindElementByXPath(table,".//div[@class='ivu-modal-footer']/div/button/span[text()='刷新']"));
-        //sub.Click();
-
         Funding fund = new Funding();
 
         // 余额
@@ -67,7 +63,7 @@ public class FundingPage : PopPage
                 using (var rg = new RechargePage(driver, cnf, gameId))
                 {
                     var rechargeLogs = rg.Select(rechargeMaxDay);
-                    // 如果没有数据查查询最近30天的数据
+                    // 如果没有数据查则查询最近30天的数据
                     if ((rechargeLogs == null || rechargeLogs.Count < 3) && rechargeMaxDay < maxDay)
                     {
                         rechargeLogs = rg.Select(maxDay);
@@ -75,7 +71,7 @@ public class FundingPage : PopPage
 
                     return rechargeLogs;
                 }
-            }, 1000, 30);
+            }, 1000, 10);
         }
 
         if (withdrawMaxDay > 0)
@@ -98,7 +94,7 @@ public class FundingPage : PopPage
 
                     return withdrawLogs;
                 }
-            }, 1000, 30);
+            }, 1000, 10);
         }
     }
 }

@@ -27,7 +27,7 @@ public class Withdraw : WithdrawExpand
     // 通道
     public string Way { get; set; } = string.Empty;
 
-    // 审核状态(成功/)
+    // 审核状态(待审核/已通过/已拒绝)
     public string Review { get; set; } = string.Empty;
 
     // 转账状态(代付中/未发起/成功/失败)

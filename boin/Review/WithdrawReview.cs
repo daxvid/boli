@@ -53,7 +53,7 @@ public class WithdrwReview : IReviewUser
                 var countBobi = user.Funding.NearBobiCount(order.OrderId, ReviewConfig.Cnf.NearWithdrawCount);
                 if (countBobi > ReviewConfig.Cnf.BobiMaxCount)
                 {
-                    rs.Add(new ReviewResult { Code = -402, Msg = "@币笔数超限:" + countBobi.ToString() });
+                    rs.Add(new ReviewResult { Code = -402, Msg = "请使用银行卡，否则不给予提现"});
                 }
             }
         }

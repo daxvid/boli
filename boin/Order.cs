@@ -60,6 +60,25 @@ public class Order : WithdrawExpand
     {
     }
 
+    public string RejectReason
+    {
+        get
+        {
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    if (r.Code < 0)
+                    {
+                        return r.Msg;
+                    }
+                }
+            }
+
+            return "success";
+        }
+    }
+
     public string ReviewNote()
     {
         StringBuilder sb = new StringBuilder(1024);

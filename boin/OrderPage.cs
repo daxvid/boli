@@ -8,26 +8,36 @@ namespace boin;
 
 public class OrderPage : LablePage
 {
-    private int orderAmountMax;
+    private string maxAmount;
     public OrderPage(ChromeDriver driver, AppConfig cnf, int orderAmountMax) : base(driver, cnf, 4, "提现管理")
     {
-        this.orderAmountMax = orderAmountMax;
+        this.maxAmount = orderAmountMax.ToString();
     }
 
     public void InitItem()
     {
         this.Open();
+        
+        // 设置最小金额
+        // <input autocomplete="off" spellcheck="false" type="text" placeholder="最小金额" class="ivu-input ivu-input-default">
+        // //*[@id="Cash"]/div[1]/div[7]/div[1]/input
+        SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[1]/input", "100");
+        
+        // 设置最大金额
+        // <input autocomplete="off" spellcheck="false" type="text" placeholder="最大金额" class="ivu-input ivu-input-default">
+        // //*[@id="Cash"]/div[1]/div[7]/div[2]/input
+        SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[2]/input", maxAmount);
+        
         // 全部，待审核
         // //*[@id="Cash"]/div[1]/div[9]/div/div[1]/div/i
         FindAndClickByXPath("//div[@id='Cash']/div[1]/div[9]/div/div[1]/div/i", 100);
         FindAndClickByXPath("//div[@id='Cash']/div[1]/div[9]/div/div[2]/ul[2]/li[2]", 100);
 
-        // 选择200条记录
+        // 选择每页记录条数(10/20/30/60/100/200)
         // //*[@id="Cash"]/div[4]/div/div/div[1]/div/i
         FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[1]/div/i", 100);
         // //*[@id="Cash"]/div[4]/div/div/div[2]/ul[2]/li[5]
         // //*[@id="Cash"]/div[4]/div/div/div[2]/ul[2]/li[6]
-        // 10/20/30/60/100/200
         FindAndClickByXPath("//div[@id='Cash']/div[4]/div/div/div[2]/ul[2]/li[6]", 100);
     }
 
@@ -76,13 +86,14 @@ public class OrderPage : LablePage
         // td[7]/div/span[number(text())<=4000]
         // td[13]/div/div[text()='--']
         // td[14]/div/div/div/div/div/button[1]/span[锁定]
-        var path = ".//tr/td[7]/div/span[number(text())<="+ orderAmountMax.ToString() + "]/../../../" +
+        var path = ".//tr/" +
+                   //"td[7]/div/span[number(text())<=" + maxAmount + "]/../../../" +
                    "td[13]/div/div[text()='--']/../../../" +
                    "td[14]/div/div/div/div/div/button[1]/span[text()='锁定']/../../../../../../../..";
         var allRows = FindElementsByXPath(tbody, path);
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[14]/td[2]/div
 
-        for (var i = allRows.Count - 1; (i >= 0 && count <= cnf.OrderMaxLock); i--)
+        for (var i = allRows.Count - 1; (i >= 0 && count < cnf.OrderMaxLock); i--)
         {
             var row = allRows[i];
             try
@@ -181,6 +192,37 @@ public class OrderPage : LablePage
         return pass;
     }
 
+    public bool RejectOrder(Order order)
+    {
+        //return Unlock(order.OrderId);
+        
+        this.Open();
+        string reviewBtn = makePath(order.OrderId) + "/button[1]/span[text()='审核']";
+        FindAndClickByXPath(reviewBtn, 4000);
+        bool pass = false;
+        try
+        {
+            using (var vp = new ReviewPage(driver, cnf, order))
+            {
+                pass = vp.Reject();
+            }
+        }
+        catch (Exception err)
+        {
+            Console.WriteLine(err);
+            throw;
+        }
+        finally
+        {
+            if (pass == false)
+            {
+                Unlock(order.OrderId);
+            }
+        }
+
+        return pass;
+    }
+    
     // 解锁
     public bool Unlock(string orderId)
     {
@@ -220,5 +262,6 @@ public class OrderPage : LablePage
         }
         return false;
     }
+
 }
 

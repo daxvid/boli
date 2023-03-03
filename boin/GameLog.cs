@@ -88,10 +88,10 @@ namespace boin;
                 log.No = Helper.ReadString(ts[4]); //单号
                 log.GameName = Helper.ReadString(ts[5]); //游戏名
                 log.OpTime = Helper.ReadString(ts[6]); //操作时间
-                log.TotalBet =  Helper.ReadDecimal(ts[7]); //下注总金额
-                log.TotalWin = Helper.ReadDecimal(ts[8]); //中奖金额
-                log.ValidBet = Helper.ReadDecimal(ts[9]); //有效下注
-                log.Tip = Helper.ReadDecimal(ts[10]); //小费
+                log.TotalBet =  Helper.ReadDecimalOrDefault(ts[7]); //下注总金额
+                log.TotalWin = Helper.ReadDecimalOrDefault(ts[8]); //中奖金额
+                log.ValidBet = Helper.ReadDecimalOrDefault(ts[9]); //有效下注
+                log.Tip = Helper.ReadDecimalOrDefault(ts[10]); //小费
                 log.CancelBet = Helper.ReadString(ts[11]); //取消下注
                 log.Init();
                 

@@ -88,7 +88,7 @@ public class BoinClient:IDisposable
             if (orders.Count > 0)
             {
                 zeroCount = 0;
-                ReviewOrders(orders);
+                reviewOrders(orders);
                 heartbeatTime = DateTime.Now;
             }
             else
@@ -105,33 +105,42 @@ public class BoinClient:IDisposable
         }
     }
 
-    private void ReviewOrders(List<Order> orders)
+    private void reviewOrders(List<Order> orders)
     {
         foreach (var order in orders)
         {
-            order.Bind = LoadBind(order.GameId, order.CardNo);
-            if (reviewer.Review(order))
-            {
-                var user = LoadUser(order);
-                ReviewUser(user);
-            }
-            else
-            {
-                order.Processed = true;
-                order.ReviewMsg = "fail";
-                
-                orderPage.Unlock(order.OrderId);
-                var msg = order.ReviewNote();
-                Cache.SaveOrder(order.OrderId, msg);
-                SendMsg(msg);
-            }
+            reviewOrder(order);
         }
-
         // 等待所有订单处理结束
-        WaitOrders(orders);
+        waitOrders(orders);
     }
 
-    private static void WaitOrders(List<Order> orders)
+    private void reviewOrder(Order order)
+    {
+        order.Bind = LoadBind(order.GameId, order.CardNo);
+        if (reviewer.Review(order))
+        {
+            var user = LoadUser(order);
+            ReviewUser(user);
+        }
+        else
+        {
+            rejectOrder(order);
+        }
+    }
+
+    // 拒绝订单
+    private void rejectOrder(Order order)
+    {
+        order.Processed = true;
+        order.ReviewMsg = "fail";
+        orderPage.RejectOrder(order);
+        var msg = order.ReviewNote();
+        Cache.SaveOrder(order.OrderId, msg);
+        SendMsg(msg);
+    }
+
+    private static void waitOrders(List<Order> orders)
     {
         foreach (var order in orders)
         {
@@ -153,7 +162,7 @@ public class BoinClient:IDisposable
                     orderPage.Open();
                     var orders = orderPage.Select(cnf.OrderHour);
                     return orders;
-                }, 1000, 60);
+                }, 1000, 10);
                 return orders;
             }
             catch (WebDriverException e)
@@ -177,7 +186,7 @@ public class BoinClient:IDisposable
                     userPage.Open();
                     var user = userPage.Select(gameId);
                     return user;
-                }, 1000, 60);
+                }, 1000, 10);
                 return user;
             }
             catch (WebDriverException e)
@@ -199,7 +208,7 @@ public class BoinClient:IDisposable
                     bindPage.Open();
                     var bind = bindPage.Select(gameId, cardNo);
                     return bind;
-                }, 1000, 30);
+                }, 1000, 10);
                 return bind;
             }
             catch (WebDriverException e)

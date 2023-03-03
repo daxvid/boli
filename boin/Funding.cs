@@ -216,7 +216,7 @@ public class Funding
             if (w.OrderId != orderId)
             {
                 checkCount++;
-                if (w.Way == "数字钱包")
+                if (w.Way == "数字钱包" && w.Review == "已通过")
                 {
                     bobiCount++;
                 }
@@ -263,7 +263,7 @@ public class Funding
         var now = DateTime.Now;
         foreach (var w in WithdrawLog)
         {
-            if ((w.OrderId != orderId) && w.Way == way)
+            if ((w.OrderId != orderId) && w.Way == way && w.Review == "已通过")
             {
                 if (w.Created.Year == now.Year && w.Created.Month == now.Month && w.Created.Day == now.Day)
                 {

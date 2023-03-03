@@ -2,6 +2,7 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
+using OpenQA.Selenium.DevTools.V108.Page;
 
 namespace boin;
 
@@ -53,8 +54,7 @@ public class ReviewPage : PageBase
         var hit = Helper.ReadString(FindElementByXPath(mainTable, hitPath));
         if (hit == "请选择")
         {
-            // TODO：选择代付商家
-            // 选择提现方式，选择第一项
+            // 选择代付商家，选择第一项
             // 支付商家下拉
             // /html/body/div[7]/div[2]/div/div/div[3]/div/div[1]/span[2]/div/div[1]/div/i
             FindAndClickByXPath(mainTable, "./div[3]/div/div[1]/span[2]/div/div[1]/div/i", 10);
@@ -83,6 +83,42 @@ public class ReviewPage : PageBase
             return false;
         }
 
+    }
+
+    public bool Reject()
+    {
+        var reason = order.RejectReason;
+        // 设置备注内容
+        // <input autocomplete="off" spellcheck="false" type="text" placeholder="请输入备注" class="ivu-input ivu-input-default">
+        // /html/body/div[47]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[5]/div/input
+        var remarkPath = "./div[2]/div/div[2]/div/div[3]/div[5]/div/input";
+        var remark = FindElementByXPath(mainTable, remarkPath);
+        remark.Clear();
+        remark.SendKeys(reason);
+        
+        // 修改按钮
+        // <span>修改</span>
+        // /html/body/div[47]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[5]/button/span
+        FindAndClickByXPath(mainTable, "./div[2]/div/div[2]/div/div[3]/div[5]/button/span[text()='修改']",10);
+
+        // 修改确认框
+        // /html/body/div[64]/div[2]/div/div/div/div/div[2]/div <div>确定修改备注？</div>
+        // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[2]/span[确定]
+        // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[1]/span[取消]
+        var confirmPath = ".//div[@class='ivu-modal-confirm-body']/div[starts-with(text(),'确定修改备注')]/../../" +
+                          "div[3]/button[2]/span[text()='确定']";
+        FindAndClickByXPath(confirmPath, 10);
+        
+        // 拒绝按钮
+        // <span>拒绝</span>
+        // /html/body/div[47]/div[2]/div/  div/div[3]/div/div[2]/div[2]/button[1]/span
+        var rejectPath = "./div[3]/div/div[2]/div[2]/button[1]/span[text()='拒绝']";
+        FindAndClickByXPath(mainTable, rejectPath, 10);
+        using (var rp = new RejectPage(driver,cnf))
+        {
+            return rp.RejectReason(reason);
+        }
+        
     }
 }
 
