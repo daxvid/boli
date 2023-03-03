@@ -118,11 +118,15 @@ public class ReviewPage : PageBase
 
     public bool Submit(bool pass)
     {
-        if (pass)
+        var r = Helper.SafeExec(driver,()=>
         {
-            return Review();
-        }
-        return Reject();
+            if (pass)
+            {
+                return Review();
+            }
+            return Reject();
+        },1000,20);
+        return r;
     }
 }
 
