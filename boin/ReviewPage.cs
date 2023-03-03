@@ -92,9 +92,7 @@ public class ReviewPage : PageBase
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="请输入备注" class="ivu-input ivu-input-default">
         // /html/body/div[47]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[5]/div/input
         var remarkPath = "./div[2]/div/div[2]/div/div[3]/div[5]/div/input";
-        var remark = FindElementByXPath(mainTable, remarkPath);
-        remark.Clear();
-        remark.SendKeys(reason);
+        SetTextElementByXPath(mainTable, remarkPath, reason);
         
         // 修改按钮
         // <span>修改</span>
