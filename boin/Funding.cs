@@ -185,19 +185,17 @@ public class Funding
         return string.Empty;
     }
 
-    // 最近的单是否拒绝
-    public bool NearReject(string orderId)
+    // 最近的单是否成功
+    public bool NearPass(string orderId)
     {
         foreach (var w in WithdrawLog)
         {
             if (w.OrderId != orderId)
             {
-                var pass = w.Pass();
-                return (!pass);
+                return w.Pass();
             }
         }
-
-        return false;
+        return true;
     }
 
     // 最近多少笔波币提现
@@ -216,7 +214,7 @@ public class Funding
             if (w.OrderId != orderId)
             {
                 checkCount++;
-                if (w.Way == "数字钱包" && w.Review == "已通过")
+                if (w.Way == "数字钱包" && w.Review == "已通过" && w.Transfer != "失败")
                 {
                     bobiCount++;
                 }
@@ -263,7 +261,7 @@ public class Funding
         var now = DateTime.Now;
         foreach (var w in WithdrawLog)
         {
-            if ((w.OrderId != orderId) && w.Way == way && w.Review == "已通过")
+            if ((w.OrderId != orderId) && w.Way == way && w.Review == "已通过" && w.Transfer != "失败")
             {
                 if (w.Created.Year == now.Year && w.Created.Month == now.Month && w.Created.Day == now.Day)
                 {

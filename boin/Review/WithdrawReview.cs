@@ -58,8 +58,8 @@ public class WithdrwReview : IReviewUser
             }
         }
 
-        var reject = user.Funding.NearReject(order.OrderId);
-        if (reject)
+        var nearPass = user.Funding.NearPass(order.OrderId);
+        if (!nearPass)
         {
             rs.Add(new ReviewResult { Code = 201, Msg = "@上一单未成功" });
         }
