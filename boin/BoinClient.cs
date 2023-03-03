@@ -118,26 +118,23 @@ public class BoinClient:IDisposable
     private void reviewOrder(Order order)
     {
         order.Bind = LoadBind(order.GameId, order.CardNo);
-        if (reviewer.Review(order))
-        {
-            var user = LoadUser(order);
-            ReviewUser(user);
-        }
-        else
+        reviewer.Review(order);
+        if (order.CanReject)
         {
             rejectOrder(order);
+            return;
         }
+
+        var user = LoadUser(order);
+        ReviewUser(user);
     }
 
     // 拒绝订单
     private void rejectOrder(Order order)
     {
-        order.Processed = true;
         order.ReviewMsg = "fail";
-        orderPage.RejectOrder(order);
-        var msg = order.ReviewNote();
-        Cache.SaveOrder(order.OrderId, msg);
-        SendMsg(msg);
+        orderPage.SubmitOrder(order,false);
+        SaveOrder(order);
     }
 
     private static void waitOrders(List<Order> orders)
@@ -150,8 +147,7 @@ public class BoinClient:IDisposable
             }
         }
     }
-
-    public List<Order> LoadOrders()
+    List<Order> LoadOrders()
     {
         while (true)
         {
@@ -174,8 +170,7 @@ public class BoinClient:IDisposable
         }
     }
 
-
-    public User LoadUser(string gameId)
+    User LoadUser(string gameId)
     {
         while (true)
         {
@@ -196,8 +191,7 @@ public class BoinClient:IDisposable
             }
         }
     }
-
-    public GameBind LoadBind(string gameId, string cardNo)
+    GameBind LoadBind(string gameId, string cardNo)
     {
         while (true)
         {
@@ -221,20 +215,21 @@ public class BoinClient:IDisposable
 
     static int orderCount = 0;
 
-    public bool ReviewUser(User user)
+    void ReviewUser(User user)
     {
         while (true)
         {
             if (user.Funding.IsSyncName)
             {
-                return Review(user);
+                Review(user);
+                return;
             }
 
             Thread.Sleep(1);
         }
     }
-
-    public User LoadUser(Order order)
+    
+    User LoadUser(Order order)
     {
         orderCount++;
         var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
@@ -248,53 +243,36 @@ public class BoinClient:IDisposable
             return user;
         }
     }
-
-    private bool Review(User user)
+    void Review(User user)
     {
-        bool success = reviewer.Review(user);
-        bool pass = success;
-        // 通过
-        if (success)
+        reviewer.Review(user);
+        var order = user.Order;
+        if (order.CanPass)
         {
-            foreach (var v in user.ReviewResult)
-            {
-                if (v.Code > 0)
-                {
-                    pass = false;
-                    break;
-                }
-            }
-
-            if (pass)
-            {
-                user.ReviewMsg = "pass";
-            }
-            else
-            {
-                // 待定，进入人工
-                user.ReviewMsg = "unknow";
-            }
+            order.ReviewMsg = "pass";
+            orderPage.SubmitOrder(order, true);
         }
-        else
-        {
+        else if (order.CanReject)
+        { 
             // 可以拒绝
-            user.ReviewMsg = "fail";
-        }
-
-        if (pass)
-        {
-            orderPage.Pass(user.Order);
+            order.ReviewMsg = "fail";
+            orderPage.SubmitOrder(order, false);
         }
         else
         {
-            orderPage.Unlock(user.Order.OrderId);
+            // 待定，进入人工
+            order.ReviewMsg = "unknown";
+            orderPage.Unlock(order.OrderId);
         }
 
-        var msg = user.ReviewNote();
-        Cache.SaveOrder(user.Order.OrderId, msg);
-        SendMsg(msg);
+        SaveOrder(order);
+    }
 
-        user.Order.Processed = true;
-        return pass;
+    void SaveOrder(Order order)
+    {
+        var msg = order.ReviewNote();
+        Cache.SaveOrder(order.OrderId, msg);
+        order.Processed = true;
+        SendMsg(msg);
     }
 }

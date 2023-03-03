@@ -56,7 +56,7 @@ public class RejectPage : PageBase
         var btn = FindElementByXPath(mainTable, "./div[2]/div[2]/button/span/span[text()='确定']");
         if (btn.Enabled)
         {
-            // return false;
+            return false;
             btn.Click();
         }
 

@@ -47,7 +47,6 @@ public class Order : WithdrawExpand
     // 订单状态
     public string Status { get; set; } = string.Empty;
 
-    public bool Pass { get; set; }
     public string ReviewMsg { get; set; } = string.Empty;
     public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
@@ -58,6 +57,44 @@ public class Order : WithdrawExpand
 
     public Order()
     {
+    }
+
+    public bool CanPass
+    {
+        get
+        {
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    if (r.Code != 0)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+    }
+    
+    public bool CanReject
+    {
+        get
+        {
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    if (r.Code < 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 
     public string RejectReason
@@ -82,12 +119,8 @@ public class Order : WithdrawExpand
     public string ReviewNote()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.Append("card:").AppendLine(this.CardNo);
-        if (!string.IsNullOrEmpty(ReviewMsg))
-        {
-            sb.Append(OrderId).Append(":").AppendLine(ReviewMsg);
-        }
-
+        sb.Append(OrderId).Append(":").AppendLine(ReviewMsg);
+        sb.Append("game:").AppendLine(this.GameId);
         if (ReviewResult != null)
         {
             foreach (var r in ReviewResult)

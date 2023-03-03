@@ -9,6 +9,7 @@ namespace boin;
 public class OrderPage : LablePage
 {
     private string maxAmount;
+
     public OrderPage(ChromeDriver driver, AppConfig cnf, int orderAmountMax) : base(driver, cnf, 4, "提现管理")
     {
         this.maxAmount = orderAmountMax.ToString();
@@ -17,17 +18,17 @@ public class OrderPage : LablePage
     public void InitItem()
     {
         this.Open();
-        
+
         // 设置最小金额
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="最小金额" class="ivu-input ivu-input-default">
         // //*[@id="Cash"]/div[1]/div[7]/div[1]/input
         SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[1]/input", "100");
-        
+
         // 设置最大金额
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="最大金额" class="ivu-input ivu-input-default">
         // //*[@id="Cash"]/div[1]/div[7]/div[2]/input
         SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[2]/input", maxAmount);
-        
+
         // 全部，待审核
         // //*[@id="Cash"]/div[1]/div[9]/div/div[1]/div/i
         FindAndClickByXPath("//div[@id='Cash']/div[1]/div[9]/div/div[1]/div/i", 100);
@@ -56,10 +57,10 @@ public class OrderPage : LablePage
 
         var bodyPath = ".//tbody[@class='ivu-table-tbody']";
         var tbody = FindElementByXPath(table, bodyPath);
-        
+
         // 锁定一批
         lockOrders(tbody);
-        
+
         // 处理等待审核的单
         var orders = ReadOrders(tbody);
         return orders;
@@ -72,7 +73,7 @@ public class OrderPage : LablePage
         var waitRows = FindElementsByXPath(tbody, waitPath);
         return waitRows.Count;
     }
-    
+
     // 锁定订单
     private int lockOrders(IWebElement tbody)
     {
@@ -81,7 +82,7 @@ public class OrderPage : LablePage
         {
             return count;
         }
-        
+
         // 查询出可以锁定的单
         // td[7]/div/span[number(text())<=4000]
         // td[13]/div/div[text()='--']
@@ -107,9 +108,12 @@ public class OrderPage : LablePage
                     count++;
                 }
             }
-            catch{}
+            catch
+            {
+            }
         }
-        Console.WriteLine("lockOrders:"+ allRows.Count.ToString()+"_"+ count);
+
+        Console.WriteLine("lockOrders:" + allRows.Count.ToString() + "_" + count);
         Thread.Sleep(1000);
         return count;
     }
@@ -168,61 +172,34 @@ public class OrderPage : LablePage
         return td14Path;
     }
 
-    public bool Pass(Order order)
+    // 提交审核结果
+    public bool SubmitOrder(Order order, bool pass)
     {
         this.Open();
         string reviewBtn = makePath(order.OrderId) + "/button[1]/span[text()='审核']";
-        FindAndClickByXPath(reviewBtn, 4000);
-        bool pass = false;
+        bool success = false;
         try
         {
-            using (var vp = new ReviewPage(driver, cnf, order))
+            success = Helper.SafeExec(driver, () =>
             {
-                pass = vp.Review();
-            }
+                FindAndClickByXPath(reviewBtn, 2000);
+                using (var vp = new ReviewPage(driver, cnf, order))
+                {
+                    return vp.Submit(pass);
+                }
+            }, 1000, 10);
         }
         finally
         {
-            if (pass == false)
+            if (success == false)
             {
                 Unlock(order.OrderId);
             }
         }
 
-        return pass;
+        return success;
     }
 
-    public bool RejectOrder(Order order)
-    {
-        //return Unlock(order.OrderId);
-        
-        this.Open();
-        string reviewBtn = makePath(order.OrderId) + "/button[1]/span[text()='审核']";
-        FindAndClickByXPath(reviewBtn, 4000);
-        bool pass = false;
-        try
-        {
-            using (var vp = new ReviewPage(driver, cnf, order))
-            {
-                pass = vp.Reject();
-            }
-        }
-        catch (Exception err)
-        {
-            Console.WriteLine(err);
-            throw;
-        }
-        finally
-        {
-            if (pass == false)
-            {
-                Unlock(order.OrderId);
-            }
-        }
-
-        return pass;
-    }
-    
     // 解锁
     public bool Unlock(string orderId)
     {
@@ -232,7 +209,7 @@ public class OrderPage : LablePage
         FindAndClickByXPath(reviewBtn, 4000);
         return true;
     }
-    
+
     private bool lockOrder(string orderId)
     {
         string td14Path = makePath(orderId);
@@ -244,6 +221,7 @@ public class OrderPage : LablePage
         {
             return true;
         }
+
         if (hit == "锁定")
         {
             lockBtn.Click();
@@ -260,8 +238,8 @@ public class OrderPage : LablePage
                 return true;
             }
         }
+
         return false;
     }
-
 }
 

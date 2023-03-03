@@ -2,7 +2,6 @@
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-using OpenQA.Selenium.DevTools.V108.Page;
 
 namespace boin;
 
@@ -13,6 +12,7 @@ public class ReviewPage : PageBase
     private readonly IWebElement mainTable;
     private readonly IWebElement closeBtn;
     private bool closed = false;
+
 
     public ReviewPage(ChromeDriver driver, AppConfig cnf, Order order) : base(driver, cnf)
     {
@@ -45,8 +45,7 @@ public class ReviewPage : PageBase
         }
         return true;
     }
-
-    public bool Review()
+    bool Review()
     {
         // 支付商家内容（飞天代付）
         // /html/body/div[7]/div[2]/div/  div/div[3]/div/div[1]/span[2]/div/div[1]/div/span
@@ -84,8 +83,7 @@ public class ReviewPage : PageBase
         }
 
     }
-
-    public bool Reject()
+    bool Reject()
     {
         var reason = order.RejectReason;
         // 设置备注内容
@@ -105,18 +103,26 @@ public class ReviewPage : PageBase
         // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[1]/span[取消]
         var confirmPath = ".//div[@class='ivu-modal-confirm-body']/div[starts-with(text(),'确定修改备注')]/../../" +
                           "div[3]/button[2]/span[text()='确定']";
-        FindAndClickByXPath(confirmPath, 10);
+        FindAndClickByXPath(confirmPath, 100);
         
         // 拒绝按钮
         // <span>拒绝</span>
         // /html/body/div[47]/div[2]/div/  div/div[3]/div/div[2]/div[2]/button[1]/span
         var rejectPath = "./div[3]/div/div[2]/div[2]/button[1]/span[text()='拒绝']";
-        FindAndClickByXPath(mainTable, rejectPath, 10);
+        FindAndClickByXPath(mainTable, rejectPath, 100);
         using (var rp = new RejectPage(driver,cnf))
         {
             return rp.RejectReason(reason);
         }
-        
+    }
+
+    public bool Submit(bool pass)
+    {
+        if (pass)
+        {
+            return Review();
+        }
+        return Reject();
     }
 }
 

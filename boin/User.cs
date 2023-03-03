@@ -36,10 +36,6 @@ public class User
 
     public Order Order { get; set; }
 
-    public bool Pass { get; set; }
-    public string ReviewMsg { get; set; } = string.Empty;
-    public List<Review.ReviewResult> ReviewResult { get; set; } = null;
-
     public static string[] Heads = new string[]
     {
         "商户", "用户信息", "等级/设备", "余额", "金流", "贵族",
@@ -55,31 +51,9 @@ public class User
         var day = DateTime.Now.Subtract(this.Created).TotalDays;
         return day < 30;
     }
-
-    public string ReviewNote()
-    {
-        StringBuilder sb = new StringBuilder(1024);
-        sb.Append(Order.OrderId).Append(":").AppendLine(ReviewMsg);
-        sb.Append("game:").AppendLine(this.GameId);
-        if (ReviewResult != null)
-        {
-            foreach (var r in ReviewResult)
-            {
-                if (r.Code != 0)
-                {
-                    sb.Append(r.Code).Append(":");
-                }
-
-                sb.AppendLine(r.Msg);
-            }
-        }
-
-        var m = sb.ToString();
-        return m;
-    }
+    
 
     // 是否玩了指定的游戏
-
     public static User Create(IWebElement element)
     {
         using (var span = new Span())

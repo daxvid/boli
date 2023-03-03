@@ -25,58 +25,46 @@ public class ReviewManager
     }
 
     // 审核提现单
-    public bool Review(Order order)
+    public void Review(Order order)
     {
-        var results = new List<ReviewResult>();
+        order.ReviewResult = new List<ReviewResult>();
         foreach (var review in orderReviews)
         {
             var rs = review.Review(order);
             if (rs != null && rs != ReviewResult.Empty)
             {
-                results.AddRange(rs);
+                order.ReviewResult.AddRange(rs);
                 foreach (var r in rs)
                 {
                     // 代码为负，强制中断
                     if (r.Code < 0)
                     {
-                        order.ReviewResult = results;
-                        return false;
+                        return;
                     }
                 }
             }
         }
-
-        order.Pass = true;
-        order.ReviewResult = results;
-        return true;
     }
 
     // 审核用户
-    public bool Review(User user)
+    public void Review(User user)
     {
-        List<ReviewResult> results = new List<ReviewResult>();
-        results.AddRange(user.Order.ReviewResult);
         foreach (var review in userReviews)
         {
             var rs = review.Review(user);
             if (rs != null && rs != ReviewResult.Empty)
             {
-                results.AddRange(rs);
+                user.Order.ReviewResult.AddRange(rs);
                 foreach (var r in rs)
                 {
                     // 代码为负，强制中断
                     if (r.Code < 0)
                     {
-                        user.ReviewResult = results;
-                        return false;
+                        return;
                     }
                 }
             }
         }
-
-        user.Pass = true;
-        user.ReviewResult = results;
-        return true;
     }
 }
 
