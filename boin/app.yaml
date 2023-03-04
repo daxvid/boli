@@ -20,9 +20,12 @@ GameLogMaxHour: 36
 # 最大锁定单数
 OrderMaxLock: 1
 
+# 处理金额范围
+AmountRang: [100,2000]
+
 # 审核配置文件
 ReviewFile: review.yaml
 
 # Chrome
-Headless: true
+Headless: false
 

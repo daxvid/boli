@@ -8,11 +8,13 @@ namespace boin;
 
 public class OrderPage : LablePage
 {
-    private string maxAmount;
+    private readonly string minAmount;
+    private readonly string maxAmount;
 
-    public OrderPage(ChromeDriver driver, AppConfig cnf, int orderAmountMax) : base(driver, cnf, 4, "提现管理")
+    public OrderPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf, 4, "提现管理")
     {
-        this.maxAmount = orderAmountMax.ToString();
+        this.minAmount = cnf.AmountRang[0].ToString();
+        this.maxAmount = cnf.AmountRang[1].ToString();
     }
 
     public void InitItem()
@@ -22,7 +24,7 @@ public class OrderPage : LablePage
         // 设置最小金额
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="最小金额" class="ivu-input ivu-input-default">
         // //*[@id="Cash"]/div[1]/div[7]/div[1]/input
-        SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[1]/input", "100");
+        SetTextElementByXPath("//div[@id='Cash']/div[1]/div[7]/div[1]/input", minAmount);
 
         // 设置最大金额
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="最大金额" class="ivu-input ivu-input-default">

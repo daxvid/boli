@@ -105,9 +105,6 @@ public class ReviewConfig
     // 老会员波币检查条件
     public AmountConfig OldBobi { get; set; }
 
-    // 每笔最大额度
-    public int OrderAmountMax { get; set; }
-
     // 最近10笔提款内 波币不能超过4笔
     public int NearWithdrawCount { get; set; }
     public int BobiMaxCount { get; set; }

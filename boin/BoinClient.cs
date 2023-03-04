@@ -65,7 +65,7 @@ public class BoinClient:IDisposable
     {
         bindPage = new GameBindPage(driver, cnf);
         userPage = new UserPage(driver, cnf);
-        orderPage = new OrderPage(driver, cnf, reviewer.Cnf.OrderAmountMax);
+        orderPage = new OrderPage(driver, cnf);
         orderPage.InitItem();
     }
 
@@ -164,7 +164,7 @@ public class BoinClient:IDisposable
             catch (WebDriverException e)
             {
                 orderPage.Close();
-                orderPage = new OrderPage(driver, cnf, reviewer.Cnf.OrderAmountMax);
+                orderPage = new OrderPage(driver, cnf);
                 orderPage.InitItem();
             }
         }

@@ -55,9 +55,6 @@ OldBobi:
     # 玩百家乐的会员 波币一天不超过3000提款
     DayMaxGames:
         百家乐: 3000
-
-# 单笔最大额度
-OrderAmountMax: 2000
     
 # 最近10笔提款内 波币不能超过4笔
 NearWithdrawCount: 10
