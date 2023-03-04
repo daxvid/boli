@@ -2,6 +2,14 @@ namespace boin;
 
 using YamlDotNet.Serialization;
 
+public class FeiTianConfig
+{
+    // 飞天充值查询地址
+    public string Host { get; set; }
+    public string Merchant { get; set; }
+    public string Token { get; set; }
+}
+
 public class AuthConfig
 {
     
@@ -16,8 +24,11 @@ public class AuthConfig
     // 所有接收通知的聊天ID
     public List<long> ChatIds;
     
-    // 充值查询地址
-    public string RechargeHost { get; set; }
+    // 四方充值查询地址
+    public string SiFangHost { get; set; }
+    
+    // 飞天充值查询地址
+    public FeiTianConfig FeiTian { get; set; }
     
     // redis连接
     public string Redis { get; set; }

@@ -9,8 +9,13 @@ BotToken: 54654545:fgbdfbfdbdfsbfgdngfnsfdgdfg
 # test: 544645654
 ChatIds: [-354654634]
 
-# 充值查询地址
-RechargeHost: http://
-
 # redis
 Redis: localhost
+
+# 充值查询地址
+SiFangHost: http://
+
+FeiTian:
+  Host: https://aaa.com
+  Merchant: 2222222
+  Token: 1111111

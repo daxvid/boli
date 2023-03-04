@@ -8,9 +8,6 @@ namespace boin;
     // 充值
 public class Recharge
 {
-    //  四方查询地址
-    public static string RechargeHost;
-
     // 游戏ID	
     public string GameId { get; set; } = string.Empty;
 
@@ -18,7 +15,7 @@ public class Recharge
     public string Nickname { get; set; } = string.Empty;
 
     // 存款人	
-    public string Depositor { get; set; } = string.Empty;
+    public string Payer { get; set; } = string.Empty;
 
     // 订单号
     public string OrderId { get; set; } = string.Empty;
@@ -70,24 +67,50 @@ public class Recharge
     // 同步姓名
     public void SyncName()
     {
-        if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
+        if (Interlocked.CompareExchange(ref nameLocker, 1, 0) != 0)
         {
-            var chan = this.RechargeChannel;
-            if (string.IsNullOrEmpty(this.Depositor) && chan.Contains("四方")
-                                                     && ((chan.Contains("银联") || chan.Contains("卡卡"))))
+            return;
+        }
+
+        var chan = this.RechargeChannel;
+        var cacheKey = this.OutsideOrderId + chan;
+        bool wait = false;
+        if (string.IsNullOrEmpty(this.Payer))
+        {
+            string name = Cache.GetRecharge(cacheKey);
+            if (name != null)
             {
-                ThreadPool.QueueUserWorkItem(state =>
-                {
-                    var depositor = GetRechargeName(this.OutsideOrderId);
-                    this.Depositor = depositor;
-                    Interlocked.Increment(ref nameLocker);
-                });
+                this.Payer = name;
             }
             else
             {
-                Interlocked.Increment(ref nameLocker);
+                if (chan.Contains("四方") && (chan.Contains("银联") || chan.Contains("卡卡")))
+                {
+                    wait = true;
+                }
+                else if (chan.Contains("飞天") && (chan.Contains("银联") || chan.Contains("云闪付")))
+                {
+                    wait = true;
+                }
             }
         }
+
+        if (!wait)
+        {
+            Interlocked.Increment(ref nameLocker);
+            return;
+        }
+
+        ThreadPool.QueueUserWorkItem(state =>
+        {
+            var payer = GetRechargeName(chan, this.OutsideOrderId);
+            this.Payer = payer ?? string.Empty;
+            Interlocked.Increment(ref nameLocker);
+            if (payer != null)
+            {
+                Cache.SaveRecharge(cacheKey, payer);
+            }
+        });
     }
 
     public static string[] Heads = new string[]
@@ -109,7 +132,7 @@ public class Recharge
             Recharge log = new Recharge();
             log.GameId = Helper.ReadString(ts[0]); // 充值账户游戏ID
             log.Nickname = Helper.ReadString(ts[1]); //  用户昵称
-            log.Depositor = Helper.ReadString(ts[2]); // 存款人
+            log.Payer = Helper.ReadString(ts[2]); // 存款人
             log.OrderId = Helper.ReadString(ts[3]); // 订单号
             log.OutsideOrderId = Helper.ReadString(ts[4]); // 外部订单号
 
@@ -136,7 +159,7 @@ public class Recharge
             Recharge log = new Recharge();
             log.GameId = Helper.ReadString(head, "充值账户游戏ID", row);
             log.Nickname = Helper.ReadString(head, "用户昵称", row);
-            log.Depositor = Helper.ReadString(head, "存款人", row);
+            log.Payer = Helper.ReadString(head, "存款人", row);
             log.OrderId = Helper.ReadString(head, "订单号", row);
             log.OutsideOrderId = Helper.ReadString(head, "外部订单号", row);
 
@@ -154,41 +177,19 @@ public class Recharge
         }
     }
 
-    public static string GetRechargeName(string orderId)
+    static string GetRechargeName(string chan, string orderId)
     {
-        var url = RechargeHost + orderId;
-        try
+        string name = null;
+        if (chan.Contains("四方"))
         {
-            string name = Cache.GetRecharge(orderId);
-            if (!string.IsNullOrEmpty(name))
-            {
-                return name;
-            }
-
-            HttpClient client = new HttpClient();
-            var task = client.GetStringAsync(url);
-            var content = task.Result;
-            //content = "{ \"userId\": \"1591389834\", \"name\":\"df\", \"orderId\": \"AD7evE7ANDpuXzL2\", \"orderNo\": \"OR1676436469554825\", \"passageNo\": \"\", \"amount\": 300000, \"realAmount\": 300000, \"status\": 2, \"duplicate\": 0, \"createTime\": 1676436469, \"finishTime\": 1676437144, \"callbackStatus\": 5, \"callbackTime\": 1676437144, \"passageName\": \"\\u5361\\u5361\", \"orderTypeName\": \"\\u94f6\\u8054\"}";
-            int index = content.IndexOf("\"name\"");
-            if (index > 0)
-            {
-                int start = content.IndexOf("\"", index + 6, 16);
-                int end = content.IndexOf("\"", start + 1, 64);
-                name = content.Substring(start + 1, end - start - 1);
-                if (!string.IsNullOrEmpty(name))
-                {
-                    name = System.Text.RegularExpressions.Regex.Unescape(name);
-                }
-
-                Cache.SaveRecharge(orderId, name);
-                return name;
-            }
+            name = SiFangPay.GetPayer(orderId);
         }
-        catch
+        else if (chan.Contains("飞天"))
         {
+            name = FeiTianPay.GetPayer(orderId);
         }
 
-        return string.Empty;
+        return name;
     }
 }
 

@@ -230,7 +230,7 @@ public class Funding
         decimal total = 0;
         foreach (var r in RechargeLog)
         {
-            if (string.IsNullOrEmpty(r.Depositor) || r.Depositor == name)
+            if (string.IsNullOrEmpty(r.Payer) || r.Payer == name)
             {
                 total += r.RechargeAmount;
             }
@@ -245,7 +245,7 @@ public class Funding
         decimal total = 0;
         foreach (var r in RechargeLog)
         {
-            if ((!string.IsNullOrEmpty(r.Depositor)) && r.Depositor != name)
+            if ((!string.IsNullOrEmpty(r.Payer)) && r.Payer != name)
             {
                 total += r.RechargeAmount;
             }
@@ -297,9 +297,9 @@ public class Funding
     {
         foreach (var r in RechargeLog)
         {
-            if ((!string.IsNullOrEmpty(r.Depositor)) && (r.Depositor != name))
+            if ((!string.IsNullOrEmpty(r.Payer)) && (r.Payer != name))
             {
-                return r.Depositor;
+                return r.Payer;
             }
         }
 
@@ -312,16 +312,16 @@ public class Funding
         Dictionary<string, decimal> names = new Dictionary<string, decimal>();
         foreach (var r in RechargeLog)
         {
-            if ((!string.IsNullOrEmpty(r.Depositor)) && (r.Depositor != name))
+            if ((!string.IsNullOrEmpty(r.Payer)) && (r.Payer != name))
             {
                 decimal t;
-                if (names.TryGetValue(r.Depositor, out t))
+                if (names.TryGetValue(r.Payer, out t))
                 {
-                    names[r.Depositor] = t + r.RechargeAmount;
+                    names[r.Payer] = t + r.RechargeAmount;
                 }
                 else
                 {
-                    names.Add(r.Depositor, r.RechargeAmount);
+                    names.Add(r.Payer, r.RechargeAmount);
                 }
             }
         }

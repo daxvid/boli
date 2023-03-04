@@ -8,7 +8,9 @@ class Program
     {
         AppConfig cnf = AppConfig.FromYamlFile("app.yaml");
         AuthConfig authCnf = AuthConfig.FromYamlFile("auth.yaml");
-        Recharge.RechargeHost = authCnf.RechargeHost;
+        SiFangPay.Host = authCnf.SiFangHost;
+        FeiTianPay.Cnf = authCnf.FeiTian;
+        
         TelegramBot.Instance.Run(authCnf);
 
         while (true)

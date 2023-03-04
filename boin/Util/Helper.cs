@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -150,8 +152,8 @@ public class Helper
         decimal r = decimal.Parse(txt);
         return r;
     }
-    
-    public static decimal ReadDecimalOrDefault(IWebElement e, decimal def=0)
+
+    public static decimal ReadDecimalOrDefault(IWebElement e, decimal def = 0)
     {
         var txt = ReadString(e);
         decimal r;
@@ -159,6 +161,7 @@ public class Helper
         {
             r = def;
         }
+
         return r;
     }
 
@@ -200,11 +203,14 @@ public class Helper
 
         return now;
     }
-    
-    static readonly List<char> hexSet = new List<char>() 
-        { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f' };  
+
+    static readonly List<char> hexSet = new List<char>()
+    {
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'
+    };
+
     // 判断十六进制字符串hex是否正确
-    public static bool IsHexadecimal(string hex) 
+    public static bool IsHexadecimal(string hex)
     {
         foreach (char item in hex)
         {
@@ -213,9 +219,10 @@ public class Helper
                 return false;
             }
         }
+
         return true;
     }
-    
+
 
     public static void SendMsg(string msg)
     {
@@ -232,7 +239,7 @@ public class Helper
         TelegramBot.SendMsg(s);
         TelegramBot.SendMsg(t);
     }
-    
+
     public static void TakeScreenshot(ChromeDriver driver, Exception e)
     {
         string dir = Path.Join(Environment.CurrentDirectory, "log");
@@ -250,14 +257,15 @@ public class Helper
             }
             else
             {
-                File.WriteAllLines(Path.Join(dir, t + ".txt"),  new string[]{ e.ToString(), e.StackTrace });
+                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { e.ToString(), e.StackTrace });
             }
         }
+
         ITakesScreenshot ssdriver = driver as ITakesScreenshot;
         Screenshot screenshot = ssdriver.GetScreenshot();
         screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
     }
-    
+
 
     public static T SafeExec<T>(ChromeDriver driver, Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
     {
@@ -287,13 +295,13 @@ public class Helper
             catch (SystemException e)
             {
                 ex = e;
-                TakeScreenshot(driver,e);
+                TakeScreenshot(driver, e);
                 Log.Info(e);
             }
             catch (Exception e)
             {
                 ex = e;
-                TakeScreenshot(driver,e);
+                TakeScreenshot(driver, e);
                 SendMsg(e);
                 throw;
             }
@@ -302,6 +310,32 @@ public class Helper
         }
 
         throw ex;
+    }
+
+    public static string EncryptMD5(string s)
+    {
+        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+        return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s)));
+    }
+
+    public static string GetJsonValue(string key, string content)
+    {
+        string keyName = "\"" + key + "\"";
+        int index = content.IndexOf(keyName);
+        if (index > 0)
+        {
+            var i = index + keyName.Length;
+            int start = content.IndexOf("\"", i, content.Length - i);
+            i = start + 1;
+            int end = content.IndexOf("\"", i, content.Length - i);
+            var name = content.Substring(start + 1, end - start - 1);
+            if (!string.IsNullOrEmpty(name))
+            {
+                name = System.Text.RegularExpressions.Regex.Unescape(name);
+            }
+            return name;
+        }
+        return null;
     }
 }
 

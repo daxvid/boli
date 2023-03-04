@@ -46,7 +46,7 @@ public class ReviewPage : PageBase
         return true;
     }
     bool Review()
-    {
+    { 
         // 支付商家内容（飞天代付）
         // /html/body/div[7]/div[2]/div/  div/div[3]/div/div[1]/span[2]/div/div[1]/div/span
         var hitPath = "./div[3]/div/div[1]/span[2]/div/div[1]/div/span";
@@ -81,21 +81,22 @@ public class ReviewPage : PageBase
 
             return false;
         }
-
     }
-    bool Reject()
+
+    void setReason(string reason)
     {
-        var reason = order.RejectReason;
         // 设置备注内容
         // <input autocomplete="off" spellcheck="false" type="text" placeholder="请输入备注" class="ivu-input ivu-input-default">
         // /html/body/div[47]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[5]/div/input
-        var remarkPath = "./div[2]/div/div[2]/div/div[3]/div[5]/div/input";
-        SetTextElementByXPath(mainTable, remarkPath, reason);
+        // /html/body/div[07]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[4]/div/input
+         var remarkPath = "./div[2]/div/div[2]/div/div[3]/div/div/input[@type='text' and @placeholder='请输入备注']";
+         SetTextElementByXPath(mainTable, remarkPath, reason);
         
         // 修改按钮
         // <span>修改</span>
         // /html/body/div[47]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[5]/button/span
-        FindAndClickByXPath(mainTable, "./div[2]/div/div[2]/div/div[3]/div[5]/button/span[text()='修改']",10);
+        // /html/body/div[07]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[4]/button/span
+        FindAndClickByXPath(mainTable, "./div[2]/div/div[2]/div/div[3]/div/button/span[text()='修改']",10);
 
         // 修改确认框
         // /html/body/div[64]/div[2]/div/div/div/div/div[2]/div <div>确定修改备注？</div>
@@ -104,7 +105,21 @@ public class ReviewPage : PageBase
         var confirmPath = ".//div[@class='ivu-modal-confirm-body']/div[starts-with(text(),'确定修改备注')]/../../" +
                           "div[3]/button[2]/span[text()='确定']";
         FindAndClickByXPath(confirmPath, 100);
-        
+    }
+    
+    bool Reject()
+    {
+        var reason = order.RejectReason;
+        try
+        {
+            setReason(reason);
+        }
+        catch(Exception err)
+        {
+            Helper.TakeScreenshot(driver, err);
+            Console.WriteLine(err);
+        }
+
         // 拒绝按钮
         // <span>拒绝</span>
         // /html/body/div[47]/div[2]/div/  div/div[3]/div/div[2]/div[2]/button[1]/span
