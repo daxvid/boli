@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 using boin.Util;
 using OpenQA.Selenium;
 
@@ -351,6 +352,23 @@ public class Funding
         }
 
         return new Tuple<decimal, int>(total, count);
+    }
+
+    // 是否存在指定的渠道充值
+    public bool ExistsChan(string chan)
+    {
+        foreach (var r in RechargeLog)
+        {
+            if (string.IsNullOrEmpty(r.Payer))
+            {
+                if (r.RechargeChannel.Contains(chan))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
 

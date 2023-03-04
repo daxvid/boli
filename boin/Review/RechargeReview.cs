@@ -18,6 +18,13 @@ public class RechargeReview : IReviewUser
         Order order = user.Order;
         List<ReviewResult> rs = new List<ReviewResult>();
         var f = user.Funding;
+
+        if (f.ExistsChan("卡卡"))
+        {
+            rs.Add(new ReviewResult { Code = 201, Msg = "@卡卡人工:" + order.Payee });
+            return new ReadOnlyCollection<ReviewResult>(rs);;
+        }
+        
         if (order.Way == "银行卡")
         {
             // 检查银行卡姓名充值是否一致
