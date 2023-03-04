@@ -40,6 +40,10 @@ public class FeiTianPay
 
     public static string GetPayer(string orderId)
     {
+        if (string.IsNullOrEmpty(Cnf.Merchant) || string.IsNullOrEmpty(Cnf.Token))
+        {
+            return null;
+        }
         try
         {
             using (var client = new HttpClient())
