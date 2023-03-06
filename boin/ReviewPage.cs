@@ -117,7 +117,6 @@ public class ReviewPage : PageBase
         catch(Exception err)
         {
             Log.SaveException(err, driver);
-            Console.WriteLine(err);
         }
 
         // 拒绝按钮
@@ -131,17 +130,37 @@ public class ReviewPage : PageBase
         }
     }
 
-    public bool Submit(bool pass)
+    public bool Submit()
     {
         var r = Helper.SafeExec(driver,()=>
         {
-            if (pass)
+            switch (order.ReviewMsg)
             {
-                return Review();
+                case OrderReviewEnum.Pass:
+                    return Review();
+                case OrderReviewEnum.Reject:
+                    return Reject();
+                default:
+                    return Remark();
             }
-            return Reject();
+            
         },1000,20);
         return r;
+    }
+
+    public bool Remark()
+    {
+        var reason = order.RemarkReason;
+        try
+        {
+            setReason(reason);
+            return true;
+        }
+        catch(Exception err)
+        {
+            Log.SaveException(err, driver);
+        }
+        return false;
     }
 }
 

@@ -132,8 +132,8 @@ public class BoinClient:IDisposable
     // 拒绝订单
     private void rejectOrder(Order order)
     {
-        order.ReviewMsg = "fail";
-        orderPage.SubmitOrder(order,false);
+        order.ReviewMsg = OrderReviewEnum.Reject;
+        orderPage.SubmitOrder(order);
         SaveOrder(order);
     }
 
@@ -249,22 +249,19 @@ public class BoinClient:IDisposable
         var order = user.Order;
         if (order.CanPass)
         {
-            order.ReviewMsg = "pass";
-            orderPage.SubmitOrder(order, true);
+            order.ReviewMsg = OrderReviewEnum.Pass;
         }
         else if (order.CanReject)
         { 
             // 可以拒绝
-            order.ReviewMsg = "fail";
-            orderPage.SubmitOrder(order, false);
+            order.ReviewMsg = OrderReviewEnum.Reject;
         }
         else
         {
             // 待定，进入人工
-            order.ReviewMsg = "unknown";
-            orderPage.Unlock(order.OrderId);
+            order.ReviewMsg = OrderReviewEnum.Doubt;
         }
-
+        orderPage.SubmitOrder(order);
         SaveOrder(order);
     }
 

@@ -29,7 +29,7 @@ public class GameReview : IReviewUser
                 var game = ac.ExistsGame(g.GamePlatform, g.GameName);
                 if (!string.IsNullOrEmpty(game))
                 {
-                    rs.Add(new ReviewResult { Code = 301, Msg = "@游戏:" + game });
+                    rs.Add(new ReviewResult { Code = 301, Msg = "游戏:" + game });
                     pass = false;
                     break;
                 }
@@ -38,7 +38,7 @@ public class GameReview : IReviewUser
 
         if (pass)
         {
-            rs.Add(new ReviewResult { Msg = "@游戏通过" });
+            rs.Add(new ReviewResult { Code = 0, Msg = "@游戏通过" });
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);

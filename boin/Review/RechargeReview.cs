@@ -21,10 +21,10 @@ public class RechargeReview : IReviewUser
 
         // if (f.ExistsChan("飞天"))
         // {
-        //     rs.Add(new ReviewResult { Code = 201, Msg = "@飞天人工:" + order.Payee });
+        //     rs.Add(new ReviewResult { Code = 201, Msg = 飞天人工:" + order.Payee });
         //     return new ReadOnlyCollection<ReviewResult>(rs);;
         // }
-        
+
         if (order.Way == "银行卡")
         {
             // 检查银行卡姓名充值是否一致
@@ -32,14 +32,14 @@ public class RechargeReview : IReviewUser
             if (t2 > 0)
             {
                 var name = f.FirstOtherRechargeName(order.Payee);
-                rs.Add(new ReviewResult { Code = 401, Msg = "@其它名字充值:" + name });
+                rs.Add(new ReviewResult { Code = 401, Msg = "其它名字充值:" + name });
             }
             else
             {
                 var t1 = f.TotalRechargeAmount(order.Payee);
                 if (t1 <= 0)
                 {
-                    rs.Add(new ReviewResult { Code = 402, Msg = "@最近无充值:" + order.Payee });
+                    rs.Add(new ReviewResult { Code = 402, Msg = "最近无充值:" + order.Payee });
                 }
                 else if (t1 < order.Amount)
                 {
@@ -60,7 +60,7 @@ public class RechargeReview : IReviewUser
             }
             else
             {
-                rs.Add(new ReviewResult { Code = 402, Msg = "@其它名字充值:" + name });
+                rs.Add(new ReviewResult { Code = 402, Msg = "其它名字充值:" + name });
             }
         }
 
@@ -92,11 +92,11 @@ public class RechargeReview : IReviewUser
             var pair = user.Funding.TotalRechargeByChannel(kv.Key, startTime);
             if (pair.Item1 > kv.Value[0])
             {
-                return new ReviewResult { Code = 400, Msg = "@" + kv.Key + kv.Value[0] + ":" + pair.Item1 };
+                return new ReviewResult { Code = 400, Msg = kv.Key + kv.Value[0] + ":" + pair.Item1 };
             }
             else if (pair.Item2 > kv.Value[1])
             {
-                return new ReviewResult { Code = 400, Msg = "@" + kv.Key + kv.Value[0] + ":" + pair.Item2 + "笔" };
+                return new ReviewResult { Code = 400, Msg = kv.Key + kv.Value[0] + ":" + pair.Item2 + "笔" };
             }
         }
 

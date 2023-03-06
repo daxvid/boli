@@ -71,7 +71,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔银行卡限制
             if (amount > max)
             {
-                return new ReviewResult { Code = 201, Msg = "@卡单笔限制" + max + ":" + amount };
+                return new ReviewResult { Code = 201, Msg = "卡单笔限制" + max + ":" + amount };
             }
 
         }
@@ -85,10 +85,10 @@ public class AmountReview : IReviewUser
         }
         else
         {
-            return new ReviewResult { Code = 203, Msg = "@未知的通道:" + way };
+            return new ReviewResult { Code = 203, Msg = "未知的通道:" + way };
         }
 
-        return new ReviewResult { Msg = "@单笔通过:" + amount };
+        return new ReviewResult { Code = 0, Msg = "@单笔通过:" + amount };
     }
 
     // 检查当日提现金额
@@ -100,7 +100,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔银行卡限制
             if (checkAmount > max)
             {
-                return new ReviewResult { Code = 201, Msg = "@卡当日限制" + max + ":" + checkAmount };
+                return new ReviewResult { Code = 201, Msg = "卡当日限制" + max + ":" + checkAmount };
             }
 
         }
@@ -114,10 +114,10 @@ public class AmountReview : IReviewUser
         }
         else
         {
-            return new ReviewResult { Code = -203, Msg = "@未知的通道:" + way };
+            return new ReviewResult { Code = -203, Msg = "未知的通道:" + way };
         }
 
-        return new ReviewResult { Msg = "@当日通过:" + checkAmount };
+        return new ReviewResult { Code = 0, Msg = "@当日通过:" + checkAmount };
     }
 
     // 检查当日充值金额
@@ -128,7 +128,7 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔银行卡限制
             if (amount > max)
             {
-                return new ReviewResult { Code = 401, Msg = "@卡提日充值限制" + max + ":" + amount };
+                return new ReviewResult { Code = 401, Msg = "卡提日充值限制" + max + ":" + amount };
             }
 
         }
@@ -137,15 +137,15 @@ public class AmountReview : IReviewUser
             // 检查老用户单笔波币限制
             if (amount > max)
             {
-                return new ReviewResult { Code = 402, Msg = "@币提日充值限制" + max + ":" + amount };
+                return new ReviewResult { Code = 402, Msg = "币提日充值限制" + max + ":" + amount };
             }
         }
         else
         {
-            return new ReviewResult { Code = -203, Msg = "@未知的通道:" + way };
+            return new ReviewResult { Code = -203, Msg = "未知的通道:" + way };
         }
 
-        return new ReviewResult { Msg = "@日充通过:" + amount };
+        return new ReviewResult { Code = 0, Msg = "@日充通过:" + amount };
     }
 
     // 检查如果玩了某种游戏，当日提现总额限制

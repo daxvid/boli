@@ -27,7 +27,7 @@ public class UserReview : IReviewUser
             if (user.Remark.Contains(key))
             {
                 return new ReadOnlyCollection<ReviewResult>(
-                    new List<ReviewResult>(){new ReviewResult { Code = 501, Msg = "@备注包含:" + key }});
+                    new List<ReviewResult>() { new ReviewResult { Code = 501, Msg = "备注包含:" + key } });
             }
         }
 

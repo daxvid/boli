@@ -175,7 +175,7 @@ public class OrderPage : LablePage
     }
 
     // 提交审核结果
-    public bool SubmitOrder(Order order, bool pass)
+    public bool SubmitOrder(Order order)
     {
         this.Open();
         string reviewBtn = makePath(order.OrderId) + "/button[1]/span[text()='审核']";
@@ -187,13 +187,13 @@ public class OrderPage : LablePage
                 FindAndClickByXPath(reviewBtn, 2000);
                 using (var vp = new ReviewPage(driver, cnf, order))
                 {
-                    return vp.Submit(pass);
+                    return vp.Submit();
                 }
             }, 1000, 10);
         }
         finally
         {
-            if (success == false)
+            if (success == false || (order.ReviewMsg == OrderReviewEnum.Doubt))
             {
                 Unlock(order.OrderId);
             }

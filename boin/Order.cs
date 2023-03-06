@@ -5,6 +5,14 @@ using boin.Util;
 
 namespace boin;
 
+public enum OrderReviewEnum
+{
+        None = 0,     // 未审核
+        Pass = 1,     // 审核通过
+        Reject = 2,   // 拒绝
+        Doubt = 3,    // 有疑问，需人工
+}
+
     // 提现订单
 public class Order : WithdrawExpand
 {
@@ -47,7 +55,8 @@ public class Order : WithdrawExpand
     // 订单状态
     public string Status { get; set; } = string.Empty;
 
-    public string ReviewMsg { get; set; } = string.Empty;
+    public OrderReviewEnum ReviewMsg { get; set; }
+    
     public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
     public GameBind Bind { get; set; }
@@ -116,10 +125,34 @@ public class Order : WithdrawExpand
         }
     }
 
+    public string RemarkReason
+    {
+        get
+        {
+            var msg = string.Empty;
+            if (ReviewResult != null)
+            {
+                foreach (var r in ReviewResult)
+                {
+                    if (r.Code > 0)
+                    {
+                        if (msg.Length > 0)
+                        {
+                            msg += ";";
+                        }
+
+                        msg += r.Msg;
+                    }
+                }
+            }
+            return msg;
+        }
+    }
+
     public string ReviewNote()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.Append(OrderId).Append(":").AppendLine(ReviewMsg);
+        sb.Append(OrderId).Append(":").AppendLine(ReviewMsg.ToString());
         sb.Append("game:").AppendLine(this.GameId);
         if (ReviewResult != null)
         {

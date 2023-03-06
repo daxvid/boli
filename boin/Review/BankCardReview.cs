@@ -28,7 +28,7 @@ public class BankCardReview : IReviewInterface
         }
         else
         {
-            rs.Add(new ReviewResult { Code = -103, Msg = "@未知的通道:" + order.Way });
+            rs.Add(new ReviewResult { Code = -103, Msg = "未知的通道:" + order.Way });
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);
@@ -46,19 +46,19 @@ public class BankCardReview : IReviewInterface
         // 银行卡状态。值：ok，no。
         if (!bankInfo.stat.Equals("ok"))
         {
-            return new ReviewResult { Code = -101, Msg = "@卡不可用" + order.CardNo };
+            return new ReviewResult { Code = -101, Msg = "卡不可用" + order.CardNo };
         }
         // 有效性，是否正确有效。值：true为是，false为否。
         else if (!bankInfo.validated)
         {
-            return new ReviewResult { Code = -102, Msg = "@卡不正确:" + order.CardNo };
+            return new ReviewResult { Code = -102, Msg = "卡不正确:" + order.CardNo };
         }
         else
         {
             var name = bankInfo.CardTypeName;
             if (string.IsNullOrEmpty(name) || name == "未知卡")
             {
-                return new ReviewResult { Code = 101, Msg = "@卡需验证:" + order.CardNo };
+                return new ReviewResult { Code = 101, Msg = "卡需验证:" + order.CardNo };
             }
             else
             {

@@ -30,22 +30,22 @@ public class WithdrwReview : IReviewUser
         {
             if (nearName == order.Payee || string.IsNullOrEmpty(nearName))
             {
-                rs.Add(new ReviewResult { Msg = "@名字通过:" + order.Payee });
+                rs.Add(new ReviewResult { Code = 0, Msg = "@名字通过:" + order.Payee });
             }
             else
             {
-                rs.Add(new ReviewResult { Code = 200, Msg = "@名字不同:" + nearName });
+                rs.Add(new ReviewResult { Code = 200, Msg = "名字不同:" + nearName });
             }
         }
         else if (order.Way == "数字钱包")
         {
             if (string.IsNullOrEmpty(nearName))
             {
-                rs.Add(new ReviewResult { Code = 201, Msg = "@首笔人工:" + order.Payee });
+                rs.Add(new ReviewResult { Code = 201, Msg = "首笔人工:" + order.Payee });
             }
             else if (nearName != order.Payee)
             {
-                rs.Add(new ReviewResult { Code = 202, Msg = "@名字不同:" + nearName });
+                rs.Add(new ReviewResult { Code = 202, Msg = "名字不同:" + nearName });
             }
             else
             {
@@ -53,7 +53,7 @@ public class WithdrwReview : IReviewUser
                 var countBobi = user.Funding.NearBobiCount(order.OrderId, ReviewConfig.Cnf.NearWithdrawCount);
                 if (countBobi > ReviewConfig.Cnf.BobiMaxCount)
                 {
-                    rs.Add(new ReviewResult { Code = -402, Msg = "请使用银行卡，否则不给予提现"});
+                    rs.Add(new ReviewResult { Code = -402, Msg = "请使用银行卡，否则不给予提现" });
                 }
             }
         }
@@ -61,7 +61,7 @@ public class WithdrwReview : IReviewUser
         var nearPass = user.Funding.NearPass(order.OrderId);
         if (!nearPass)
         {
-            rs.Add(new ReviewResult { Code = 201, Msg = "@上一单未成功" });
+            rs.Add(new ReviewResult { Code = 201, Msg = "上一单未成功" });
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);

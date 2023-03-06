@@ -68,4 +68,4 @@ RechargeChannel:
     客单充值(不能删): [2000,3]
     
 #备注中包含以下关键字，暂时不审核
-RemarkKeys: [冻结, 排查]
+RemarkKeys: [冻结,排查,限额]
