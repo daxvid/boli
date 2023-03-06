@@ -240,31 +240,7 @@ public class Helper
         TelegramBot.SendMsg(t);
     }
 
-    public static void TakeScreenshot(ChromeDriver driver, Exception e)
-    {
-        string dir = Path.Join(Environment.CurrentDirectory, "log");
-        if (!Path.Exists(dir))
-        {
-            Directory.CreateDirectory(dir);
-        }
-
-        string t = DateTime.Now.ToString("yyMMddHHmmssfff");
-        if (e != null)
-        {
-            if (e is WebDriverException)
-            {
-                File.WriteAllText(Path.Join(dir, t + ".txt"), e.ToString());
-            }
-            else
-            {
-                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { e.ToString(), e.StackTrace });
-            }
-        }
-
-        ITakesScreenshot ssdriver = driver as ITakesScreenshot;
-        Screenshot screenshot = ssdriver.GetScreenshot();
-        screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
-    }
+    // TakeScreenshot
 
 
     public static T SafeExec<T>(ChromeDriver driver, Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
@@ -279,7 +255,7 @@ public class Helper
             catch (WebDriverException e)
             {
                 ex = e;
-                TakeScreenshot(driver, e);
+                Log.SaveException(e, driver);
                 if (e is InvalidElementStateException ||
                     e is NotFoundException ||
                     e is WebDriverTimeoutException)
@@ -295,13 +271,13 @@ public class Helper
             catch (SystemException e)
             {
                 ex = e;
-                TakeScreenshot(driver, e);
+                Log.SaveException(e, driver);
                 Log.Info(e);
             }
             catch (Exception e)
             {
                 ex = e;
-                TakeScreenshot(driver, e);
+                Log.SaveException(e, driver);
                 SendMsg(e);
                 throw;
             }
@@ -315,7 +291,7 @@ public class Helper
     public static string EncryptMD5(string s)
     {
         MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-        return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s)));
+        return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s))).Replace("-","");
     }
 
     public static string GetJsonValue(string key, string content)

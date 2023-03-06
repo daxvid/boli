@@ -116,7 +116,7 @@ public class ReviewPage : PageBase
         }
         catch(Exception err)
         {
-            Helper.TakeScreenshot(driver, err);
+            Log.SaveException(err, driver);
             Console.WriteLine(err);
         }
 

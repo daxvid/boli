@@ -351,11 +351,6 @@ namespace boin
             return true;
         }
 
-        public void TakeScreenshot(Exception e)
-        {
-            Helper.TakeScreenshot(driver,e);
-        }
-
     }
 }
 

@@ -33,11 +33,55 @@ namespace boin.Util;
 //     "createTime": "2022-09-03 21:15:09", "finishTime": "2023-02-22 18:10:49",
 //     "callbackStatus": null, "callbackTime": null}]}
 
+//
+// {"code": 200, "msg": "", "data": [
+// {
+// "orderId": 32589758,
+// "orderNo": "OR1678071601686248",
+// "userId": "674157546",
+// "realName": "\u8042\u5146\u5764",
+// "orderType": 3,
+// "amount": 500000,
+// "realAmount": 500000,
+// "status": 2,
+// "duplicate": false,
+// "createTime": "2023-03-06 11:00:06",
+// "finishTime": "2023-03-06 11:01:26",
+// "callbackStatus": 5,
+// "callbackTime": "2023-03-06 11:01:26"}]}
+
+
+public class FeiTianOrder
+{
+    public int orderId;
+    public string orderNo;
+    public string userId;
+    public string realName;
+    public int orderType;
+    public decimal amount;
+    public decimal realAmount;
+    public int status;
+    public bool duplicate;
+    public string createTime;
+    public string finishTime;
+    public int callbackStatus;
+    public string callbackTime;
+}
+
+public class FeiTianResult
+{
+    public int code;
+    public string msg;
+    public FeiTianOrder[] data;
+}
+
+
 // 飞天查询
 public class FeiTianPay
 {
     public static FeiTianConfig Cnf;
 
+    // OR1678071601686248
     public static string GetPayer(string orderId)
     {
         if (string.IsNullOrEmpty(Cnf.Merchant) || string.IsNullOrEmpty(Cnf.Token))
@@ -49,14 +93,13 @@ public class FeiTianPay
             using (var client = new HttpClient())
             {
                 // client.DefaultRequestHeaders.Accept.Add(
-                //     new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded; charset=UTF-8")); 
+                //     new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded;charset=UTF-8")); 
                 // client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
                 // client.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
                 // client.DefaultRequestHeaders.Add("X-MicrosoftAjax", "Delta=true");
                 // client.DefaultRequestHeaders.Add("Accept", "*/*");
                 // client.Timeout = TimeSpan.FromMilliseconds(10000);
-                
-                client.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+                // client.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
 
                 const string orderType = "1";
                 var timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
@@ -77,13 +120,14 @@ public class FeiTianPay
                 if (res.IsSuccessStatusCode)
                 {
                     var content = res.Content.ReadAsStringAsync().Result;
-                    var name = Helper.GetJsonValue("name", content);
+                    var name = Helper.GetJsonValue("realName", content);
                     return name;
                 }
             }
         }
-        catch
+        catch(Exception err)
         {
+           Log.SaveException(err);
         }
         return null;
     }

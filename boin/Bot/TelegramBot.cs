@@ -1,4 +1,5 @@
 ﻿using System;
+using boin.Util;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.AvailableTypes;
@@ -43,17 +44,18 @@ public class TelegramBot
                 {
                     update(client);
                 }
-                catch
+                catch(Exception err)
                 {
+                    Log.SaveException(err);
                     try
                     {
+                        client.Close();
+                        Thread.Sleep(10000);
                         client = new BotClient(cnf.BotToken);
                         this.api = client;
-                        SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
+                        //SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
                     }
-                    catch
-                    {
-                    }
+                    catch{}
                 }
             }
         });
@@ -87,16 +89,19 @@ public class TelegramBot
             else
             {
                 updates = client.GetUpdates();
-                Thread.Sleep(10);
+                Thread.Sleep(1000);
             }
         }
     }
 
-    public void SendMessage(string msg)
+    void SendMessage(string msg)
     {
-        foreach (var charId in cnf.ChatIds)
+        lock (api)
         {
-            api.SendMessage(charId, msg);
+            foreach (var charId in cnf.ChatIds)
+            {
+                api.SendMessage(charId, msg);
+            }
         }
     }
 

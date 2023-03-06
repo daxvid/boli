@@ -10,7 +10,7 @@ class Program
         AuthConfig authCnf = AuthConfig.FromYamlFile("auth.yaml");
         SiFangPay.Host = authCnf.SiFangHost;
         FeiTianPay.Cnf = authCnf.FeiTian;
-        
+
         TelegramBot.Instance.Run(authCnf);
 
         while (true)
@@ -25,7 +25,7 @@ class Program
                 {
                     try
                     {
-                        Helper.TakeScreenshot(client.driver ,err);
+                        Log.SaveException(err, client.driver);
                         Helper.SendMsg(err);
                     }
                     catch

@@ -19,11 +19,11 @@ public class RechargeReview : IReviewUser
         List<ReviewResult> rs = new List<ReviewResult>();
         var f = user.Funding;
 
-        if (f.ExistsChan("卡卡"))
-        {
-            rs.Add(new ReviewResult { Code = 201, Msg = "@卡卡人工:" + order.Payee });
-            return new ReadOnlyCollection<ReviewResult>(rs);;
-        }
+        // if (f.ExistsChan("飞天"))
+        // {
+        //     rs.Add(new ReviewResult { Code = 201, Msg = "@飞天人工:" + order.Payee });
+        //     return new ReadOnlyCollection<ReviewResult>(rs);;
+        // }
         
         if (order.Way == "银行卡")
         {
@@ -60,7 +60,7 @@ public class RechargeReview : IReviewUser
             }
             else
             {
-                rs.Add(new ReviewResult { Code = -402, Msg = "@其它名字充值:" + name });
+                rs.Add(new ReviewResult { Code = 402, Msg = "@其它名字充值:" + name });
             }
         }
 
