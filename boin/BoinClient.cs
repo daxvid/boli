@@ -121,20 +121,13 @@ public class BoinClient:IDisposable
         reviewer.Review(order);
         if (order.CanReject)
         {
-            rejectOrder(order);
+            order.ReviewMsg = OrderReviewEnum.Reject;
+            SaveOrder(order);
             return;
         }
 
         var user = LoadUser(order);
         ReviewUser(user);
-    }
-
-    // 拒绝订单
-    private void rejectOrder(Order order)
-    {
-        order.ReviewMsg = OrderReviewEnum.Reject;
-        orderPage.SubmitOrder(order);
-        SaveOrder(order);
     }
 
     private static void waitOrders(List<Order> orders)
@@ -261,12 +254,12 @@ public class BoinClient:IDisposable
             // 待定，进入人工
             order.ReviewMsg = OrderReviewEnum.Doubt;
         }
-        orderPage.SubmitOrder(order);
         SaveOrder(order);
     }
 
     void SaveOrder(Order order)
     {
+        orderPage.SubmitOrder(order);
         var msg = order.ReviewNote();
         Cache.SaveOrder(order.OrderId, msg);
         order.Processed = true;
