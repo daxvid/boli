@@ -25,7 +25,7 @@ public class BoinClient:IDisposable
         this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
         this.driver = newDriver(cnf.Headless);
-        Cache.Init(authCnf.Redis);
+        Cache.Init(authCnf.Redis, authCnf.Platform);
     }
 
     public void Dispose()

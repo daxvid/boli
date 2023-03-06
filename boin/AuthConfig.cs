@@ -33,6 +33,9 @@ public class AuthConfig
     // redis连接
     public string Redis { get; set; }
     
+    // # my=meiying, yr=yiren 
+    public string Platform { get; set; }
+    
     public static AuthConfig FromYamlFile(string path)
     {
         string yml = File.ReadAllText(path);
