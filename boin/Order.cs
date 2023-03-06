@@ -125,18 +125,18 @@ public class Order : WithdrawExpand
         }
     }
 
-    public string RemarkReason
+    public string DoubtReason
     {
         get
         {
-            var msg = string.Empty;
+            var msg = "@";
             if (ReviewResult != null)
             {
                 foreach (var r in ReviewResult)
                 {
                     if (r.Code > 0)
                     {
-                        if (msg.Length > 0)
+                        if (msg.Length > 1)
                         {
                             msg += ";";
                         }
@@ -145,6 +145,7 @@ public class Order : WithdrawExpand
                     }
                 }
             }
+
             return msg;
         }
     }

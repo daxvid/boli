@@ -141,16 +141,17 @@ public class ReviewPage : PageBase
                 case OrderReviewEnum.Reject:
                     return Reject();
                 default:
-                    return Remark();
+                    return Doubt();
             }
             
         },1000,20);
         return r;
     }
 
-    public bool Remark()
+    // 有疑问的订单设置备注即可
+    public bool Doubt()
     {
-        var reason = order.RemarkReason;
+        var reason = order.DoubtReason;
         try
         {
             setReason(reason);
