@@ -169,20 +169,20 @@ public class Funding
         return true;
     }
 
-    // 最近提现的名字
-    public string NearBankName(string orderId, string way, string cardNo)
+    // 最近成功提现的订单
+    public Withdraw NearSuccessWithdraw(string orderId, string way, string cardNo)
     {
         foreach (var w in WithdrawLog)
         {
             if (w.OrderId != orderId)
             {
-                if ((w.Way == way || w.CardNo == cardNo) && w.Transfer == "成功" && (!string.IsNullOrEmpty(w.Payee)))
+                if ((w.Way == way || w.CardNo == cardNo) && w.Transfer == "成功")
                 {
-                    return w.Payee;
+                    return w;
                 }
             }
         }
-        return string.Empty;
+        return null;
     }
 
     // 最近的单是否成功

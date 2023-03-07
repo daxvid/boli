@@ -25,27 +25,27 @@ public class WithdrwReview : IReviewUser
         Order order = user.Order;
         List<ReviewResult> rs = new List<ReviewResult>();
         //最新两笔提款名字不一致-不可以通过
-        var nearName = user.Funding.NearBankName(order.OrderId, order.Way, order.CardNo);
+        var nearWithdraw = user.Funding.NearSuccessWithdraw(order.OrderId, order.Way, order.CardNo);
         if (order.Way == "银行卡")
         {
-            if (nearName == order.Payee || string.IsNullOrEmpty(nearName))
+            if (nearWithdraw != null && nearWithdraw.Payee != order.Payee)
             {
-                rs.Add(new ReviewResult { Code = 0, Msg = "@名字通过:" + order.Payee });
+                rs.Add(new ReviewResult { Code = 200, Msg = "名字不同:" + nearWithdraw.Payee });
             }
             else
             {
-                rs.Add(new ReviewResult { Code = 200, Msg = "名字不同:" + nearName });
+                rs.Add(new ReviewResult { Code = 0, Msg = "@名字通过:" + order.Payee });
             }
         }
         else if (order.Way == "数字钱包")
         {
-            if (string.IsNullOrEmpty(nearName))
+            if (nearWithdraw == null)
             {
                 rs.Add(new ReviewResult { Code = 201, Msg = "首笔人工:" + order.Payee });
             }
-            else if (nearName != order.Payee)
+            else if (nearWithdraw.CardNo != order.CardNo)
             {
-                rs.Add(new ReviewResult { Code = 202, Msg = "名字不同:" + nearName });
+                rs.Add(new ReviewResult { Code = 202, Msg = "钱包不同:" + nearWithdraw.CardNo });
             }
             else
             {
