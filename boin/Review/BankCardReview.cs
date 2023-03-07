@@ -19,11 +19,6 @@ public class BankCardReview : IReviewInterface
     {
         List<ReviewResult> rs = new List<ReviewResult>();
 
-        if (!IsChineseName(order.Payee))
-        {
-            rs.Add(new ReviewResult { Code = 103, Msg = "姓名格式可疑"});
-        }
-        
         if (order.Way == "银行卡")
         {
             rs.Add(ReviewBank(order));
@@ -35,6 +30,11 @@ public class BankCardReview : IReviewInterface
         else
         {
             rs.Add(new ReviewResult { Code = -103, Msg = "未知的通道:" + order.Way });
+        }
+
+        if (!IsChineseName(order.Payee))
+        {
+            rs.Add(new ReviewResult { Code = 103, Msg = "姓名格式可疑" });
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);
