@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-
+using System.Globalization;
 using boin.Util;
 
 namespace boin.Review;
@@ -32,7 +32,7 @@ public class BankCardReview : IReviewInterface
             rs.Add(new ReviewResult { Code = -103, Msg = "未知的通道:" + order.Way });
         }
 
-        if (!IsChineseName(order.Payee))
+        if ((!string.IsNullOrEmpty(order.Payee)) && (!IsChineseName(order.Payee)))
         {
             rs.Add(new ReviewResult { Code = 103, Msg = "姓名格式可疑" });
         }
