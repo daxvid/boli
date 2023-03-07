@@ -25,7 +25,7 @@ public class WithdrwReview : IReviewUser
         Order order = user.Order;
         List<ReviewResult> rs = new List<ReviewResult>();
         //最新两笔提款名字不一致-不可以通过
-        var nearName = user.Funding.NearBankName(order.OrderId, order.Way);
+        var nearName = user.Funding.NearBankName(order.OrderId, order.Way, order.CardNo);
         if (order.Way == "银行卡")
         {
             if (nearName == order.Payee || string.IsNullOrEmpty(nearName))

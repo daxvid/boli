@@ -170,19 +170,18 @@ public class Funding
     }
 
     // 最近提现的名字
-    public string NearBankName(string orderId, string way)
+    public string NearBankName(string orderId, string way, string cardNo)
     {
         foreach (var w in WithdrawLog)
         {
             if (w.OrderId != orderId)
             {
-                if (w.Way == way && w.Transfer == "成功" && (!string.IsNullOrEmpty(w.Payee)) )
+                if ((w.Way == way || w.CardNo == cardNo) && w.Transfer == "成功" && (!string.IsNullOrEmpty(w.Payee)))
                 {
                     return w.Payee;
                 }
             }
         }
-
         return string.Empty;
     }
 

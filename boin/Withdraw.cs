@@ -24,7 +24,7 @@ public class Withdraw : WithdrawExpand
     // 提现金额
     public decimal Amount { get; set; } = 0;
 
-    // 通道
+    // 通道(银行卡/数字钱包/未知=数字钱包)
     public string Way { get; set; } = string.Empty;
 
     // 审核状态(待审核/已通过/已拒绝)
@@ -76,6 +76,10 @@ public class Withdraw : WithdrawExpand
             order.NickName = Helper.ReadString(ts[5]); // 用户昵称
             order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
             order.Way = Helper.ReadString(ts[7]); // 通道
+            if (order.Way == "未知")
+            {
+                order.Way = "数字钱包";
+            }
             order.Review = Helper.ReadString(ts[8]); // 状态
             order.Transfer = Helper.ReadString(ts[9]); // 转账
             order.Operating = Helper.ReadString(ts[10]); // 操作类型

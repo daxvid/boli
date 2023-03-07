@@ -98,7 +98,7 @@ public class UserPage : LablePage
 
     private bool readUserInfo(User user, int i)
     {
-        Console.WriteLine("AppID:" + user.AppId + "; GameId:" + user.GameId);
+        Console.WriteLine("AppId:" + user.AppId + "; GameId:" + user.GameId);
         Int64 gid;
         if (Int64.TryParse(user.GameId, out gid))
         {

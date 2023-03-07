@@ -18,6 +18,12 @@ public class BankCardReview : IReviewInterface
     public ReadOnlyCollection<ReviewResult> Review(Order order)
     {
         List<ReviewResult> rs = new List<ReviewResult>();
+
+        if (!IsChineseName(order.Payee))
+        {
+            rs.Add(new ReviewResult { Code = 103, Msg = "姓名格式可疑"});
+        }
+        
         if (order.Way == "银行卡")
         {
             rs.Add(ReviewBank(order));
@@ -32,6 +38,23 @@ public class BankCardReview : IReviewInterface
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);
+    }
+
+    private bool IsChineseName(string name)
+    {
+        if (name.Length < 2)
+        {
+            return false;
+        }
+        foreach (var n in name)
+        {
+            // [\u4e00-\u9fcb]
+            if (n != '.' && (n < '\u4E00' || n > '\u9FCB'))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private ReviewResult ReviewBank(Order order)
