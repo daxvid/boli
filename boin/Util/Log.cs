@@ -19,6 +19,7 @@ public class Log
     
     public static void SaveException(Exception e, ChromeDriver driver= null)
     {
+        var msg = e.ToString();
         string dir = Path.Join(Environment.CurrentDirectory, "log");
         if (!Path.Exists(dir))
         {
@@ -30,11 +31,15 @@ public class Log
         {
             if (e is WebDriverException)
             {
-                File.WriteAllText(Path.Join(dir, t + ".txt"), e.ToString());
+                Console.WriteLine(msg);
+                File.WriteAllText(Path.Join(dir, t + ".txt"), msg);
             }
             else
             {
-                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { e.ToString(), e.StackTrace });
+                var st = e.StackTrace;
+                Console.WriteLine(msg);
+                Console.WriteLine(st);
+                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { msg, st});
             }
         }
 

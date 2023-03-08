@@ -55,11 +55,7 @@ public class BoinClient:IDisposable
     {
         Helper.SendMsg(msg);
     }
-
-    public void SendMsg(Exception err)
-    {
-        Helper.SendMsg(err);
-    }
+    
     
     void initPage()
     {

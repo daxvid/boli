@@ -230,19 +230,6 @@ public class Helper
         TelegramBot.SendMsg(msg);
     }
 
-    public static void SendMsg(Exception err)
-    {
-        var s = err.ToString();
-        var t = err.StackTrace;
-        Console.WriteLine(s);
-        Console.WriteLine(t);
-        TelegramBot.SendMsg(s);
-        TelegramBot.SendMsg(t);
-    }
-
-    // TakeScreenshot
-
-
     public static T SafeExec<T>(ChromeDriver driver, Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
     {
         Exception ex = null;
@@ -264,7 +251,7 @@ public class Helper
                 }
                 else
                 {
-                    SendMsg(e);
+                    Log.SaveException(e, driver);
                     throw;
                 }
             }
@@ -278,7 +265,6 @@ public class Helper
             {
                 ex = e;
                 Log.SaveException(e, driver);
-                SendMsg(e);
                 throw;
             }
 
@@ -312,6 +298,19 @@ public class Helper
             return name;
         }
         return null;
+    }
+
+    // 名字掩码处理，只保留最后一个字
+    public static string MaskName(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+        {
+            return name;
+        }
+
+        var len = name.Length;
+        var mask = new string('*', len-1);
+        return mask + name[len - 1];
     }
 }
 

@@ -26,7 +26,6 @@ class Program
                     try
                     {
                         Log.SaveException(err, client.driver);
-                        Helper.SendMsg(err);
                     }
                     catch
                     {

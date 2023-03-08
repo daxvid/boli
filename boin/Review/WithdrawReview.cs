@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using boin.Util;
 
 namespace boin.Review;
 
@@ -34,7 +35,8 @@ public class WithdrwReview : IReviewUser
             }
             else
             {
-                rs.Add(new ReviewResult { Code = 0, Msg = "@名字通过:" + order.Payee });
+                var maskName = Helper.MaskName(order.Payee);
+                rs.Add(new ReviewResult { Code = 0, Msg = "@名字通过:" + maskName});
             }
         }
         else if (order.Way == "数字钱包")

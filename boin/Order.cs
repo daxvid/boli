@@ -154,7 +154,7 @@ public class Order : WithdrawExpand
     {
         StringBuilder sb = new StringBuilder(1024);
         sb.Append(OrderId).Append(":").AppendLine(ReviewMsg.ToString());
-        sb.Append("game:").AppendLine(this.GameId);
+        //sb.Append("game:").AppendLine(this.GameId);
         if (ReviewResult != null)
         {
             foreach (var r in ReviewResult)

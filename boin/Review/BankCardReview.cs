@@ -110,7 +110,8 @@ public class BankCardReview : IReviewInterface
 
             if (b.Payee == order.Payee)
             {
-                return new ReviewResult { Code = 0, Msg = "@钱包正确:" + b.Payee };
+                var maskName = Helper.MaskName(order.Payee);
+                return new ReviewResult { Code = 0, Msg = "@钱包正确:" + maskName };
             }
         }
 
