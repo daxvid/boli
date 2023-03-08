@@ -13,10 +13,10 @@ public class PageBase : IDisposable
     protected int maxPage = 4;
     protected AppConfig cnf;
 
-    public static readonly ReadOnlyCollection<IWebElement> EmptyElements =
+    protected static readonly ReadOnlyCollection<IWebElement> EmptyElements =
         new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
-    public PageBase(ChromeDriver driver, AppConfig cnf)
+    protected PageBase(ChromeDriver driver, AppConfig cnf)
     {
         this.cnf = cnf;
         this.driver = driver;
@@ -106,6 +106,7 @@ public class PageBase : IDisposable
 
     protected IWebElement FindElement(By by)
     {
+        return wait.Until(driver => driver.FindElement(by));
         IWebElement r = null;
         var result = wait.Until(driver =>
         {
@@ -143,6 +144,7 @@ public class PageBase : IDisposable
 
     protected IWebElement FindElement(IWebElement e, By by)
     {
+        return wait.Until(driver => e.FindElement(by));
         IWebElement r = null;
         var result = wait.Until(driver =>
         {

@@ -145,7 +145,7 @@ public class BoinClient:IDisposable
                     orderPage.Open();
                     var orders = orderPage.Select(cnf.OrderHour);
                     return orders;
-                }, 1000, 10);
+                }, 2000, 5);
                 return orders;
             }
             catch (WebDriverException)
@@ -168,7 +168,7 @@ public class BoinClient:IDisposable
                     userPage.Open();
                     var user = userPage.Select(order);
                     return user;
-                }, 1000, 10);
+                }, 2000, 5);
                 return user;
             }
             catch (WebDriverException)
@@ -189,7 +189,7 @@ public class BoinClient:IDisposable
                     bindPage.Open();
                     var bind = bindPage.Select(gameId, cardNo);
                     return bind;
-                }, 1000, 10);
+                }, 2000, 5);
                 return bind;
             }
             catch (WebDriverException)

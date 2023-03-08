@@ -3,7 +3,7 @@
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;
 
-public class MoreSuchElementException : Exception
+public class MoreSuchElementException : NoSuchElementException
 {
 	public By By { get; set; }
 	public ReadOnlyCollection<IWebElement>? Elemens { get; set; }

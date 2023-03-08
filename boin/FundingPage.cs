@@ -68,7 +68,7 @@ public class FundingPage : PopPage
                 }
 
                 return rechargeLogs;
-            }, 1000, 10);
+            }, 2000, 5);
         }
 
         if (withdrawMaxDay > 0)
@@ -89,7 +89,7 @@ public class FundingPage : PopPage
                 }
 
                 return withdrawLogs;
-            }, 1000, 10);
+            }, 2000, 5);
         }
     }
 }

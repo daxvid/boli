@@ -188,7 +188,7 @@ public class OrderPage : LablePage
                 {
                     return vp.Submit();
                 }
-            }, 1000, 10);
+            }, 2000, 5);
         }
         finally
         {

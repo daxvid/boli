@@ -226,45 +226,45 @@ public class Helper
 
     public static T SafeExec<T>(ChromeDriver driver, Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
     {
-        Exception? ex = null;
-        for (var i = 0; i < tryCount; i++)
+        var i = 0;
+        while (true)
         {
+            Exception? err = null;
             try
             {
                 return fun();
             }
             catch (WebDriverException e)
             {
-                Log.SaveException(e, driver);
-                if (e is InvalidElementStateException ||
-                    e is NotFoundException ||
-                    e is WebDriverTimeoutException)
-                {
-                    ex = e;
-                }
-                else
+                err = e;
+                if ((i >= tryCount) ||
+                    (e is InvalidElementStateException ||
+                     e is NotFoundException ||
+                     e is WebDriverTimeoutException) == false)
                 {
                     throw;
                 }
             }
-            catch (SystemException e)
-            {
-                ex = e;
-                Log.SaveException(e, driver);
-            }
             catch (Exception e)
             {
-                Log.SaveException(e, driver);
+                err = e;
                 throw;
+            }
+            finally
+            {
+                if (i == 0 && err != null)
+                {
+                    Log.SaveException(err, driver);
+                }
+                i++;
             }
             Thread.Sleep(sleep);
         }
-        throw ex;
     }
 
     public static string EncryptMD5(string s)
     {
-        MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
+        var md5 = MD5.Create();
         return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s))).Replace("-","");
     }
 

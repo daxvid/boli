@@ -5,8 +5,8 @@ using StackExchange.Redis;
 
 public class Cache
 {
-    static ConnectionMultiplexer redis;
-    static IDatabase db;
+    static ConnectionMultiplexer? redis;
+    static IDatabase? db;
     static object _locker = new object();
     static string Platform = string.Empty;
 
@@ -25,7 +25,7 @@ public class Cache
         var key = "b." + card;
         lock (_locker)
         {
-            db.StringSet(key, msg, TimeSpan.FromDays(30));
+            db!.StringSet(key, msg, TimeSpan.FromDays(30));
         }
     }
 
@@ -34,7 +34,7 @@ public class Cache
         var key = "b." + card;
         lock (_locker)
         {
-            string? value = db.StringGet(key);
+            string? value = db!.StringGet(key);
             return value;
         }
     }
@@ -44,7 +44,7 @@ public class Cache
         var key = Platform + ".o." + orderId;
         lock (_locker)
         {
-            db.StringSet(key, msg, TimeSpan.FromDays(3));
+            db!.StringSet(key, msg, TimeSpan.FromDays(3));
         }
     }
 
@@ -53,7 +53,7 @@ public class Cache
         var key = Platform + ".o." + orderId;
         lock (_locker)
         {
-            string? value = db.StringGet(key);
+            string? value = db!.StringGet(key);
             return value;
         }
     }
@@ -63,7 +63,7 @@ public class Cache
         var key = Platform + ".r." + card;
         lock (_locker)
         {
-            db.StringSet(key, msg, TimeSpan.FromDays(60));
+            db!.StringSet(key, msg, TimeSpan.FromDays(60));
         }
     }
 
@@ -72,7 +72,7 @@ public class Cache
         var key = Platform + ".r." + card;
         lock (_locker)
         {
-            string? value = db.StringGet(key);
+            string? value = db!.StringGet(key);
             return value;
         }
     }
@@ -83,7 +83,7 @@ public class Cache
         var key = Platform + ".gb." + card;
         lock (_locker)
         {
-            db.StringSet(key, msg, TimeSpan.FromDays(2));
+            db!.StringSet(key, msg, TimeSpan.FromDays(2));
         }
     }
 
@@ -92,7 +92,7 @@ public class Cache
         var key = Platform + ".gb." + card;
         lock (_locker)
         {
-            string? value = db.StringGet(key);
+            string? value = db!.StringGet(key);
             return value;
         }
     }

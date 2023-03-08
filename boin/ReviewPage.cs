@@ -139,7 +139,7 @@ public class ReviewPage : PageBase
                     return Doubt();
             }
             
-        },1000,20);
+        },2000,5);
         return r;
     }
 
