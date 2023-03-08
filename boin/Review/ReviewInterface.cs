@@ -1,8 +1,7 @@
-﻿using System;
-using OpenQA.Selenium;
+﻿namespace boin.Review;
+
 using System.Collections.ObjectModel;
 
-namespace boin.Review;
 
 public class ReviewResult
 {

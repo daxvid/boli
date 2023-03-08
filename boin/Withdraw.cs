@@ -1,8 +1,7 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using boin.Util;
-
-namespace boin;
 
 public class Withdraw : WithdrawExpand
 {
@@ -59,61 +58,35 @@ public class Withdraw : WithdrawExpand
 
     public static Withdraw Create(IWebElement element, IWebElement rowEx)
     {
-        using (var span = new Span())
+        using var span = new Span();
+        var ts = element.FindElements(By.XPath(".//td"));
+        if (ts.Count != Heads.Length)
         {
-            var row = Helper.Ele2Dic(element);
-            var ts = element.FindElements(By.XPath(".//td"));
-            if (ts.Count != Heads.Length)
-            {
-                throw new ArgumentException("Withdraw Create");
-            }
-
-            Withdraw order = new Withdraw();
-            order.OrderId = Helper.ReadString(ts[1]); // 订单号
-            order.Created = Helper.ReadDateTime(ts[2]); // 发起时间
-            order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
-            order.GameId = Helper.ReadString(ts[4]); // 游戏ID
-            order.NickName = Helper.ReadString(ts[5]); // 用户昵称
-            order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
-            order.Way = Helper.ReadString(ts[7]); // 通道
-            if (order.Way == "未知")
-            {
-                order.Way = "数字钱包";
-            }
-            order.Review = Helper.ReadString(ts[8]); // 状态
-            order.Transfer = Helper.ReadString(ts[9]); // 转账
-            order.Operating = Helper.ReadString(ts[10]); // 操作类型
-
-            order.ReadExpand(rowEx, false);
-
-            span.Msg = "提现:" + order.OrderId;
-            return order;
+            throw new ArgumentException("Withdraw Create");
         }
-    }
 
-    public static Withdraw Create(Dictionary<string, string> head, IWebElement element, IWebElement rowEx)
-    {
-        using (var span = new Span())
+        Withdraw order = new Withdraw
         {
-            var row = Helper.Ele2Dic(element);
-
-            Withdraw order = new Withdraw();
-            order.OrderId = Helper.ReadString(head, "订单号", row);
-            //order.Created = Helper.ReadString(head, "发起时间", row);
-            order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
-            order.GameId = Helper.ReadString(head, "游戏ID", row);
-            order.NickName = Helper.ReadString(head, "用户昵称", row);
-            order.Amount = Helper.ReadDecimal(head, "提现金额", row);
-            order.Way = Helper.ReadString(head, "通道", row);
-            order.Review = Helper.ReadString(head, "状态", row);
-            order.Transfer = Helper.ReadString(head, "转账", row);
-            order.Operating = Helper.ReadString(head, "操作类型", row);
-
-            order.ReadExpand(rowEx, false);
-
-            span.Msg = "提现:" + order.OrderId;
-            return order;
+            OrderId = Helper.ReadString(ts[1]), // 订单号
+            Created = Helper.ReadDateTime(ts[2]), // 发起时间
+            TimeToAccount = Helper.ReadString(ts[3]), // 到账时间
+            GameId = Helper.ReadString(ts[4]), // 游戏ID
+            NickName = Helper.ReadString(ts[5]), // 用户昵称
+            Amount = Helper.ReadDecimal(ts[6]), // 提现金额
+            Way = Helper.ReadString(ts[7]), // 通道
+            Review = Helper.ReadString(ts[8]), // 状态
+            Transfer = Helper.ReadString(ts[9]), // 转账
+            Operating = Helper.ReadString(ts[10]), // 操作类型
+        };
+        order.ReadExpand(rowEx, false);
+        if (order.Way == "未知")
+        {
+            order.Way = "数字钱包";
         }
+
+        span.Msg = "提现:" + order.OrderId;
+        return order;
     }
+    
 }
 

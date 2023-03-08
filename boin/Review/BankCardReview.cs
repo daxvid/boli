@@ -1,9 +1,8 @@
-﻿using System;
+﻿namespace boin.Review;
+
 using System.Collections.ObjectModel;
-using System.Globalization;
 using boin.Util;
 
-namespace boin.Review;
 
     // 银行卡审核
 public class BankCardReview : IReviewInterface
@@ -59,7 +58,7 @@ public class BankCardReview : IReviewInterface
 
     private ReviewResult ReviewBank(Order order)
     {
-        BankCardInfo bankInfo = order.BankCardInfo;
+        BankCardInfo? bankInfo = order.BankCardInfo;
         while (bankInfo == null)
         {
             Thread.Sleep(1000);

@@ -1,6 +1,6 @@
-using OpenQA.Selenium.Chrome;
-
 namespace boin;
+
+using OpenQA.Selenium.Chrome;
 
 public class LablePage : PageBase
 {

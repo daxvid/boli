@@ -1,14 +1,14 @@
+namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-
-namespace boin;
 
 public class PopPage : PageBase
 {
     protected string gameId;
     protected string path;
     protected IWebElement mainTable;
-    private IWebElement closeBtn;
+    private IWebElement? closeBtn;
 
     protected PopPage(ChromeDriver driver, AppConfig cnf, string gameId, string path) : base(driver, cnf)
     {

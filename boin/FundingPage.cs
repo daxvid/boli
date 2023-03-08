@@ -1,11 +1,10 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
 
-namespace boin;
-
-    // 资金概况
+// 资金概况
 public class FundingPage : PopPage
 {
     public FundingPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
@@ -57,20 +56,18 @@ public class FundingPage : PopPage
         if (rechargeMaxDay > 0)
         {
             //读取充值明细
-            f.RechargeLog = Helper.SafeExec(driver,() =>
+            f.RechargeLog = Helper.SafeExec(driver, () =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a", 1000);
-                using (var rg = new RechargePage(driver, cnf, gameId))
+                using var rg = new RechargePage(driver, cnf, gameId);
+                var rechargeLogs = rg.Select(rechargeMaxDay);
+                // 如果没有数据查则查询最近30天的数据
+                if ((rechargeLogs.Count < 3) && rechargeMaxDay < maxDay)
                 {
-                    var rechargeLogs = rg.Select(rechargeMaxDay);
-                    // 如果没有数据查则查询最近30天的数据
-                    if ((rechargeLogs == null || rechargeLogs.Count < 3) && rechargeMaxDay < maxDay)
-                    {
-                        rechargeLogs = rg.Select(maxDay);
-                    }
-
-                    return rechargeLogs;
+                    rechargeLogs = rg.Select(maxDay);
                 }
+
+                return rechargeLogs;
             }, 1000, 10);
         }
 
@@ -80,20 +77,18 @@ public class FundingPage : PopPage
             tbox = FindElementByXPath(table, tboxPath);
 
             // 读取提现明细
-            f.WithdrawLog = Helper.SafeExec(driver,() =>
+            f.WithdrawLog = Helper.SafeExec(driver, () =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a", 1000);
-                using (var wg = new WithdrawPage(driver, cnf, gameId))
+                using var wg = new WithdrawPage(driver, cnf, gameId);
+                var withdrawLogs = wg.Select(withdrawMaxDay);
+                // 如果没有数据查查询最近30天的数据
+                if ((withdrawLogs.Count <= 1) && withdrawMaxDay < maxDay)
                 {
-                    var withdrawLogs = wg.Select(withdrawMaxDay);
-                    // 如果没有数据查查询最近30天的数据
-                    if ((withdrawLogs == null || withdrawLogs.Count <= 1) && withdrawMaxDay < maxDay)
-                    {
-                        withdrawLogs = wg.Select(maxDay);
-                    }
-
-                    return withdrawLogs;
+                    withdrawLogs = wg.Select(maxDay);
                 }
+
+                return withdrawLogs;
             }, 1000, 10);
         }
     }

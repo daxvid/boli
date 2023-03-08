@@ -1,11 +1,11 @@
-﻿using System;
+﻿namespace boin;
+
+using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
 
-namespace boin;
-
-    // 用户游戏日志
+// 用户游戏日志
 public class GameLogPage : PopPage
 {
     public GameLogPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,

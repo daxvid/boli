@@ -3,10 +3,10 @@ namespace boin.Util;
 // 四方查询
 public class SiFangPay
 {
-    public static string Host;
+    public static string Host = string.Empty;
     
     // test: OR1677472338813641
-    public static string GetPayer(string orderId)
+    public static string? GetPayer(string orderId)
     {
         var url = Host + orderId;
         HttpClient client = new HttpClient();

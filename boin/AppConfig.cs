@@ -1,6 +1,6 @@
-﻿using YamlDotNet.Serialization;
+﻿namespace boin;
 
-namespace boin;
+using YamlDotNet.Serialization;
 
 public class AppConfig
 {
@@ -30,10 +30,10 @@ public class AppConfig
     public int OrderMaxLock { get; set; }
     
     // 处理金额范围
-    public int[] AmountRang { get; set; }
+    public int[] AmountRang { get; set; } = new int[] { };
 
     // 审核配置文件
-    public string ReviewFile { get; set; }
+    public string ReviewFile { get; set; } = string.Empty;
     
     // Chrome
     public bool Headless { get; set; }

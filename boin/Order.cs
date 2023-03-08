@@ -1,9 +1,9 @@
-﻿
+﻿namespace boin;
+
 using System.Text;
+using boin.Review;
 using OpenQA.Selenium;
 using boin.Util;
-
-namespace boin;
 
 public enum OrderReviewEnum
 {
@@ -56,10 +56,10 @@ public class Order : WithdrawExpand
     public string Status { get; set; } = string.Empty;
 
     public OrderReviewEnum ReviewMsg { get; set; }
-    
-    public List<Review.ReviewResult> ReviewResult { get; set; } = null;
 
-    public GameBind Bind { get; set; }
+    public List<Review.ReviewResult> ReviewResult { get; set; } = new List<ReviewResult>() { };
+
+    public GameBind? Bind { get; set; }
 
     // 是否已处理
     public bool Processed { get; set; }
@@ -72,33 +72,28 @@ public class Order : WithdrawExpand
     {
         get
         {
-            if (ReviewResult != null)
+            foreach (var r in ReviewResult)
             {
-                foreach (var r in ReviewResult)
+                if (r.Code != 0)
                 {
-                    if (r.Code != 0)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
             return true;
         }
     }
-    
+
     public bool CanReject
     {
         get
         {
-            if (ReviewResult != null)
+
+            foreach (var r in ReviewResult)
             {
-                foreach (var r in ReviewResult)
+                if (r.Code < 0)
                 {
-                    if (r.Code < 0)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -110,14 +105,12 @@ public class Order : WithdrawExpand
     {
         get
         {
-            if (ReviewResult != null)
+
+            foreach (var r in ReviewResult)
             {
-                foreach (var r in ReviewResult)
+                if (r.Code < 0)
                 {
-                    if (r.Code < 0)
-                    {
-                        return r.Msg;
-                    }
+                    return r.Msg;
                 }
             }
 
@@ -130,19 +123,16 @@ public class Order : WithdrawExpand
         get
         {
             var msg = "@";
-            if (ReviewResult != null)
+            foreach (var r in ReviewResult)
             {
-                foreach (var r in ReviewResult)
+                if (r.Code > 0)
                 {
-                    if (r.Code > 0)
+                    if (msg.Length > 1)
                     {
-                        if (msg.Length > 1)
-                        {
-                            msg += ";";
-                        }
-
-                        msg += r.Msg;
+                        msg += ";";
                     }
+
+                    msg += r.Msg;
                 }
             }
 
@@ -155,17 +145,14 @@ public class Order : WithdrawExpand
         StringBuilder sb = new StringBuilder(1024);
         sb.Append(OrderId).Append(":").AppendLine(ReviewMsg.ToString());
         //sb.Append("game:").AppendLine(this.GameId);
-        if (ReviewResult != null)
+        foreach (var r in ReviewResult)
         {
-            foreach (var r in ReviewResult)
+            if (r.Code != 0)
             {
-                if (r.Code != 0)
-                {
-                    sb.Append(r.Code).Append(":");
-                }
-
-                sb.AppendLine(r.Msg);
+                sb.Append(r.Code).Append(":");
             }
+
+            sb.AppendLine(r.Msg);
         }
 
         var m = sb.ToString();
@@ -173,7 +160,7 @@ public class Order : WithdrawExpand
     }
 
 
-    public static string[] Heads = new string[]
+    public static readonly string[] Heads = new string[]
     {
         string.Empty, "订单号", "发起时间", "到账时间", "游戏ID",
         "用户昵称", "提现金额", "通道", "状态", "转账", "操作类型", "操作人", "提现备注", "操作"
@@ -181,65 +168,33 @@ public class Order : WithdrawExpand
 
     public static Order Create(IWebElement element, IWebElement rowEx)
     {
-        using (var span = new Span())
+        using var span = new Span();
+        var ts = element.FindElements(By.XPath(".//td"));
+        if (ts.Count != Heads.Length)
         {
-            var ts = element.FindElements(By.XPath(".//td"));
-            if (ts.Count != Heads.Length)
-            {
-                throw new ArgumentException("Order Create");
-            }
-
-            var orderId = Helper.ReadString(ts[1]);
-            Order order = new Order();
-            order.OrderId = orderId; // 订单号
-            order.Created = Helper.ReadShortTime(ts[2]); // 发起时间
-            order.TimeToAccount = Helper.ReadString(ts[3]); // 到账时间
-            order.GameId = Helper.ReadString(ts[4]); // 游戏ID"
-            order.NickName = Helper.ReadString(ts[5]); // 用户昵称
-            order.Amount = Helper.ReadDecimal(ts[6]); // 提现金额
-            order.Way = Helper.ReadString(ts[7]); // 通道
-            order.Review = Helper.ReadString(ts[8]); // 状态
-            order.Transfer = Helper.ReadString(ts[9]); // 转账
-            order.Operating = Helper.ReadString(ts[10]); // 操作类型
-            order.Operator = Helper.ReadString(ts[11]); //  操作人
-            order.Remark = Helper.ReadString(ts[12]); // 提现备注
-            order.Status = Helper.ReadString(ts[13]); //  操作
-            order.ReadExpand(rowEx, order.Way == "银行卡");
-
-            span.Msg = "订单:" + order.OrderId;
-            return order;
+            throw new ArgumentException("Order Create");
         }
-    }
 
-    public static Order Create(Dictionary<string, string> head, IWebElement element, IWebElement rowEx)
-    {
-        using (var span = new Span())
+        var orderId = Helper.ReadString(ts[1]);
+        Order order = new Order()
         {
-            var row = Helper.Ele2Dic(element);
-            var tdList = element.FindElements(By.XPath(".//td"));
+            OrderId = orderId, // 订单号
+            Created = Helper.ReadShortTime(ts[2]), // 发起时间
+            TimeToAccount = Helper.ReadString(ts[3]), // 到账时间
+            GameId = Helper.ReadString(ts[4]), // 游戏ID"
+            NickName = Helper.ReadString(ts[5]), // 用户昵称
+            Amount = Helper.ReadDecimal(ts[6]), // 提现金额
+            Way = Helper.ReadString(ts[7]), // 通道
+            Review = Helper.ReadString(ts[8]), // 状态
+            Transfer = Helper.ReadString(ts[9]), // 转账
+            Operating = Helper.ReadString(ts[10]), // 操作类型
+            Operator = Helper.ReadString(ts[11]), //  操作人
+            Remark = Helper.ReadString(ts[12]), // 提现备注
+            Status = Helper.ReadString(ts[13]), //  操作
+        };
 
-            Order order = new Order();
-            order.OrderId = Helper.ReadString(head, "订单号", row);
-            //order.Created = Helper.ReadString(head, "发起时间", row);
-            order.TimeToAccount = Helper.ReadString(head, "到账时间", row);
-            order.GameId = Helper.ReadString(head, "游戏ID", row);
-            order.NickName = Helper.ReadString(head, "用户昵称", row);
-            order.Amount = Helper.ReadDecimal(head, "提现金额", row);
-            order.Way = Helper.ReadString(head, "通道", row);
-            order.Review = Helper.ReadString(head, "状态", row);
-            order.Transfer = Helper.ReadString(head, "转账", row);
-            order.Operating = Helper.ReadString(head, "操作类型", row);
-            order.Operator = Helper.ReadString(head, "操作人", row);
-            order.Remark = Helper.ReadString(head, "提现备注", row);
-            order.Status = Helper.ReadString(head, "操作", row);
-
-            order.ReadExpand(rowEx, order.Way == "银行卡");
-
-
-            span.Msg = "订单:" + order.OrderId;
-            return order;
-        }
+        order.ReadExpand(rowEx, order.Way == "银行卡");
+        span.Msg = "订单:" + order.OrderId;
+        return order;
     }
 }
-
-

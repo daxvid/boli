@@ -1,14 +1,10 @@
-﻿using System;
+﻿namespace boin;
+
 using System.Collections.ObjectModel;
-using System.Reflection.Emit;
-using boin.Bot;
-using boin.Review;
 using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-
-namespace boin;
 
 public class PageBase : IDisposable
 {
@@ -27,14 +23,13 @@ public class PageBase : IDisposable
         this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
     }
 
-    protected IWebElement SetTextElementByXPath(string path, string txt)
+    protected bool SetTextElementByXPath(string path, string txt)
     {
         return SetTextElement(By.XPath(path), txt);
     }
 
-    protected IWebElement SetTextElement(By by, string txt)
+    protected bool SetTextElement(By by, string txt)
     {
-        IWebElement r = null;
         var result = wait.Until(driver =>
         {
             try
@@ -47,7 +42,7 @@ public class PageBase : IDisposable
 
                 if (es.Count == 1)
                 {
-                    r = es[0];
+                    var r = es[0];
                     r.Clear();
                     r.SendKeys(txt);
                     return true;
@@ -63,17 +58,16 @@ public class PageBase : IDisposable
 
             return false;
         });
-        return r;
+        return result;
     }
 
-    protected IWebElement SetTextElementByXPath(IWebElement e, string path, string txt)
+    protected bool SetTextElementByXPath(IWebElement e, string path, string txt)
     {
         return SetTextElement(e, By.XPath(path), txt);
     }
 
-    protected IWebElement SetTextElement(IWebElement e, By by, string txt)
+    protected bool SetTextElement(IWebElement e, By by, string txt)
     {
-        IWebElement r = null;
         var result = wait.Until(driver =>
         {
             try
@@ -86,7 +80,7 @@ public class PageBase : IDisposable
 
                 if (es.Count == 1)
                 {
-                    r = es[0];
+                    var r = es[0];
                     r.Clear();
                     r.SendKeys(txt);
                     return true;
@@ -102,7 +96,7 @@ public class PageBase : IDisposable
 
             return false;
         });
-        return r;
+        return result;
     }
 
     protected IWebElement FindElementByXPath(string path)

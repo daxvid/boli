@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿namespace boin.Review;
 
-namespace boin.Review;
+using System.Collections.ObjectModel;
 
 // 充值记录
 public class RechargeReview : IReviewUser
@@ -78,11 +77,10 @@ public class RechargeReview : IReviewUser
     // 计算日期:上一笔提款日-最新一笔提款日
     // 金额>2000-人工审核
     // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
-    public ReviewResult RechargeByChannel(User user)
+    public ReviewResult? RechargeByChannel(User user)
     {
         Order order = user.Order;
-        DateTime startTime;
-        if (!user.Funding.LastSuccessWithdrawTime(order.OrderId, out startTime))
+        if (!user.Funding.LastSuccessWithdrawTime(order.OrderId, out DateTime startTime))
         {
             startTime = DateTime.Now.AddDays(-21);
         }

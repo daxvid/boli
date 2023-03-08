@@ -1,11 +1,10 @@
-﻿using System;
+﻿namespace boin.Util;
 
-namespace boin.Util;
 
 public class Span : IDisposable
 {
     long start = DateTime.UtcNow.Ticks;
-    public string Msg { get; set; }
+    public string Msg { get; set; } = string.Empty;
 
     public Span()
     {

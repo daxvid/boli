@@ -1,9 +1,8 @@
+namespace boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-
-namespace boin;
 
 public class ReviewPage : PageBase
 {
@@ -45,8 +44,9 @@ public class ReviewPage : PageBase
         }
         return true;
     }
+
     bool Review()
-    { 
+    {
         // 支付商家内容（飞天代付）
         // /html/body/div[7]/div[2]/div/  div/div[3]/div/div[1]/span[2]/div/div[1]/div/span
         var hitPath = "./div[3]/div/div[1]/span[2]/div/div[1]/div/span";
@@ -72,15 +72,12 @@ public class ReviewPage : PageBase
         // /html/body/div[7]/div[2]/div/   div/div[3]/div/div[2]/div[2]/button[2]/span
         string dfPath = "./div[3]/div/div[2]/div[2]/button[2]/span[text()='代付提现']";
         FindAndClickByXPath(mainTable, dfPath, 10);
-        using (var hint = new ReviewHintPage(driver, cnf, order))
+        using var hint = new ReviewHintPage(driver, cnf, order);
+        if (hint.Confirm())
         {
-            if (hint.Confirm())
-            {
-                return true;
-            }
-
-            return false;
+            return true;
         }
+        return false;
     }
 
     void setReason(string reason)
@@ -124,10 +121,8 @@ public class ReviewPage : PageBase
         // /html/body/div[47]/div[2]/div/  div/div[3]/div/div[2]/div[2]/button[1]/span
         var rejectPath = "./div[3]/div/div[2]/div[2]/button[1]/span[text()='拒绝']";
         FindAndClickByXPath(mainTable, rejectPath, 100);
-        using (var rp = new RejectPage(driver,cnf))
-        {
-            return rp.RejectReason(reason);
-        }
+        using var rp = new RejectPage(driver, cnf);
+        return rp.RejectReason(reason);
     }
 
     public bool Submit()

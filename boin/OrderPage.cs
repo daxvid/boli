@@ -1,10 +1,9 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Review;
 using boin.Util;
-
-namespace boin;
 
 public class OrderPage : LablePage
 {

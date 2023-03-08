@@ -1,18 +1,17 @@
-using System;
+namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
 
-namespace boin;
-
-    // 资金概况
+// 资金概况
 public class UserEditPage : PageBase
 {
     private string gameId;
     private string path;
     private IWebElement mainTable;
-    private IWebElement closeBtn;
-    private IWebElement closeBtn2;
+    private IWebElement? closeBtn;
+    private IWebElement? closeBtn2;
 
     public UserEditPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf)
     {
@@ -34,11 +33,11 @@ public class UserEditPage : PageBase
         {
             try
             {
-                closeBtn2.Click();
+                closeBtn2!.Click();
             }
             catch
             {
-                closeBtn.Click();
+                closeBtn!.Click();
             }
             closeBtn = null;
         }

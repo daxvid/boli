@@ -1,10 +1,10 @@
-﻿using System;
+﻿namespace boin;
+
+using System;
 using System.Reflection.Emit;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-
-namespace boin;
 
 // 充值记录
 public class RechargePage : PopPage

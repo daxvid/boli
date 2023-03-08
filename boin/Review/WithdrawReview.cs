@@ -1,10 +1,9 @@
-﻿using System;
+﻿namespace boin.Review;
+
 using System.Collections.ObjectModel;
 using boin.Util;
 
-namespace boin.Review;
-
-    // 审核之前的提现
+// 审核之前的提现
 public class WithdrwReview : IReviewUser
 {
     ReviewConfig cnf;

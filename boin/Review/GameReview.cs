@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿namespace boin.Review;
 
-namespace boin.Review;
+using System.Collections.ObjectModel;
 
 // 游戏审核
 public class GameReview : IReviewUser
@@ -22,17 +21,14 @@ public class GameReview : IReviewUser
 
         // 检查用户玩的游戏
         bool pass = true;
-        if (user.GameInfo.GameLogs != null)
+        foreach (var g in user.GameInfo.GameLogs)
         {
-            foreach (var g in user.GameInfo.GameLogs)
+            var game = ac.ExistsGame(g.GamePlatform, g.GameName);
+            if (!string.IsNullOrEmpty(game))
             {
-                var game = ac.ExistsGame(g.GamePlatform, g.GameName);
-                if (!string.IsNullOrEmpty(game))
-                {
-                    rs.Add(new ReviewResult { Code = 301, Msg = "游戏:" + game });
-                    pass = false;
-                    break;
-                }
+                rs.Add(new ReviewResult { Code = 301, Msg = "游戏:" + game });
+                pass = false;
+                break;
             }
         }
 

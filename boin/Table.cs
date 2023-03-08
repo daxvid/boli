@@ -1,18 +1,15 @@
-﻿using System;
-using System.Globalization;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-
-namespace boin;
 
 public class Head
 {
     // 标题名
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     // class name
-    public string Tag { get; set; }
+    public string Tag { get; set; } = string.Empty;
 
     // 读取列表头
     public static List<Head> ReadHead(IWebElement table)
@@ -71,7 +68,7 @@ public class Table
         this.tb = tb;
     }
 
-    public static Tuple<IWebElement, List<Head>> FindTable(ChromeDriver driver, IEnumerable<String> headNames)
+    public static Tuple<IWebElement, List<Head>>? FindTable(ChromeDriver driver, IEnumerable<String> headNames)
     {
         var tables = driver.FindElements(By.ClassName("ivu-table"));
         foreach (var table in tables)

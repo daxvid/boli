@@ -1,10 +1,10 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
 using boin.Util;
 
-namespace boin;
 
 public class UserPage : LablePage
 {
@@ -13,8 +13,9 @@ public class UserPage : LablePage
     {
     }
 
-    public User Select(string gameId)
+    public User Select( Order  order)
     {
+        string gameId = order.GameId;
         // 设置游戏ID
         var gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
         SetTextElementByXPath(gameIdPath, gameId);
@@ -36,64 +37,12 @@ public class UserPage : LablePage
             var table = FindElementByXPath("//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]");
             var tbody = FindElementByXPath(table, ".//tbody[@class='ivu-table-tbody']");
             var row = FindElementByXPath(tbody, ".//tr");
-            var user = User.Create(row);
+            var user = User.Create(row, order);
             readUserInfo(user, 0);
             return user;
         }
 
         throw new MoreSuchElementException(xp, "selectUser", null);
-    }
-
-    public List<User> ReadTable()
-    {
-        var table = FindElementByXPath("//div[@id='LiveGameRoleList']/div[2]/div[2]/div[1]");
-        var tbody = FindElementByXPath(table, ".//tbody[@class='ivu-table-tbody']");
-
-        // 展开所有显示
-        // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[10]/div/div/button/span
-        // //*[@id="LiveGameRoleList"]/div[2]/div[2]/div[1]/div[2]/table/tbody/tr[3]/td[10]/div/div/button/span
-        var path = ".//td[10]/div/div/button/span[text()='显示']";
-        var expandList = FindElementsByXPath(tbody, path);
-        foreach (var exBtn in expandList)
-        {
-            if (exBtn.Enabled && exBtn.Displayed)
-            {
-                SafeClick(exBtn, 5);
-            }
-        }
-
-        Thread.Sleep(100);
-
-        var users = readUsers(tbody);
-        var gameCount = 0;
-        foreach (var user in users)
-        {
-            if (readUserInfo(user, gameCount))
-            {
-                gameCount++;
-            }
-        }
-
-        return users;
-    }
-
-    // 读取每一项用户信息
-    private List<User> readUsers(IWebElement tbody)
-    {
-        var allRows = FindElementsByXPath(tbody, ".//tr");
-        var count = allRows.Count;
-        var users = new List<User>(count);
-        for (var i = 0; i < count; i++)
-        {
-            var row = allRows[i];
-            var user = User.Create(row);
-            if (user != null)
-            {
-                users.Add(user);
-            }
-        }
-
-        return users;
     }
 
     private bool readUserInfo(User user, int i)
@@ -127,11 +76,9 @@ public class UserPage : LablePage
         moveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using (FundingPage gl = new FundingPage(driver, cnf, user.GameId))
-        {
-            var funding = gl.Select();
-            user.Funding = funding;
-        }
+        using FundingPage gl = new FundingPage(driver, cnf, user.GameId);
+        var funding = gl.Select();
+        user.Funding = funding;
     }
 
     // 注单(游戏)
@@ -142,13 +89,11 @@ public class UserPage : LablePage
         moveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using (GameLogPage gl = new GameLogPage(driver, cnf, user.GameId))
-        {
-            var gameInfo = gl.Select(cnf.GameLogMaxHour);
-            user.GameInfo = gameInfo;
-        }
+        using GameLogPage gl = new GameLogPage(driver, cnf, user.GameId);
+        var gameInfo = gl.Select(cnf.GameLogMaxHour);
+        user.GameInfo = gameInfo;
     }
-    
+
     // 编辑,查看备注
     private void readUserEdit(User user, int i)
     {
@@ -157,12 +102,10 @@ public class UserPage : LablePage
         moveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using (UserEditPage ue = new UserEditPage(driver, cnf, user.GameId))
-        {
-            user.Remark = ue.ReadRemark();
-        }
+        using UserEditPage ue = new UserEditPage(driver, cnf, user.GameId);
+        user.Remark = ue.ReadRemark();
     }
-    
+
 
     private bool moveToOp(User user, int i)
     {

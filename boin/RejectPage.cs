@@ -1,15 +1,13 @@
 namespace boin;
 
-using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
 
 // 拒绝页面
 public class RejectPage : PageBase
 {
     private IWebElement mainTable;
-    private IWebElement closeBtn;
+    private IWebElement? closeBtn;
 
     public RejectPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf)
     {

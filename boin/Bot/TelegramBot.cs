@@ -1,11 +1,10 @@
-﻿using System;
+﻿namespace boin.Bot;
+
 using boin.Util;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
-using Telegram.BotAPI.AvailableTypes;
 using Telegram.BotAPI.GettingUpdates;
 
-namespace boin.Bot;
 
 public class TelegramBot
 {
@@ -27,8 +26,8 @@ public class TelegramBot
         get { return instance; }
     }
 
-    AuthConfig cnf;
-    BotClient api;
+    AuthConfig? cnf;
+    BotClient? api;
 
     public void Run(AuthConfig cnf)
     {
@@ -44,7 +43,7 @@ public class TelegramBot
                 {
                     update(client);
                 }
-                catch(Exception err)
+                catch (Exception err)
                 {
                     Log.SaveException(err);
                     try
@@ -55,7 +54,9 @@ public class TelegramBot
                         this.api = client;
                         //SendMessage("restart bot:" + DateTime.Now.ToString("yy-MM-dd HH:mm:ss"));
                     }
-                    catch{}
+                    catch
+                    {
+                    }
                 }
             }
         });
@@ -96,6 +97,11 @@ public class TelegramBot
 
     void SendMessage(string msg)
     {
+        if (api == null || cnf == null)
+        {
+            return;
+        }
+
         lock (api)
         {
             foreach (var charId in cnf.ChatIds)
@@ -115,7 +121,6 @@ public class TelegramBot
             }
             catch
             {
-
             }
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-namespace boin;
+﻿namespace boin;
 
 public class UserManager
 {

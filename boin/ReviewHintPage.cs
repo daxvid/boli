@@ -1,9 +1,8 @@
+namespace boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-
-namespace boin;
 
 public class ReviewHintPage : PageBase
 {

@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace boin.Review;
+
 using YamlDotNet.Serialization;
 using boin.Util;
 
-namespace boin.Review;
 
 //新会员(注册时间一个月内)波币当日提款不超过3000
 //老会员(注册时间一个月以上)波币当日提款不超过6000
@@ -38,10 +38,10 @@ public class AmountConfig
     public decimal OnceMax { get; set; }
 
     // 不可以通过的游戏
-    public Dictionary<string, List<string>> BanGames { get; set; }
+    public Dictionary<string, List<string>> BanGames { get; set; } = new Dictionary<string, List<string>>();
 
     // 玩某个游戏的提款限制， 玩百家乐的会员，波币一天不超过3000提款
-    public Dictionary<string, decimal> DayMaxGames { get; set; }
+    public Dictionary<string, decimal> DayMaxGames { get; set; } = new Dictionary<string, decimal>();
 
     public string ExistsGame(string platform, string game)
     {
@@ -91,19 +91,19 @@ public class AmountConfig
 
 public class ReviewConfig
 {
-    public static ReviewConfig Cnf;
+    public static ReviewConfig Cnf = new ReviewConfig();
 
     // 新会员银行卡检查条件
-    public AmountConfig NewBank { get; set; }
+    public AmountConfig NewBank { get; set; } = new AmountConfig();
 
     // 老会员银行卡检查条件
-    public AmountConfig OldBank { get; set; }
+    public AmountConfig OldBank { get; set; }= new AmountConfig();
 
     // 新会员波币检查条件
-    public AmountConfig NewBobi { get; set; }
+    public AmountConfig NewBobi { get; set; }= new AmountConfig();
 
     // 老会员波币检查条件
-    public AmountConfig OldBobi { get; set; }
+    public AmountConfig OldBobi { get; set; } = new AmountConfig();
 
     // 最近10笔提款内 波币不能超过4笔
     public int NearWithdrawCount { get; set; }
@@ -113,10 +113,10 @@ public class ReviewConfig
     // 计算日期:上一笔提款日-最新一笔提款日
     // 金额>2000-人工审核
     // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
-    public Dictionary<string, List<decimal>> RechargeChannel { get; set; }
+    public Dictionary<string, List<decimal>> RechargeChannel { get; set; } = new Dictionary<string, List<decimal>>();
 
     // 备注中包含以下关键字，暂时不审核
-    public List<string> RemarkKeys { get; set; }
+    public List<string> RemarkKeys { get; set; } = new List<string>();
 
     public ReviewConfig()
     {
@@ -128,12 +128,10 @@ public class ReviewConfig
         {
             return isNew ? NewBank : OldBank;
         }
-        else if (way == "数字钱包")
+        else //if (way == "数字钱包")
         {
             return isNew ? NewBobi : OldBobi;
         }
-
-        return null;
     }
 
     public static ReviewConfig FromYamlFile(string path)

@@ -1,7 +1,7 @@
-﻿using System;
+﻿namespace boin.Review;
+
 using System.Collections.ObjectModel;
 
-namespace boin.Review;
 
 // （波币）拒绝原因-
 // 今日波币已达上限，请使用银行卡
@@ -149,7 +149,7 @@ public class AmountReview : IReviewUser
     }
 
     // 检查如果玩了某种游戏，当日提现总额限制
-    ReviewResult checkDayGames(User user, Dictionary<string, decimal> dayMaxGames, decimal dayAmount, decimal amount)
+    ReviewResult? checkDayGames(User user, Dictionary<string, decimal> dayMaxGames, decimal dayAmount, decimal amount)
     {
         var checkAmount = dayAmount + amount;
         if ((dayMaxGames != null) && (dayMaxGames.Count > 0))

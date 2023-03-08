@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-
 namespace boin.Util;
 
 // 飞天接口订单查询
@@ -54,40 +52,41 @@ namespace boin.Util;
 public class FeiTianOrder
 {
     public int orderId;
-    public string orderNo;
-    public string userId;
-    public string realName;
+    public string orderNo = string.Empty;
+    public string userId = string.Empty;
+    public string realName = string.Empty;
     public int orderType;
     public decimal amount;
     public decimal realAmount;
     public int status;
     public bool duplicate;
-    public string createTime;
-    public string finishTime;
+    public string createTime = string.Empty;
+    public string finishTime = string.Empty;
     public int callbackStatus;
-    public string callbackTime;
+    public string callbackTime = string.Empty;
 }
 
 public class FeiTianResult
 {
     public int code;
-    public string msg;
-    public FeiTianOrder[] data;
+    public string msg = string.Empty;
+    public FeiTianOrder[]? data;
 }
 
 
 // 飞天查询
 public class FeiTianPay
 {
-    public static FeiTianConfig Cnf;
+    public static FeiTianConfig? Cnf;
 
     // OR1678071601686248
-    public static string GetPayer(string orderId)
+    public static string? GetPayer(string orderId)
     {
-        if (string.IsNullOrEmpty(Cnf.Merchant) || string.IsNullOrEmpty(Cnf.Token))
+        if (Cnf == null || string.IsNullOrEmpty(Cnf.Merchant) || string.IsNullOrEmpty(Cnf.Token))
         {
             return null;
         }
+
         try
         {
             using (var client = new HttpClient())
@@ -125,10 +124,11 @@ public class FeiTianPay
                 }
             }
         }
-        catch(Exception err)
+        catch (Exception err)
         {
-           Log.SaveException(err);
+            Log.SaveException(err);
         }
+
         return null;
     }
 }

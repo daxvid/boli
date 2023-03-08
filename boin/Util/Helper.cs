@@ -1,4 +1,5 @@
-﻿using System;
+﻿namespace boin.Util;
+
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,8 +7,6 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using boin.Bot;
-
-namespace boin.Util;
 
 public class Helper
 {
@@ -50,20 +49,15 @@ public class Helper
     public static string ReadString(Dictionary<string, string> head, string key,
         Dictionary<string, IWebElement> dicCell)
     {
-        string className;
-        if (!head.TryGetValue(key, out className))
+        if (head.TryGetValue(key, out string? className))
         {
-            return string.Empty;
+            if (dicCell.TryGetValue(className??string.Empty, out IWebElement? cell))
+            {
+                var value = (cell!.Text??string.Empty).Trim();
+                return value;
+            }
         }
-
-        IWebElement cell;
-        if (!dicCell.TryGetValue(className, out cell))
-        {
-            return string.Empty;
-        }
-
-        var value = cell.Text.Trim();
-        return value;
+        return string.Empty;
     }
 
     public static Dictionary<string, IWebElement> Ele2Dic(IWebElement element)
@@ -72,7 +66,7 @@ public class Helper
         Dictionary<string, IWebElement> row = new Dictionary<string, IWebElement>(tdList.Count * 2);
         foreach (var td in tdList)
         {
-            var key = td.GetAttribute("class");
+            var key = td.GetAttribute("class")??string.Empty;
             row.Add(key, td);
         }
 
@@ -232,7 +226,7 @@ public class Helper
 
     public static T SafeExec<T>(ChromeDriver driver, Func<T> fun, int sleep = 1000, int tryCount = int.MaxValue)
     {
-        Exception ex = null;
+        Exception? ex = null;
         for (var i = 0; i < tryCount; i++)
         {
             try
@@ -241,17 +235,15 @@ public class Helper
             }
             catch (WebDriverException e)
             {
-                ex = e;
                 Log.SaveException(e, driver);
                 if (e is InvalidElementStateException ||
                     e is NotFoundException ||
                     e is WebDriverTimeoutException)
                 {
-                    Log.Info(e);
+                    ex = e;
                 }
                 else
                 {
-                    Log.SaveException(e, driver);
                     throw;
                 }
             }
@@ -259,18 +251,14 @@ public class Helper
             {
                 ex = e;
                 Log.SaveException(e, driver);
-                Log.Info(e);
             }
             catch (Exception e)
             {
-                ex = e;
                 Log.SaveException(e, driver);
                 throw;
             }
-
             Thread.Sleep(sleep);
         }
-
         throw ex;
     }
 
@@ -280,7 +268,7 @@ public class Helper
         return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s))).Replace("-","");
     }
 
-    public static string GetJsonValue(string key, string content)
+    public static string? GetJsonValue(string key, string content)
     {
         string keyName = "\"" + key + "\"";
         int index = content.IndexOf(keyName);

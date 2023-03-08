@@ -1,8 +1,8 @@
-﻿using OpenQA.Selenium;
+﻿namespace boin;
+
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-
-namespace boin;
 
 // 提现记录
 public class WithdrawPage : PopPage
@@ -50,54 +50,6 @@ public class WithdrawPage : PopPage
 
             var logs = ReadWithdraws(tbody, page);
             allLogs.AddRange(logs);
-        }
-
-        return allLogs;
-    }
-
-    // 读取每一项日志信息
-    private List<Withdraw> ReadLogs(IWebElement tbody, int page)
-    {
-        var allRows1 = FindElementsByXPath(tbody, ".//tr");
-        // 展开所有列表
-        var expandList = FindElementsByXPath(tbody, ".//tr/td/div/div[@class='ivu-table-cell-expand']");
-        foreach (var exBtn in expandList)
-        {
-            Helper.TryClick(wait, exBtn);
-        }
-
-        var allRows = FindElementsByXPath(tbody, ".//tr");
-        var allLogs = new List<Withdraw>();
-        var count = allRows.Count;
-        for (var i = 0; i < count; i++)
-        {
-            var row = allRows[i];
-            IWebElement rowEx = null;
-            var className = row.GetAttribute("class");
-            if (!className.StartsWith("ivu-table-row"))
-            {
-                continue;
-            }
-
-            if (i + 1 < count)
-            {
-                rowEx = allRows[i + 1].FindElement(By.XPath(".//td[@class='ivu-table-expanded-cell']"));
-                if (rowEx != null)
-                {
-                    i += 1;
-                }
-            }
-
-            if (rowEx == null)
-            {
-                throw new NoSuchElementException("not find rowEx");
-            }
-
-            var withdraw = Withdraw.Create(row, rowEx);
-            if (withdraw != null)
-            {
-                allLogs.Add(withdraw);
-            }
         }
 
         return allLogs;

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Reflection.Metadata.Ecma335;
+﻿namespace boin;
+
 using boin.Util;
 using OpenQA.Selenium;
-
-namespace boin;
 
 public class FundingDay
 {
@@ -89,7 +87,6 @@ public class FundingDay
         ChipToDiamondCount = int.Parse(chipToDiamond.Substring(0, index - 1));
         ChipToDiamondAmount = decimal.Parse(chipToDiamond.Substring(index + 1));
 
-
         // 提充客损
         ChargeCustomerLoss =
             Helper.ReadDecimal(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提充客损']/../td[2]")));
@@ -110,28 +107,24 @@ public class Funding
     public FundingDay Nearly2Months { get; set; } = new FundingDay();
 
     // 充值记录
-    public List<Recharge> RechargeLog { get; set; }
+    public List<Recharge> RechargeLog { get; set; } = new List<Recharge>();
 
     // 提现记录
-    public List<Withdraw> WithdrawLog { get; set; }
+    public List<Withdraw> WithdrawLog { get; set; } = new List<Withdraw>();
 
     public Funding()
     {
     }
 
-
     public bool IsSyncName
     {
         get
         {
-            if (RechargeLog != null)
+            foreach (var r in RechargeLog)
             {
-                foreach (var r in RechargeLog)
+                if (r.IsSyncName == false)
                 {
-                    if (r.IsSyncName == false)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
@@ -170,7 +163,7 @@ public class Funding
     }
 
     // 最近成功提现的订单
-    public Withdraw NearSuccessWithdraw(string orderId, string way, string cardNo)
+    public Withdraw? NearSuccessWithdraw(string orderId, string way, string cardNo)
     {
         foreach (var w in WithdrawLog)
         {
@@ -182,6 +175,7 @@ public class Funding
                 }
             }
         }
+
         return null;
     }
 
@@ -195,17 +189,13 @@ public class Funding
                 return w.Pass();
             }
         }
+
         return true;
     }
 
     // 最近多少笔波币提现
     public int NearBobiCount(string orderId, int maxCount)
     {
-        if (WithdrawLog == null)
-        {
-            return 0;
-        }
-
         int checkCount = 0;
         int bobiCount = 0;
         for (var i = 0; (i < WithdrawLog.Count && checkCount < maxCount); i++)
@@ -288,6 +278,7 @@ public class Funding
             }
         }
 
+
         time = DateTime.Now;
         return false;
     }
@@ -310,6 +301,7 @@ public class Funding
     public Dictionary<string, decimal> AllOtherRecharge(string name)
     {
         Dictionary<string, decimal> names = new Dictionary<string, decimal>();
+
         foreach (var r in RechargeLog)
         {
             if ((!string.IsNullOrEmpty(r.Payer)) && (r.Payer != name))
@@ -334,6 +326,7 @@ public class Funding
     {
         decimal total = 0;
         int count = 0;
+
         foreach (var r in RechargeLog)
         {
             if (r.RechargeChannel == chan)
@@ -370,4 +363,3 @@ public class Funding
         return false;
     }
 }
-

@@ -1,8 +1,8 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using boin.Util;
 
-namespace boin;
 
 public class BankCardInfo
 {
@@ -22,7 +22,7 @@ public class BankCardInfo
     public string stat = string.Empty;
 
     // 
-    public List<Dictionary<string, string>> messages;
+    public List<Dictionary<string, string>>? messages;
 
     public string CardTypeName
     {
@@ -82,7 +82,7 @@ public class WithdrawExpand
 
     }
 
-    public BankCardInfo BankCardInfo { get; set; }
+    public BankCardInfo? BankCardInfo { get; set; }
 
     // 开户行名称
     public string BankName { get; set; } = string.Empty;
@@ -90,7 +90,7 @@ public class WithdrawExpand
     private long nameLocker = 0;
 
     // 同步银行卡名称
-    protected void syncBankName()
+    private void syncBankName()
     {
         if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
         {

@@ -1,9 +1,8 @@
-using System.Text;
-using  boin.Util;
-using OpenCCNET;
-using OpenQA.Selenium.DevTools.V109.Target;
-
 namespace boin.Util;
+
+using System.Text;
+using OpenCCNET;
+
 
 public class StringUtility
 {

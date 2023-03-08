@@ -1,9 +1,7 @@
-﻿using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿namespace boin.Util;
+
 using Newtonsoft.Json;
 using RestSharp;
-
-namespace boin.Util;
 
 public class BankUtil
 {
@@ -180,7 +178,7 @@ public class BankUtil
     };
 
     // 通过银行简称获取银行卡所属银行全名 如没有查到全名则返回银行简称
-    public static string GetNameOfBank(string bankAbbreviation)
+    public static string GetNameOfBank(string? bankAbbreviation)
     {
         var n = bankAbbreviation ?? string.Empty;
         return bankDic.GetValueOrDefault(n, n);
@@ -193,7 +191,7 @@ public class BankUtil
     public static BankCardInfo GetBankInfo(string cardNo)
     {
         string url = aliUrl + cardNo;
-        string content = string.Empty;
+        string? content = string.Empty;
         try
         {
             content = Cache.GetBank(cardNo);
@@ -217,16 +215,21 @@ public class BankUtil
                     Thread.Sleep(100);
                 }
             }
-
-            var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
-            Cache.SaveBank(cardNo, content);
-            return bankInfo;
+            if (!string.IsNullOrEmpty(content))
+            {
+                var bankInfo = JsonConvert.DeserializeObject<BankCardInfo>(content);
+                if (bankInfo != null)
+                {
+                    Cache.SaveBank(cardNo, content);
+                    return bankInfo;
+                }
+            }
         }
         catch (Exception err)
         {
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add("Message", err.Message);
-            msg.Add("StackTrace", err.StackTrace);
+            msg.Add("StackTrace", err.StackTrace??string.Empty);
             msg.Add("content", content ?? string.Empty);
             var bankInfo = new BankCardInfo()
             {
@@ -237,6 +240,16 @@ public class BankUtil
             };
             return bankInfo;
         }
+        
+        var bankInfo2 = new BankCardInfo()
+        {
+            stat = "ok",
+            validated = true,
+            key = "",
+            messages = new List<Dictionary<string, string>>() {}
+        };
+        return bankInfo2;
+        
     }
 
 

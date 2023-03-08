@@ -1,4 +1,5 @@
 ﻿namespace boin;
+
 using boin.Bot;
 using boin.Util;
 
@@ -15,23 +16,22 @@ class Program
 
         while (true)
         {
-            using (BoinClient client = new BoinClient(cnf, authCnf))
+            BoinClient client = new BoinClient(cnf, authCnf);
+            try
+            {
+                client.Run();
+            }
+            catch (Exception err)
             {
                 try
                 {
-                    client.Run();
+                    Log.SaveException(err, client.driver);
                 }
-                catch (Exception err)
+                catch
                 {
-                    try
-                    {
-                        Log.SaveException(err, client.driver);
-                    }
-                    catch
-                    {
-                    }
-                    Thread.Sleep(30 * 1000);
                 }
+
+                Thread.Sleep(30 * 1000);
             }
         }
 

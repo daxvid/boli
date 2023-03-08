@@ -1,9 +1,8 @@
-﻿using System;
+﻿namespace boin;
+
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using boin.Util;
-
-namespace boin;
 
 public class GameBindPage : LablePage
 {
@@ -97,7 +96,7 @@ public class GameBindPage : LablePage
         return Binds;
     }
 
-    public GameBind Select(string gameId, string cardNo)
+    public GameBind? Select(string gameId, string cardNo)
     {
         if (trySelect(gameId, cardNo))
         {
@@ -107,7 +106,6 @@ public class GameBindPage : LablePage
                 return binds[0];
             }
         }
-
         return null;
     }
 

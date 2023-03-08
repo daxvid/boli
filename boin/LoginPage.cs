@@ -1,9 +1,9 @@
+namespace boin;
+
 using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using TwoStepsAuthenticator;
-
-namespace boin;
 
 public class LoginPage: PageBase
 {

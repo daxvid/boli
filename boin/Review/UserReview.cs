@@ -1,7 +1,6 @@
-using System;
-using System.Collections.ObjectModel;
-
 namespace boin.Review;
+
+using System.Collections.ObjectModel;
 
 public class UserReview : IReviewUser
 {

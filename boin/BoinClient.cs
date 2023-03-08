@@ -1,10 +1,9 @@
-﻿using boin.Review;
+﻿namespace boin;
+
+using boin.Review;
 using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using TwoStepsAuthenticator;
-
-namespace boin;
 
 public class BoinClient:IDisposable
 {
@@ -26,6 +25,11 @@ public class BoinClient:IDisposable
         this.reviewer = new ReviewManager(cnf.ReviewFile);
         this.driver = newDriver(cnf.Headless);
         Cache.Init(authCnf.Redis, authCnf.Platform);
+        
+        loginPage = new LoginPage(driver, cnf, authCnf);
+        bindPage = new GameBindPage(driver, cnf);
+        userPage = new UserPage(driver, cnf);
+        orderPage = new OrderPage(driver, cnf);
     }
 
     public void Dispose()
@@ -56,24 +60,14 @@ public class BoinClient:IDisposable
         Helper.SendMsg(msg);
     }
     
-    
-    void initPage()
-    {
-        bindPage = new GameBindPage(driver, cnf);
-        userPage = new UserPage(driver, cnf);
-        orderPage = new OrderPage(driver, cnf);
-        orderPage.InitItem();
-    }
-
     public void Run()
     {
-        loginPage = new LoginPage(driver, cnf, authCnf);
         if (!loginPage.Login())
         {
             return;
         }
 
-        initPage();
+        orderPage.InitItem();
 
         int zeroCount = 0;
         DateTime heartbeatTime = DateTime.Now;
@@ -122,6 +116,10 @@ public class BoinClient:IDisposable
             return;
         }
 
+        orderCount++;
+        var msg = orderCount.ToString() + ":" + order.OrderId;
+        using var span = new Span(msg);
+        SendMsg(msg);
         var user = LoadUser(order);
         ReviewUser(user);
     }
@@ -150,7 +148,7 @@ public class BoinClient:IDisposable
                 }, 1000, 10);
                 return orders;
             }
-            catch (WebDriverException e)
+            catch (WebDriverException)
             {
                 orderPage.Close();
                 orderPage = new OrderPage(driver, cnf);
@@ -159,7 +157,7 @@ public class BoinClient:IDisposable
         }
     }
 
-    User LoadUser(string gameId)
+    User LoadUser(Order order)
     {
         while (true)
         {
@@ -168,19 +166,19 @@ public class BoinClient:IDisposable
                 var user = Helper.SafeExec(driver,() =>
                 {
                     userPage.Open();
-                    var user = userPage.Select(gameId);
+                    var user = userPage.Select(order);
                     return user;
                 }, 1000, 10);
                 return user;
             }
-            catch (WebDriverException e)
+            catch (WebDriverException)
             {
                 userPage.Close();
                 userPage = new UserPage(driver, cnf);
             }
         }
     }
-    GameBind LoadBind(string gameId, string cardNo)
+    GameBind? LoadBind(string gameId, string cardNo)
     {
         while (true)
         {
@@ -194,7 +192,7 @@ public class BoinClient:IDisposable
                 }, 1000, 10);
                 return bind;
             }
-            catch (WebDriverException e)
+            catch (WebDriverException)
             {
                 bindPage.Close();
                 bindPage = new GameBindPage(driver, cnf);
@@ -218,20 +216,6 @@ public class BoinClient:IDisposable
         }
     }
     
-    User LoadUser(Order order)
-    {
-        orderCount++;
-        var msg = // "user:" + order.GameId + Environment.NewLine + "o_" +
-            orderCount.ToString() + ":" + order.OrderId;
-        using (var span = new Span())
-        {
-            SendMsg(msg);
-            span.Msg = msg;
-            var user = LoadUser(order.GameId);
-            user.Order = order;
-            return user;
-        }
-    }
     void Review(User user)
     {
         reviewer.Review(user);

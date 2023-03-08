@@ -1,5 +1,5 @@
-﻿using System;
-namespace boin.Review;
+﻿namespace boin.Review;
+
 
 public class ReviewManager
 {
