@@ -1,29 +1,22 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
-using boin.Util;
+using Boin.Util;
 
 // 审核之前的提现
-public class WithdrwReview : IReviewUser
+public class WithdrawReview : IReviewUser
 {
-    ReviewConfig cnf;
+    private readonly ReviewConfig config;
 
-    public WithdrwReview(ReviewConfig cnf)
+    public WithdrawReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
-
-
-    public ReadOnlyCollection<ReviewResult> Review(Order order)
-    {
-        return ReviewResult.Empty;
-    }
-
 
     public ReadOnlyCollection<ReviewResult> Review(User user)
     {
-        Order order = user.Order;
-        List<ReviewResult> rs = new List<ReviewResult>();
+        var order = user.Order;
+        var rs = new List<ReviewResult>();
         //最新两笔提款名字不一致-不可以通过
         var nearWithdraw = user.Funding.NearSuccessWithdraw(order.OrderId, order.Way, order.CardNo);
         if (order.Way == "银行卡")

@@ -1,21 +1,21 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
+using Boin.Util;
 
 // 提现记录
 public class WithdrawPage : PopPage
 {
-    public WithdrawPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+    public WithdrawPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
         "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span")
     {
-        this.maxPage = cnf.WithdrawMaxPage;
+        this.MaxPage = config.WithdrawMaxPage;
     }
 
     public List<Withdraw> Select(int maxDay)
     {
-        var table = getCurrentTable(1);
+        var table = GetCurrentTable(1);
         if (maxDay > 0)
         {
             var dayRang = FindElementByXPath(table,
@@ -23,7 +23,7 @@ public class WithdrawPage : PopPage
             Helper.SetDayRang(dayRang, maxDay);
             // 点击查询按钮;
             FindAndClickByXPath(table, ".//button/span[text()='查询']", 1000);
-            table = getCurrentTable(1);
+            table = GetCurrentTable(1);
         }
 
         return ReadWithdrawLog(table);
@@ -37,7 +37,7 @@ public class WithdrawPage : PopPage
         var tbody = FindElementByXPath(table, bodyPath);
         var allLogs = ReadWithdraws(tbody, 1);
 
-        for (var page = 2; page <= maxPage; page++)
+        for (var page = 2; page <= MaxPage; page++)
         {
             // 去到下一页
             if (!GoToNextPage(table))
@@ -45,7 +45,7 @@ public class WithdrawPage : PopPage
                 break;
             }
 
-            table = getCurrentTable(page);
+            table = GetCurrentTable(page);
             tbody = FindElementByXPath(table, bodyPath);
 
             var logs = ReadWithdraws(tbody, page);
@@ -81,10 +81,7 @@ public class WithdrawPage : PopPage
             }
 
             var withdraw = Withdraw.Create(row, rowEx);
-            if (withdraw != null)
-            {
-                allLogs.Add(withdraw);
-            }
+            allLogs.Add(withdraw);
         }
 
         return allLogs;

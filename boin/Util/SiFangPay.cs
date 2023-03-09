@@ -1,4 +1,4 @@
-namespace boin.Util;
+namespace Boin.Util;
 
 // 四方查询
 public class SiFangPay

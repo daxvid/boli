@@ -1,8 +1,7 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using YamlDotNet.Serialization;
-using boin.Util;
-
+using Boin.Util;
 
 //新会员(注册时间一个月内)波币当日提款不超过3000
 //老会员(注册时间一个月以上)波币当日提款不超过6000
@@ -47,21 +46,18 @@ public class AmountConfig
     {
         foreach (var kv in BanGames)
         {
-            var k = kv.Key;
+            var key = kv.Key;
             foreach (var ban in kv.Value)
             {
-                if (!string.IsNullOrEmpty(ban))
+                if ((!string.IsNullOrEmpty(ban)) && game.Contains(ban))
                 {
-                    if (game.Contains(ban))
+                    if (key == "all")
                     {
-                        if (k == "all")
-                        {
-                            return ban;
-                        }
-                        else if (k == platform)
-                        {
-                            return k + ban;
-                        }
+                        return ban;
+                    }
+                    else if (key == platform)
+                    {
+                        return key + ban;
                     }
                 }
             }
@@ -124,19 +120,17 @@ public class ReviewConfig
 
     public AmountConfig GetAmountConfig(string way, bool isNew)
     {
-        if (way == "银行卡")
+        return way switch
         {
-            return isNew ? NewBank : OldBank;
-        }
-        else //if (way == "数字钱包")
-        {
-            return isNew ? NewBobi : OldBobi;
-        }
+            "银行卡" => isNew ? NewBank : OldBank,
+            _ => isNew ? NewBobi : OldBobi
+
+        };
     }
 
     public static ReviewConfig FromYamlFile(string path)
     {
-        string yml = File.ReadAllText(path);
+        var yml = File.ReadAllText(path);
         var deserializer = new DeserializerBuilder().Build();
         var cnf = deserializer.Deserialize<ReviewConfig>(yml);
         cnf.NewBank.Init();

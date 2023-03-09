@@ -1,15 +1,15 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
 
 // 充值记录
 public class RechargeReview : IReviewUser
 {
-    ReviewConfig cnf;
+    private readonly ReviewConfig config;
 
-    public RechargeReview(ReviewConfig cnf)
+    public RechargeReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
 
     public ReadOnlyCollection<ReviewResult> Review(User user)
@@ -18,50 +18,43 @@ public class RechargeReview : IReviewUser
         List<ReviewResult> rs = new List<ReviewResult>();
         var f = user.Funding;
 
-        // if (f.ExistsChan("飞天"))
-        // {
-        //     rs.Add(new ReviewResult { Code = 201, Msg = 飞天人工:" + order.Payee });
-        //     return new ReadOnlyCollection<ReviewResult>(rs);;
-        // }
-
-        if (order.Way == "银行卡")
+        ReviewResult r;
+        var name = f.FirstOtherRechargeName(order.Payee);
+        switch (order.Way)
         {
-            // 检查银行卡姓名充值是否一致
-            var t2 = f.OtherRechargeAmount(order.Payee);
-            if (t2 > 0)
-            {
-                var name = f.FirstOtherRechargeName(order.Payee);
-                rs.Add(new ReviewResult { Code = 401, Msg = "其它名字充值:" + name });
-            }
-            else
-            {
-                var t1 = f.TotalRechargeAmount(order.Payee);
-                if (t1 <= 0)
+            case "银行卡":
+                // 检查银行卡姓名充值是否一致
+                var t2 = f.OtherRechargeAmount(order.Payee);
+                if (t2 > 0)
                 {
-                    rs.Add(new ReviewResult { Code = 402, Msg = "最近无充值:" + order.Payee });
-                }
-                else if (t1 < order.Amount)
-                {
-                    rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 });
+                    r = new ReviewResult { Code = 401, Msg = "其它名字充值:" + name };
                 }
                 else
                 {
-                    rs.Add(new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 });
+                    var t1 = f.TotalRechargeAmount(order.Payee);
+                    if (t1 <= 0)
+                    {
+                        r = new ReviewResult { Code = 402, Msg = "最近无充值:" + order.Payee };
+                    }
+                    else if (t1 < order.Amount)
+                    {
+                        r = new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 };
+                    }
+                    else
+                    {
+                        r = new ReviewResult { Code = 0, Msg = "@总充通过:" + t1 };
+                    }
                 }
-            }
+
+                break;
+            default:
+                r = string.IsNullOrEmpty(name)
+                    ? new ReviewResult { Code = 0, Msg = "@币充值通过" }
+                    : new ReviewResult { Code = 402, Msg = "其它名字充值:" + name };
+                break;
         }
-        else
-        {
-            var name = f.FirstOtherRechargeName(order.Payee);
-            if (string.IsNullOrEmpty(name))
-            {
-                rs.Add(new ReviewResult { Code = 0, Msg = "@币充值通过" });
-            }
-            else
-            {
-                rs.Add(new ReviewResult { Code = 402, Msg = "其它名字充值:" + name });
-            }
-        }
+
+        rs.Add(r);
 
         var rbc = RechargeByChannel(user);
         if (rbc != null)
@@ -77,15 +70,15 @@ public class RechargeReview : IReviewUser
     // 计算日期:上一笔提款日-最新一笔提款日
     // 金额>2000-人工审核
     // 金额<2000，笔数小于3笔的-可以机器人审核，笔数>三笔的-人工审核
-    public ReviewResult? RechargeByChannel(User user)
+    private ReviewResult? RechargeByChannel(User user)
     {
         Order order = user.Order;
-        if (!user.Funding.LastSuccessWithdrawTime(order.OrderId, out DateTime startTime))
+        if (!user.Funding.LastSuccessWithdrawTime(order.OrderId, out var startTime))
         {
             startTime = DateTime.Now.AddDays(-21);
         }
 
-        foreach (var kv in cnf.RechargeChannel)
+        foreach (var kv in config.RechargeChannel)
         {
             var pair = user.Funding.TotalRechargeByChannel(kv.Key, startTime);
             if (pair.Item1 > kv.Value[0])

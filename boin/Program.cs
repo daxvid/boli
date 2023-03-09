@@ -1,14 +1,14 @@
-﻿namespace boin;
+﻿namespace Boin;
 
-using boin.Bot;
-using boin.Util;
+using Boin.Bot;
+using Boin.Util;
 
 class Program
 {
     static void Main(string[] args)
     {
-        AppConfig cnf = AppConfig.FromYamlFile("app.yaml");
-        AuthConfig authCnf = AuthConfig.FromYamlFile("auth.yaml");
+        var cnf = AppConfig.FromYamlFile("app.yaml");
+        var authCnf = AuthConfig.FromYamlFile("auth.yaml");
         SiFangPay.Host = authCnf.SiFangHost;
         FeiTianPay.Cnf = authCnf.FeiTian;
 
@@ -16,25 +16,16 @@ class Program
 
         while (true)
         {
-            BoinClient client = new BoinClient(cnf, authCnf);
+            using var client = new BoinClient(cnf, authCnf);
             try
             {
                 client.Run();
             }
             catch (Exception err)
             {
-                try
-                {
-                    Log.SaveException(err, client.driver);
-                }
-                catch
-                {
-                }
-
-                Thread.Sleep(30 * 1000);
+                client.SaveException(err);
             }
+            Thread.Sleep(30 * 1000);
         }
-
     }
 }
-

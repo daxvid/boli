@@ -1,22 +1,22 @@
-﻿namespace boin.Util;
+﻿namespace Boin.Util;
 
 using System;
 using StackExchange.Redis;
 
 public class Cache
 {
-    static ConnectionMultiplexer? redis;
-    static IDatabase? db;
-    static object _locker = new object();
-    static string Platform = string.Empty;
+    static ConnectionMultiplexer? _redis;
+    static IDatabase? _db;
+    private static readonly object _locker = new object();
+    static string _platform = string.Empty;
 
     public static void Init(string strConn = "localhost", string platform = "")
     {
-        Platform = platform;
+        _platform = platform;
         lock (_locker)
         {
-            redis = ConnectionMultiplexer.Connect(strConn);
-            db = redis.GetDatabase();
+            _redis = ConnectionMultiplexer.Connect(strConn);
+            _db = _redis.GetDatabase();
         }
     }
 
@@ -25,7 +25,7 @@ public class Cache
         var key = "b." + card;
         lock (_locker)
         {
-            db!.StringSet(key, msg, TimeSpan.FromDays(30));
+            _db!.StringSet(key, msg, TimeSpan.FromDays(30));
         }
     }
 
@@ -34,45 +34,45 @@ public class Cache
         var key = "b." + card;
         lock (_locker)
         {
-            string? value = db!.StringGet(key);
+            string? value = _db!.StringGet(key);
             return value;
         }
     }
 
     public static void SaveOrder(string orderId, string msg)
     {
-        var key = Platform + ".o." + orderId;
+        var key = _platform + ".o." + orderId;
         lock (_locker)
         {
-            db!.StringSet(key, msg, TimeSpan.FromDays(3));
+            _db!.StringSet(key, msg, TimeSpan.FromDays(3));
         }
     }
 
     public static string? GetOrder(string orderId)
     {
-        var key = Platform + ".o." + orderId;
+        var key = _platform + ".o." + orderId;
         lock (_locker)
         {
-            string? value = db!.StringGet(key);
+            string? value = _db!.StringGet(key);
             return value;
         }
     }
 
     public static void SaveRecharge(string card, string msg)
     {
-        var key = Platform + ".r." + card;
+        var key = _platform + ".r." + card;
         lock (_locker)
         {
-            db!.StringSet(key, msg, TimeSpan.FromDays(60));
+            _db!.StringSet(key, msg, TimeSpan.FromDays(60));
         }
     }
 
     public static string? GetRecharge(string card)
     {
-        var key = Platform + ".r." + card;
+        var key = _platform + ".r." + card;
         lock (_locker)
         {
-            string? value = db!.StringGet(key);
+            string? value = _db!.StringGet(key);
             return value;
         }
     }
@@ -80,19 +80,19 @@ public class Cache
 
     public static void SaveGameBind(string card, string msg)
     {
-        var key = Platform + ".gb." + card;
+        var key = _platform + ".gb." + card;
         lock (_locker)
         {
-            db!.StringSet(key, msg, TimeSpan.FromDays(2));
+            _db!.StringSet(key, msg, TimeSpan.FromDays(2));
         }
     }
 
     public static string? GetGameBind(string card)
     {
-        var key = Platform + ".gb." + card;
+        var key = _platform + ".gb." + card;
         lock (_locker)
         {
-            string? value = db!.StringGet(key);
+            string? value = _db!.StringGet(key);
             return value;
         }
     }

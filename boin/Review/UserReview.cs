@@ -1,35 +1,31 @@
-namespace boin.Review;
+namespace Boin.Review;
 
 using System.Collections.ObjectModel;
 
 public class UserReview : IReviewUser
 {
-    static readonly ReadOnlyCollection<ReviewResult> empty =
-        new ReadOnlyCollection<ReviewResult>(new List<ReviewResult>());
 
-    ReviewConfig cnf;
+    private readonly ReviewConfig config;
 
-    public UserReview(ReviewConfig cnf)
+    public UserReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
 
     public ReadOnlyCollection<ReviewResult> Review(User user)
     {
-        if (string.IsNullOrEmpty(user.Remark))
+        if (!string.IsNullOrEmpty(user.Remark))
         {
-            return empty;
-        }
-
-        foreach (var key in cnf.RemarkKeys)
-        {
-            if (user.Remark.Contains(key))
+            foreach (var key in config.RemarkKeys)
             {
-                return new ReadOnlyCollection<ReviewResult>(
-                    new List<ReviewResult>() { new ReviewResult { Code = 501, Msg = "备注包含:" + key } });
+                if (user.Remark.Contains(key))
+                {
+                    return new ReadOnlyCollection<ReviewResult>(
+                        new List<ReviewResult>() { new ReviewResult { Code = 501, Msg = "备注包含:" + key } });
+                }
             }
         }
 
-        return empty;
+        return ReviewResult.Empty;
     }
 }

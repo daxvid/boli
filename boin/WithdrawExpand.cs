@@ -1,8 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
-
+using Boin.Util;
 
 public class BankCardInfo
 {
@@ -86,11 +85,11 @@ public class WithdrawExpand
 
     // 开户行名称
     public string BankName { get; set; } = string.Empty;
-    
+
     private long nameLocker = 0;
 
     // 同步银行卡名称
-    private void syncBankName()
+    private void SyncBankName()
     {
         if (Interlocked.CompareExchange(ref nameLocker, 1, 0) == 0)
         {
@@ -113,9 +112,9 @@ public class WithdrawExpand
     }
 
 
-    public void ReadExpand(IWebElement rowEx, bool readBankInfo)
+    protected void ReadExpand(IWebElement rowEx, bool readBankInfo)
     {
-        var ex = readEx(rowEx);
+        var ex = ReadEx(rowEx);
         this.PayChan = Helper.GetValue(ex, "支付渠道：");
         this.Payee = Helper.GetValue(ex, "实名：");
         this.CardNo = Helper.GetValue(ex, "账号/卡号：");
@@ -127,11 +126,11 @@ public class WithdrawExpand
         this.UserError = Helper.GetValue(ex, "用户显示错误：");
         if (readBankInfo)
         {
-            syncBankName();
+            SyncBankName();
         }
     }
 
-    Dictionary<string, string> readEx(IWebElement row)
+    Dictionary<string, string> ReadEx(IWebElement row)
     {
         var cells = row.FindElements(By.XPath(".//div[@class='ivu-col ivu-col-span-8']"));
         Dictionary<string, string> dic = new Dictionary<string, string>(cells.Count * 3 / 2);

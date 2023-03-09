@@ -1,4 +1,4 @@
-﻿namespace boin.Util;
+﻿namespace Boin.Util;
 
 
 public class Span : IDisposable

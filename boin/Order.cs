@@ -1,9 +1,9 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using System.Text;
-using boin.Review;
 using OpenQA.Selenium;
-using boin.Util;
+using Boin.Review;
+using Boin.Util;
 
 public enum OrderReviewEnum
 {
@@ -13,7 +13,7 @@ public enum OrderReviewEnum
         Doubt = 3,    // 有疑问，需人工
 }
 
-    // 提现订单
+// 提现订单
 public class Order : WithdrawExpand
 {
     // 订单号
@@ -88,7 +88,6 @@ public class Order : WithdrawExpand
     {
         get
         {
-
             foreach (var r in ReviewResult)
             {
                 if (r.Code < 0)
@@ -105,7 +104,6 @@ public class Order : WithdrawExpand
     {
         get
         {
-
             foreach (var r in ReviewResult)
             {
                 if (r.Code < 0)
@@ -159,8 +157,7 @@ public class Order : WithdrawExpand
         return m;
     }
 
-
-    public static readonly string[] Heads = new string[]
+    private static readonly string[] Heads = new string[]
     {
         string.Empty, "订单号", "发起时间", "到账时间", "游戏ID",
         "用户昵称", "提现金额", "通道", "状态", "转账", "操作类型", "操作人", "提现备注", "操作"
@@ -176,7 +173,7 @@ public class Order : WithdrawExpand
         }
 
         var orderId = Helper.ReadString(ts[1]);
-        Order order = new Order()
+        var order = new Order()
         {
             OrderId = orderId, // 订单号
             Created = Helper.ReadShortTime(ts[2]), // 发起时间

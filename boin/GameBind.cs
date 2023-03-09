@@ -1,8 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
-
+using Boin.Util;
 
 public class GameBind
 {
@@ -31,7 +30,7 @@ public class GameBind
     public string Remark { get; set; } = string.Empty;
 
 
-    public static readonly string[] Heads = new string[]
+    private static readonly string[] Heads = new string[]
     {
         "", "游戏ID", "支付渠道", "银行名称", "收款人", "收款账号/卡号", "开户支行",
         "创建时间", "备注", "操作"

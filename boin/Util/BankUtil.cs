@@ -1,4 +1,4 @@
-﻿namespace boin.Util;
+﻿namespace Boin.Util;
 
 using Newtonsoft.Json;
 using RestSharp;

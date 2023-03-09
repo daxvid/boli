@@ -1,4 +1,4 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -45,11 +45,10 @@ public class Head
         var heads = table.FindElements(By.XPath(".//div[@class='ivu-table-header']/table/thead/tr/th"));
         foreach (var th in heads)
         {
-            var value = string.Empty;
             var tag = th.GetAttribute("class");
             if (!string.IsNullOrEmpty(tag))
             {
-                value = th.Text;
+                var value = th.Text;
                 listHead.Add(new Head { Name = value, Tag = tag });
             }
         }
@@ -60,14 +59,6 @@ public class Head
 
 public class Table
 {
-    IWebElement tb;
-    public List<Head> Heards = new List<Head>();
-
-    public Table(IWebElement tb)
-    {
-        this.tb = tb;
-    }
-
     public static Tuple<IWebElement, List<Head>>? FindTable(ChromeDriver driver, IEnumerable<String> headNames)
     {
         var tables = driver.FindElements(By.ClassName("ivu-table"));

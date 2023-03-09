@@ -1,47 +1,19 @@
-namespace boin;
+namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
+using Boin.Util;
 
-public class ReviewHintPage : PageBase
+public class ReviewHintPage : ClosePage
 {
-    private readonly Order order;
-    private readonly string path;
-    private readonly IWebElement mainTable;
-    private readonly IWebElement closeBtn;
-    private bool closed = false;
+    private static readonly string path =
+        ".//div/div[@class='ivu-modal-content ivu-modal-content-no-mask']/div[1]/div[text()='提示' and @class='modal_header']/../..";
 
-    public ReviewHintPage(ChromeDriver driver, AppConfig cnf, Order order) : base(driver, cnf)
+    private readonly Order order;
+
+    public ReviewHintPage(ChromeDriver driver, AppConfig config, Order order) : base(driver, config, path)
     {
         this.order = order;
-        this.path =
-            ".//div[@class='ivu-modal-content ivu-modal-content-no-mask']/div[1]/div[text()='提示' and @class='modal_header']/../..";
-
-        // <div class="ivu-modal-content ivu-modal-content-no-mask">
-        mainTable = FindElementByXPath(this.path);
-        closeBtn = FindElementByXPath(mainTable, "./a[@class='ivu-modal-close']/i");
-    }
-
-    public override bool Close()
-    {
-        if (closed)
-        {
-            return false;
-        }
-
-        closed = true;
-        try
-        {
-            if (closeBtn.Enabled)
-            {
-                closeBtn.Click();
-            }
-        }
-        catch
-        {
-        }
-        return true;
     }
 
     public bool Confirm()
@@ -58,8 +30,8 @@ public class ReviewHintPage : PageBase
 
         try
         {
-            var amount = Helper.ReadDecimal(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[1]"));
-            var cardNo = Helper.ReadString(FindElementByXPath(mainTable, "./div[2]/div[@class='modal_main']/span[2]"));
+            var amount = Helper.ReadDecimal(FindElementByXPath(MainTable, "./div[2]/div[@class='modal_main']/span[1]"));
+            var cardNo = Helper.ReadString(FindElementByXPath(MainTable, "./div[2]/div[@class='modal_main']/span[2]"));
             if (order.CardNo != cardNo || order.Amount != amount)
             {
                 return false;
@@ -67,12 +39,12 @@ public class ReviewHintPage : PageBase
         }
         catch (Exception err)
         {
-            Console.WriteLine(err);
+            Log.SaveException(err, Driver);
             return false;
-        } 
+        }
 
         // 点击确认按钮
-        FindAndClickByXPath(mainTable, "./div[2]/div[2]/button/span/span", 1000);
+        FindAndClickByXPath(MainTable, "./div[2]/div[2]/button/span/span", 1000);
 
         // 等待另外一个确认框然后关闭
         // 审核通过/审核成功/确定

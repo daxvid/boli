@@ -1,4 +1,4 @@
-namespace boin.Util;
+namespace Boin.Util;
 
 using System;
 using OpenQA.Selenium;
@@ -8,10 +8,10 @@ public class Log
 {
     public static void Debug()
     {
-        
+
     }
 
-    public static void SaveException(Exception e, ChromeDriver? driver= null)
+    public static void SaveException(Exception e, ChromeDriver? driver = null)
     {
         var msg = e.ToString();
         string dir = Path.Join(Environment.CurrentDirectory, "log");
@@ -30,10 +30,10 @@ public class Log
             }
             else
             {
-                var st = e.StackTrace??string.Empty;
+                var st = e.StackTrace ?? string.Empty;
                 Console.WriteLine(msg);
                 Console.WriteLine(st);
-                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { msg, st});
+                File.WriteAllLines(Path.Join(dir, t + ".txt"), new string[] { msg, st });
             }
         }
 
@@ -43,11 +43,10 @@ public class Log
         }
     }
 
-    private static void TakeScreenshot(ChromeDriver driver, string dir, string t)
+    public static void TakeScreenshot(ChromeDriver driver, string dir, string t)
     {
-            ITakesScreenshot ssdriver = driver as ITakesScreenshot;
-            Screenshot screenshot = ssdriver.GetScreenshot();
-            screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
+        ITakesScreenshot ssdriver = driver as ITakesScreenshot;
+        Screenshot screenshot = ssdriver.GetScreenshot();
+        screenshot.SaveAsFile(Path.Join(dir, t + ".png"), ScreenshotImageFormat.Png);
     }
-
 }

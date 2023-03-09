@@ -1,7 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
+using Boin.Util;
 
 public class User
 {

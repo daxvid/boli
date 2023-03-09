@@ -1,25 +1,25 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 
 public class ReviewManager
 {
-    public ReviewConfig Cnf;
-    List<IReviewUser> userReviews = new List<IReviewUser>();
-    List<IReviewOrder> orderReviews = new List<IReviewOrder>();
+    private readonly ReviewConfig config;
+    private readonly List<IReviewUser> userReviews = new List<IReviewUser>();
+    private readonly List<IReviewOrder> orderReviews = new List<IReviewOrder>();
 
     //public 
 
     public ReviewManager(string cnfFile)
     {
         var cnf = ReviewConfig.FromYamlFile(cnfFile);
-        Cnf = cnf;
+        config = cnf;
 
         orderReviews.Add(new BankCardReview(cnf));
 
         userReviews.Add(new UserReview(cnf));
         userReviews.Add(new BankCardReview(cnf));
         userReviews.Add(new AmountReview(cnf));
-        userReviews.Add(new WithdrwReview(cnf));
+        userReviews.Add(new WithdrawReview(cnf));
         userReviews.Add(new RechargeReview(cnf));
         userReviews.Add(new GameReview(cnf));
     }
@@ -31,7 +31,7 @@ public class ReviewManager
         foreach (var review in orderReviews)
         {
             var rs = review.Review(order);
-            if (rs != null && rs != ReviewResult.Empty)
+            if (rs != ReviewResult.Empty)
             {
                 order.ReviewResult.AddRange(rs);
                 foreach (var r in rs)
@@ -52,7 +52,7 @@ public class ReviewManager
         foreach (var review in userReviews)
         {
             var rs = review.Review(user);
-            if (rs != null && rs != ReviewResult.Empty)
+            if (rs != ReviewResult.Empty)
             {
                 user.Order.ReviewResult.AddRange(rs);
                 foreach (var r in rs)

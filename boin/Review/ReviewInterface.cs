@@ -1,4 +1,4 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
 

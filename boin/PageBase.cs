@@ -1,25 +1,25 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using System.Collections.ObjectModel;
-using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using Boin.Util;
 
 public class PageBase : IDisposable
 {
-    protected ChromeDriver driver;
-    protected WebDriverWait wait;
-    protected int maxPage = 4;
-    protected AppConfig cnf;
+    protected readonly ChromeDriver Driver;
+    protected readonly WebDriverWait wait;
+    protected int MaxPage = 4;
+    protected readonly AppConfig Config;
 
-    protected static readonly ReadOnlyCollection<IWebElement> EmptyElements =
+    private static readonly ReadOnlyCollection<IWebElement> EmptyElements =
         new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
-    protected PageBase(ChromeDriver driver, AppConfig cnf)
+    protected PageBase(ChromeDriver driver, AppConfig config)
     {
-        this.cnf = cnf;
-        this.driver = driver;
+        this.Config = config;
+        this.Driver = driver;
         this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
     }
 
@@ -30,11 +30,11 @@ public class PageBase : IDisposable
 
     protected bool SetTextElement(By by, string txt)
     {
-        var result = wait.Until(driver =>
+        var result = wait.Until(drv =>
         {
             try
             {
-                var es = driver.FindElements(by);
+                var es = drv.FindElements(by);
                 if (es.Count == 0)
                 {
                     return false;
@@ -68,7 +68,7 @@ public class PageBase : IDisposable
 
     protected bool SetTextElement(IWebElement e, By by, string txt)
     {
-        var result = wait.Until(driver =>
+        var result = wait.Until(drv =>
         {
             try
             {
@@ -106,13 +106,13 @@ public class PageBase : IDisposable
 
     protected IWebElement FindElement(By by)
     {
-        return wait.Until(driver => driver.FindElement(by));
+        return wait.Until(drv => drv.FindElement(by));
         IWebElement r = null;
-        var result = wait.Until(driver =>
+        var result = wait.Until(drv =>
         {
             try
             {
-                var es = driver.FindElements(by);
+                var es = drv.FindElements(by);
                 if (es.Count == 0)
                 {
                     return false;
@@ -144,9 +144,9 @@ public class PageBase : IDisposable
 
     protected IWebElement FindElement(IWebElement e, By by)
     {
-        return wait.Until(driver => e.FindElement(by));
+        return wait.Until(drv => e.FindElement(by));
         IWebElement r = null;
-        var result = wait.Until(driver =>
+        var result = wait.Until(drv =>
         {
             try
             {
@@ -182,11 +182,11 @@ public class PageBase : IDisposable
 
     protected ReadOnlyCollection<IWebElement> FindElements(By by)
     {
-        var result = wait.Until(driver =>
+        var result = wait.Until(drv =>
         {
             try
             {
-                var es = driver.FindElements(by);
+                var es = drv.FindElements(by);
                 return es;
             }
             catch (NoSuchElementException)
@@ -205,7 +205,7 @@ public class PageBase : IDisposable
 
     protected ReadOnlyCollection<IWebElement> FindElements(IWebElement e, By by)
     {
-        var result = wait.Until(driver => e.FindElements(by));
+        var result = wait.Until(drv => e.FindElements(by));
         return result;
     }
 
@@ -216,9 +216,9 @@ public class PageBase : IDisposable
 
     protected void FindAndClick(By by, int ms)
     {
-        wait.Until(driver =>
+        wait.Until(drv =>
         {
-            var btn = driver.FindElement(by);
+            var btn = drv.FindElement(by);
             btn.Click();
             Thread.Sleep(ms);
             return true;
@@ -232,7 +232,7 @@ public class PageBase : IDisposable
 
     protected void FindAndClick(IWebElement e, By by, int ms)
     {
-        wait.Until(driver =>
+        wait.Until(drv =>
         {
             var btn = e.FindElement(by);
             btn.Click();
@@ -243,25 +243,24 @@ public class PageBase : IDisposable
 
     protected bool SafeClick(IWebElement btn, int ms = 0)
     {
-        if (btn.Enabled)
+        return wait.Until(drv =>
         {
-            return wait.Until(driver =>
+            try
             {
-                try
+                if (btn.Enabled)
                 {
                     btn.Click();
                     Thread.Sleep(ms);
-                    return true;
-                }
-                catch (ElementClickInterceptedException)
-                {
                 }
 
-                return false;
-            });
-        }
+                return true;
+            }
+            catch (ElementClickInterceptedException)
+            {
+            }
 
-        return true;
+            return false;
+        });
     }
 
     protected bool GoToPage(int index, string item)
@@ -276,9 +275,8 @@ public class PageBase : IDisposable
         return true;
     }
 
-    public virtual bool Close()
+    public virtual void Close()
     {
-        return true;
     }
 
     public virtual void SendMsg(string msg)
@@ -343,6 +341,5 @@ public class PageBase : IDisposable
         Thread.Sleep(ms);
         return true;
     }
-
 }
 

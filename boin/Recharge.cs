@@ -1,9 +1,9 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
+using Boin.Util;
 
-    // 充值
+// 充值
 public class Recharge
 {
     // 游戏ID	
@@ -55,15 +55,12 @@ public class Recharge
     {
     }
 
-    public bool IsSyncName
-    {
-        get { return Interlocked.Read(ref nameLocker) == 2; }
-    }
+    public bool IsSyncName => Interlocked.Read(ref nameLocker) == 2;
 
     private long nameLocker = 0;
 
     // 同步姓名
-    public void SyncName()
+    private void SyncName()
     {
         if (Interlocked.CompareExchange(ref nameLocker, 1, 0) != 0)
         {
@@ -111,7 +108,7 @@ public class Recharge
         });
     }
 
-    public static readonly string[] Heads = new string[]
+    private static readonly string[] Heads = new string[]
     {
         "充值账户游戏ID", "用户昵称", "存款人", "订单号", "外部订单号",
         "充值金额", "首充", "实际到账金额", "充值类型", "充值接口", "VIP期数", "时间", "说明"
@@ -143,7 +140,7 @@ public class Recharge
             Created = Helper.ReadDateTime(ts[11]), // 时间
             Mark = Helper.ReadString(ts[12]), // 说明
         };
-
+        log.SyncName();
         span.Msg = "充值:" + log.OrderId;
         return log;
     }

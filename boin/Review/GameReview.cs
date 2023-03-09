@@ -1,26 +1,26 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
 
 // 游戏审核
 public class GameReview : IReviewUser
 {
-    ReviewConfig cnf;
+    private readonly ReviewConfig config;
 
-    public GameReview(ReviewConfig cnf)
+    public GameReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
 
     public ReadOnlyCollection<ReviewResult> Review(User user)
     {
         List<ReviewResult> rs = new List<ReviewResult>();
         var order = user.Order;
-        bool isNew = user.IsNewUser();
-        var ac = cnf.GetAmountConfig(order.Way, isNew);
+        var isNew = user.IsNewUser();
+        var ac = config.GetAmountConfig(order.Way, isNew);
 
         // 检查用户玩的游戏
-        bool pass = true;
+        var pass = true;
         foreach (var g in user.GameInfo.GameLogs)
         {
             var game = ac.ExistsGame(g.GamePlatform, g.GameName);

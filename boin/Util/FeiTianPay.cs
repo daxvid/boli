@@ -1,4 +1,4 @@
-namespace boin.Util;
+namespace Boin.Util;
 
 // 飞天接口订单查询
 // 1. 创建订单

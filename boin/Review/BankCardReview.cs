@@ -1,35 +1,29 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
-using boin.Util;
+using Boin.Util;
 
-
-    // 银行卡审核
+// 银行卡审核
 public class BankCardReview : IReviewInterface
 {
-    ReviewConfig cnf;
+    private readonly ReviewConfig config;
 
-    public BankCardReview(ReviewConfig cnf)
+    public BankCardReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
 
     public ReadOnlyCollection<ReviewResult> Review(Order order)
     {
         List<ReviewResult> rs = new List<ReviewResult>();
 
-        if (order.Way == "银行卡")
+        var re = order.Way switch
         {
-            rs.Add(ReviewBank(order));
-        }
-        else if (order.Way == "数字钱包")
-        {
-            rs.Add(ReviewBobi(order));
-        }
-        else
-        {
-            rs.Add(new ReviewResult { Code = -103, Msg = "未知的通道:" + order.Way });
-        }
+            "银行卡" => ReviewBank(order),
+            "数字钱包" => ReviewBobi(order),
+            _ => new ReviewResult { Code = -103, Msg = "未知的通道:" + order.Way }
+        };
+        rs.Add(re);
 
         if ((!string.IsNullOrEmpty(order.Payee)) && (!IsChineseName(order.Payee)))
         {
@@ -37,23 +31,6 @@ public class BankCardReview : IReviewInterface
         }
 
         return new ReadOnlyCollection<ReviewResult>(rs);
-    }
-
-    private bool IsChineseName(string name)
-    {
-        if (name.Length < 2)
-        {
-            return false;
-        }
-        foreach (var n in name)
-        {
-            // [\u4e00-\u9fcb]
-            if (n != '.' && (n < '\u4E00' || n > '\u9FCB'))
-            {
-                return false;
-            }
-        }
-        return true;
     }
 
     private ReviewResult ReviewBank(Order order)
@@ -68,12 +45,12 @@ public class BankCardReview : IReviewInterface
         // 银行卡状态。值：ok，no。
         if (!bankInfo.stat.Equals("ok"))
         {
-            return new ReviewResult { Code = -101, Msg = "卡不可用" + order.CardNo };
+            return new ReviewResult { Code = 101, Msg = "卡不可用" + order.CardNo };
         }
         // 有效性，是否正确有效。值：true为是，false为否。
         else if (!bankInfo.validated)
         {
-            return new ReviewResult { Code = -102, Msg = "卡不正确:" + order.CardNo };
+            return new ReviewResult { Code = 102, Msg = "卡号不正确"};
         }
         else
         {
@@ -92,7 +69,7 @@ public class BankCardReview : IReviewInterface
     private ReviewResult ReviewBobi(Order order)
     {
         // 波币地址格式检查
-        if (!checkBobiAddress(order.CardNo))
+        if (!CheckBobiAddress(order.CardNo))
         {
             return new ReviewResult { Code = -101, Msg = "波币资讯有误请填写正确地址谢谢" };
         }
@@ -122,7 +99,7 @@ public class BankCardReview : IReviewInterface
         return ReviewResult.Empty;
     }
 
-    private bool checkBobiAddress(string address)
+    private bool CheckBobiAddress(string address)
     {
         if (string.IsNullOrEmpty(address) || address.Length < 12)
         {
@@ -135,6 +112,23 @@ public class BankCardReview : IReviewInterface
         }
 
         return Helper.IsHexadecimal(address);
+    }
+    
+    private bool IsChineseName(string name)
+    {
+        if (name.Length < 2)
+        {
+            return false;
+        }
+        foreach (var n in name)
+        {
+            // [\u4e00-\u9fcb]
+            if (n != '.' && (n < '\u4E00' || n > '\u9FCB'))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }
 

@@ -1,7 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
+using Boin.Util;
 
 public class Withdraw : WithdrawExpand
 {
@@ -39,7 +39,7 @@ public class Withdraw : WithdrawExpand
     {
     }
 
-    public static string[] Heads = new string[]
+    private static readonly string[] Heads = new string[]
     {
         string.Empty, "订单号", "发起时间", "到账时间", "游戏ID", "用户昵称", "提现金额",
         "通道", "状态", "转账", "操作类型"

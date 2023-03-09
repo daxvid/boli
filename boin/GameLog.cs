@@ -1,7 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
-using boin.Util;
+using Boin.Util;
 
 // 游戏日志
 public class GameLog
@@ -69,7 +69,7 @@ public class GameLog
         return false;
     }
 
-    public static string[] Heads = new string[]
+    private static readonly string[] Heads = new string[]
     {
         string.Empty, "编号ID", "游戏ID", "游戏平台", "单号",
         "游戏名", "操作时间", "下注总金额", "中奖金额", "有效下注", "小费", "取消下注", "操作"

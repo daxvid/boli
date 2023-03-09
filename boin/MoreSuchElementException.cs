@@ -1,4 +1,4 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using System.Collections.ObjectModel;

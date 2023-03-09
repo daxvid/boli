@@ -1,7 +1,7 @@
-﻿namespace boin;
+﻿namespace Boin;
 
-using boin.Util;
 using OpenQA.Selenium;
+using Boin.Util;
 
 public class FundingDay
 {
@@ -60,7 +60,6 @@ public class FundingDay
         index = recharge.IndexOf('/');
         RechargeCount = int.Parse(recharge.Substring(0, index - 1));
         RechargeAmount = decimal.Parse(recharge.Substring(index + 1));
-
 
         // 提现
         var withdraw = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]")));

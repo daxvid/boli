@@ -1,43 +1,68 @@
-﻿namespace boin;
+﻿namespace Boin;
 
-using boin.Review;
-using boin.Util;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using Boin.Review;
+using Boin.Util;
 
-public class BoinClient:IDisposable
+public class BoinClient : IDisposable
 {
-    public ChromeDriver driver;
-    
-    ReviewManager reviewer;
+    private static int _orderCount;
+    private readonly ChromeDriver driver;
 
-    private LoginPage loginPage;
+    private readonly ReviewManager reviewer;
+
+    private readonly LoginPage loginPage;
     private UserPage userPage;
     private OrderPage orderPage;
     private GameBindPage bindPage;
-    private AppConfig cnf;
-    private AuthConfig authCnf;
+    
+    private readonly AppConfig cnf;
+    private readonly AuthConfig authCnf;
+    private bool closed;
 
     public BoinClient(AppConfig cnf, AuthConfig authCnf)
     {
         this.cnf = cnf;
         this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
-        this.driver = newDriver(cnf.Headless);
+        this.driver = NewDriver(cnf.Headless);
         Cache.Init(authCnf.Redis, authCnf.Platform);
-        
+
         loginPage = new LoginPage(driver, cnf, authCnf);
         bindPage = new GameBindPage(driver, cnf);
         userPage = new UserPage(driver, cnf);
         orderPage = new OrderPage(driver, cnf);
     }
 
-    public void Dispose()
+    public void Close()
     {
+        if (closed)
+        {
+            return;
+        }
+
+        closed = true;
         driver.Quit();
     }
+    
+    public void SaveException(Exception err)
+    {
+        try
+        {
+            Log.SaveException(err, driver);
+        }
+        catch
+        {
+        }
+    }
+    
+    public void Dispose()
+    {
+        Close();
+    }
 
-    static ChromeDriver newDriver(bool headless)
+    private static ChromeDriver NewDriver(bool headless)
     {
         var op = new ChromeOptions();
 
@@ -55,11 +80,7 @@ public class BoinClient:IDisposable
         //var session = ((IDevTools)driver).GetDevToolsSession();
         return driver;
     }
-    public void SendMsg(string msg)
-    {
-        Helper.SendMsg(msg);
-    }
-    
+
     public void Run()
     {
         if (!loginPage.Login())
@@ -78,7 +99,7 @@ public class BoinClient:IDisposable
             if (orders.Count > 0)
             {
                 zeroCount = 0;
-                reviewOrders(orders);
+                ReviewOrders(orders);
                 heartbeatTime = DateTime.Now;
             }
             else
@@ -89,23 +110,24 @@ public class BoinClient:IDisposable
                 if ((now - heartbeatTime).TotalSeconds >= 60)
                 {
                     heartbeatTime = now;
-                    SendMsg(now.ToString("ok[HH:mm:ss]"));
+                    Helper.SendMsg(now.ToString("ok[HH:mm:ss]"));
                 }
             }
         }
     }
 
-    private void reviewOrders(List<Order> orders)
+    private void ReviewOrders(List<Order> orders)
     {
         foreach (var order in orders)
         {
-            reviewOrder(order);
+            ReviewOrder(order);
         }
+
         // 等待所有订单处理结束
-        waitOrders(orders);
+        WaitOrders(orders);
     }
 
-    private void reviewOrder(Order order)
+    private void ReviewOrder(Order order)
     {
         order.Bind = LoadBind(order.GameId, order.CardNo);
         reviewer.Review(order);
@@ -116,15 +138,15 @@ public class BoinClient:IDisposable
             return;
         }
 
-        orderCount++;
-        var msg = orderCount.ToString() + ":" + order.OrderId;
+        _orderCount++;
+        var msg = _orderCount.ToString() + ":" + order.OrderId;
         using var span = new Span(msg);
-        SendMsg(msg);
+        Helper.SendMsg(msg);
         var user = LoadUser(order);
         ReviewUser(user);
     }
 
-    private static void waitOrders(List<Order> orders)
+    private static void WaitOrders(List<Order> orders)
     {
         foreach (var order in orders)
         {
@@ -134,13 +156,14 @@ public class BoinClient:IDisposable
             }
         }
     }
-    List<Order> LoadOrders()
+
+    private List<Order> LoadOrders()
     {
         while (true)
         {
             try
             {
-                var orders = Helper.SafeExec(driver,() =>
+                var orders = Helper.SafeExec(driver, () =>
                 {
                     orderPage.Open();
                     var orders = orderPage.Select(cnf.OrderHour);
@@ -157,13 +180,13 @@ public class BoinClient:IDisposable
         }
     }
 
-    User LoadUser(Order order)
+    private User LoadUser(Order order)
     {
         while (true)
         {
             try
             {
-                var user = Helper.SafeExec(driver,() =>
+                var user = Helper.SafeExec(driver, () =>
                 {
                     userPage.Open();
                     var user = userPage.Select(order);
@@ -178,13 +201,14 @@ public class BoinClient:IDisposable
             }
         }
     }
-    GameBind? LoadBind(string gameId, string cardNo)
+
+    private GameBind? LoadBind(string gameId, string cardNo)
     {
         while (true)
         {
             try
             {
-                var bind = Helper.SafeExec(driver,() =>
+                var bind = Helper.SafeExec(driver, () =>
                 {
                     bindPage.Open();
                     var bind = bindPage.Select(gameId, cardNo);
@@ -200,9 +224,7 @@ public class BoinClient:IDisposable
         }
     }
 
-    static int orderCount = 0;
-
-    void ReviewUser(User user)
+    private void ReviewUser(User user)
     {
         while (true)
         {
@@ -215,8 +237,8 @@ public class BoinClient:IDisposable
             Thread.Sleep(1);
         }
     }
-    
-    void Review(User user)
+
+    private void Review(User user)
     {
         reviewer.Review(user);
         var order = user.Order;
@@ -225,7 +247,7 @@ public class BoinClient:IDisposable
             order.ReviewMsg = OrderReviewEnum.Pass;
         }
         else if (order.CanReject)
-        { 
+        {
             // 可以拒绝
             order.ReviewMsg = OrderReviewEnum.Reject;
         }
@@ -234,15 +256,16 @@ public class BoinClient:IDisposable
             // 待定，进入人工
             order.ReviewMsg = OrderReviewEnum.Doubt;
         }
+
         SaveOrder(order);
     }
 
-    void SaveOrder(Order order)
+    private void SaveOrder(Order order)
     {
         orderPage.SubmitOrder(order);
         var msg = order.ReviewNote();
         Cache.SaveOrder(order.OrderId, msg);
         order.Processed = true;
-        SendMsg(msg);
+        Helper.SendMsg(msg);
     }
 }

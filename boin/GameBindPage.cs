@@ -1,19 +1,18 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
+using Boin.Util;
 
-public class GameBindPage : LablePage
+public class GameBindPage : LabelPage
 {
-
-    public GameBindPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf, 1, "绑定管理")
+    public GameBindPage(ChromeDriver driver, AppConfig config) : base(driver, config, 1, "绑定管理")
     {
     }
 
     public List<GameBind> Select(string gameId)
     {
-        int t = trySelect(gameId);
+        int t = TrySelect(gameId);
         if (t >= 0)
         {
             if (t == 0)
@@ -28,7 +27,7 @@ public class GameBindPage : LablePage
         return new List<GameBind>();
     }
 
-    private int trySelect(string gameId)
+    private int TrySelect(string gameId)
     {
         // 设置游戏ID
         // //*[@id="GameBindList"]/div[1]/div[2]/input
@@ -73,32 +72,29 @@ public class GameBindPage : LablePage
 
         Thread.Sleep(200);
 
-        var binds = readBinds(tbody);
+        var binds = ReadBinds(tbody);
         return binds;
     }
 
     // 读取每一项用户信息
-    private List<GameBind> readBinds(IWebElement tbody)
+    private List<GameBind> ReadBinds(IWebElement tbody)
     {
         var allRows = FindElementsByXPath(tbody, ".//tr");
         var count = allRows.Count;
-        var Binds = new List<GameBind>(count);
+        var binds = new List<GameBind>(count);
         for (var i = 0; i < count; i++)
         {
             var row = allRows[i];
             var bind = GameBind.Create(row);
-            if (bind != null)
-            {
-                Binds.Add(bind);
-            }
+            binds.Add(bind);
         }
 
-        return Binds;
+        return binds;
     }
 
     public GameBind? Select(string gameId, string cardNo)
     {
-        if (trySelect(gameId, cardNo))
+        if (TrySelect(gameId, cardNo))
         {
             var binds = ReadTable(gameId);
             if (binds.Count > 0)
@@ -109,7 +105,7 @@ public class GameBindPage : LablePage
         return null;
     }
 
-    private bool trySelect(string gameId, string cardNo)
+    private bool TrySelect(string gameId, string cardNo)
     {
         // 设置游戏ID
         // //*[@id="GameBindList"]/div[1]/div[2]/input

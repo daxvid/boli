@@ -1,10 +1,9 @@
-﻿namespace boin.Bot;
+﻿namespace Boin.Bot;
 
-using boin.Util;
 using Telegram.BotAPI;
 using Telegram.BotAPI.AvailableMethods;
 using Telegram.BotAPI.GettingUpdates;
-
+using Boin.Util;
 
 public class TelegramBot
 {
@@ -26,12 +25,12 @@ public class TelegramBot
         get { return instance; }
     }
 
-    AuthConfig? cnf;
+    AuthConfig? config;
     BotClient? api;
 
     public void Run(AuthConfig cnf)
     {
-        this.cnf = cnf;
+        this.config = cnf;
         var client = new BotClient(cnf.BotToken);
         this.api = client;
         ThreadPool.QueueUserWorkItem(state =>
@@ -41,7 +40,7 @@ public class TelegramBot
             {
                 try
                 {
-                    update(client);
+                    Update(client);
                 }
                 catch (Exception err)
                 {
@@ -62,7 +61,7 @@ public class TelegramBot
         });
     }
 
-    static void update(BotClient client)
+    static void Update(BotClient client)
     {
         var updates = client.GetUpdates();
         while (true)
@@ -95,16 +94,16 @@ public class TelegramBot
         }
     }
 
-    void SendMessage(string msg)
+    private void SendMessage(string msg)
     {
-        if (api == null || cnf == null)
+        if (api == null || config == null)
         {
             return;
         }
 
         lock (api)
         {
-            foreach (var charId in cnf.ChatIds)
+            foreach (var charId in config.ChatIds)
             {
                 api.SendMessage(charId, msg);
             }

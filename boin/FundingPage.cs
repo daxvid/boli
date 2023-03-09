@@ -1,27 +1,26 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
+using Boin.Util;
 
 // 资金概况
 public class FundingPage : PopPage
 {
-    public FundingPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+    public FundingPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
         "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div")
     {
     }
 
-    private IWebElement getCurrentTable()
+    private IWebElement GetCurrentTable()
     {
-        //mainTable = FindElementByXPath(path);
-        return mainTable;
+        return MainTable;
     }
 
     public Funding Select()
     {
         var tboxPath = ".//div[@class='tab_box ivu-row']";
-        var table = getCurrentTable();
+        var table = GetCurrentTable();
         var tbox = FindElementByXPath(table, tboxPath);
 
         Funding fund = new Funding();
@@ -32,7 +31,7 @@ public class FundingPage : PopPage
 
         //今日(默认)
         FindAndClickByXPath(tbox, ".//div/div[text()='今日' and starts-with(@class,'tab_sty')]", 500);
-        FillRechargeAndWithdraw(fund, fund.ToDay, cnf.RechargeMaxDay, cnf.WithdrawMaxDay);
+        FillRechargeAndWithdraw(fund, fund.ToDay, Config.RechargeMaxDay, Config.WithdrawMaxDay);
 
         // 昨日
         FindAndClickByXPath(tbox, ".//div/div[text()='昨日' and starts-with(@class,'tab_sty')]", 500);
@@ -47,7 +46,7 @@ public class FundingPage : PopPage
     private void FillRechargeAndWithdraw(Funding f, FundingDay fund, int rechargeMaxDay, int withdrawMaxDay)
     {
         var tboxPath = ".//div[@class='tab_box ivu-row']";
-        var table = getCurrentTable();
+        var table = GetCurrentTable();
         var tbox = FindElementByXPath(table, tboxPath);
 
         fund.ReadFrom(tbox);
@@ -56,10 +55,10 @@ public class FundingPage : PopPage
         if (rechargeMaxDay > 0)
         {
             //读取充值明细
-            f.RechargeLog = Helper.SafeExec(driver, () =>
+            f.RechargeLog = Helper.SafeExec(Driver, () =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='充值']/../td[2]/a", 1000);
-                using var rg = new RechargePage(driver, cnf, gameId);
+                using var rg = new RechargePage(Driver, Config, GameId);
                 var rechargeLogs = rg.Select(rechargeMaxDay);
                 // 如果没有数据查则查询最近30天的数据
                 if ((rechargeLogs.Count < 3) && rechargeMaxDay < maxDay)
@@ -73,14 +72,14 @@ public class FundingPage : PopPage
 
         if (withdrawMaxDay > 0)
         {
-            table = getCurrentTable();
+            table = GetCurrentTable();
             tbox = FindElementByXPath(table, tboxPath);
 
             // 读取提现明细
-            f.WithdrawLog = Helper.SafeExec(driver, () =>
+            f.WithdrawLog = Helper.SafeExec(Driver, () =>
             {
                 FindAndClickByXPath(tbox, ".//div/table/tr/td[text()='提现']/../td[2]/a", 1000);
-                using var wg = new WithdrawPage(driver, cnf, gameId);
+                using var wg = new WithdrawPage(Driver, Config, GameId);
                 var withdrawLogs = wg.Select(withdrawMaxDay);
                 // 如果没有数据查查询最近30天的数据
                 if ((withdrawLogs.Count <= 1) && withdrawMaxDay < maxDay)

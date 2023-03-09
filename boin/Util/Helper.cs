@@ -1,4 +1,4 @@
-﻿namespace boin.Util;
+﻿namespace Boin.Util;
 
 using System.Globalization;
 using System.Security.Cryptography;
@@ -6,7 +6,7 @@ using System.Text;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
-using boin.Bot;
+using Boin.Bot;
 
 public class Helper
 {

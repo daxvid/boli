@@ -1,7 +1,6 @@
-﻿namespace boin.Review;
+﻿namespace Boin.Review;
 
 using System.Collections.ObjectModel;
-
 
 // （波币）拒绝原因-
 // 今日波币已达上限，请使用银行卡
@@ -13,14 +12,11 @@ using System.Collections.ObjectModel;
 // 金额审核
 public class AmountReview : IReviewUser
 {
-    static readonly ReadOnlyCollection<ReviewResult> empty =
-        new ReadOnlyCollection<ReviewResult>(new List<ReviewResult>());
+    private readonly ReviewConfig config;
 
-    ReviewConfig cnf;
-
-    public AmountReview(ReviewConfig cnf)
+    public AmountReview(ReviewConfig config)
     {
-        this.cnf = cnf;
+        this.config = config;
     }
 
     public ReadOnlyCollection<ReviewResult> Review(User user)
@@ -28,33 +24,20 @@ public class AmountReview : IReviewUser
         List<ReviewResult> rs = new List<ReviewResult>();
         var order = user.Order;
         bool isNew = user.IsNewUser();
-        var ac = cnf.GetAmountConfig(order.Way, isNew);
+        var ac = config.GetAmountConfig(order.Way, isNew);
 
         // 检查单笔额度
-        var r1 = checkOnceMax(order.Way, ac.OnceMax, order.Amount);
-        if (r1 != null)
-        {
-            rs.Add(r1);
-        }
-
+        rs.Add(CheckOnceMax(order.Way, ac.OnceMax, order.Amount));
         // 检查当日总额度
         var dayWithdraw = user.Funding.TotalDayWithdraw(order.Way, order.OrderId);
-        var r2 = checkDayMax(order.Way, ac.DayMax, dayWithdraw, order.Amount);
-        if (r2 != null)
-        {
-            rs.Add(r2);
-        }
+        rs.Add(CheckDayMax(order.Way, ac.DayMax, dayWithdraw, order.Amount));
 
         // 检查当日总充值
         var dayRecharge = user.Funding.ToDay.RechargeAmount;
-        var r3 = checkDayRecharge(order.Way, ac.DayRecharge, dayRecharge);
-        if (r3 != null)
-        {
-            rs.Add(r3);
-        }
+        rs.Add(CheckDayRecharge(order.Way, ac.DayRecharge, dayRecharge));
 
         // 检查如果玩了某种游戏，当日提现总额限制
-        var r4 = checkDayGames(user, ac.DayMaxGames, dayWithdraw, order.Amount);
+        var r4 = CheckDayGames(user, ac.DayMaxGames, dayWithdraw, order.Amount);
         if (r4 != null)
         {
             rs.Add(r4);
@@ -64,107 +47,81 @@ public class AmountReview : IReviewUser
     }
 
     // 检查每笔提现金额
-    ReviewResult checkOnceMax(string way, decimal max, decimal amount)
+    private static ReviewResult CheckOnceMax(string way, decimal max, decimal amount)
     {
-        if (way == "银行卡")
+        return way switch
         {
             // 检查老用户单笔银行卡限制
-            if (amount > max)
-            {
-                return new ReviewResult { Code = 201, Msg = "卡单笔超限" + max + ":" + amount };
-            }
+            "银行卡" => amount > max
+                ? new ReviewResult { Code = 201, Msg = "卡单笔超限" + max + ":" + amount }
+                : new ReviewResult { Code = 0, Msg = "@单笔通过:" + amount },
 
-        }
-        else if (way == "数字钱包")
-        {
             // 检查老用户单笔波币限制
-            if (amount > max)
-            {
-                return new ReviewResult { Code = -202, Msg = "超过单笔波币金额，请使用银行卡" };
-            }
-        }
-        else
-        {
-            return new ReviewResult { Code = 203, Msg = "未知的通道:" + way };
-        }
+            "数字钱包" => amount > max
+                ? new ReviewResult { Code = -202, Msg = "超过单笔波币金额，请使用银行卡" }
+                : new ReviewResult { Code = 0, Msg = "@单笔通过:" + amount },
 
-        return new ReviewResult { Code = 0, Msg = "@单笔通过:" + amount };
+            // 未知的通道
+            _ => new ReviewResult { Code = 203, Msg = "未知的通道:" + way }
+        };
     }
 
     // 检查当日提现金额
-    ReviewResult checkDayMax(string way, decimal max, decimal dayAmount, decimal amount)
+    private static ReviewResult CheckDayMax(string way, decimal max, decimal dayAmount, decimal amount)
     {
         var checkAmount = dayAmount + amount;
-        if (way == "银行卡")
+        return way switch
         {
-            // 检查老用户单笔银行卡限制
-            if (checkAmount > max)
-            {
-                return new ReviewResult { Code = 201, Msg = "卡当日提款超限" + max + ":" + checkAmount };
-            }
+            // 检查老用户当日银行卡限制
+            "银行卡" => checkAmount > max
+                ? new ReviewResult { Code = 201, Msg = "卡当日提款超限" + max + ":" + checkAmount }
+                : new ReviewResult { Code = 0, Msg = "@当日通过:" + checkAmount },
 
-        }
-        else if (way == "数字钱包")
-        {
-            // 检查老用户单笔波币限制
-            if (checkAmount > max)
-            {
-                return new ReviewResult { Code = -202, Msg = "今日波币已达上限，请使用银行卡" };
-            }
-        }
-        else
-        {
-            return new ReviewResult { Code = -203, Msg = "未知的通道:" + way };
-        }
+            // 检查老用户当日波币限制
+            "数字钱包" => checkAmount > max
+                ? new ReviewResult { Code = -202, Msg = "今日波币已达上限，请使用银行卡" }
+                : new ReviewResult { Code = 0, Msg = "@当日通过:" + checkAmount },
 
-        return new ReviewResult { Code = 0, Msg = "@当日通过:" + checkAmount };
+            // 未知的通道
+            _ => new ReviewResult { Code = 203, Msg = "未知的通道:" + way }
+        };
     }
 
     // 检查当日充值金额
-    ReviewResult checkDayRecharge(string way, decimal max, decimal amount)
+    private static ReviewResult CheckDayRecharge(string way, decimal max, decimal amount)
     {
-        if (way == "银行卡")
+        return way switch
         {
-            // 检查老用户单笔银行卡限制
-            if (amount > max)
-            {
-                return new ReviewResult { Code = 401, Msg = "日充超限需人工" + max + ":" + amount };
-            }
+            // 检查当日银行卡充值限制
+            "银行卡" => amount > max
+                ? new ReviewResult { Code = 401, Msg = "日充超限需人工" + max + ":" + amount }
+                : new ReviewResult { Code = 0, Msg = "@日充通过:" + amount },
 
-        }
-        else if (way == "数字钱包")
-        {
-            // 检查老用户单笔波币限制
-            if (amount > max)
-            {
-                return new ReviewResult { Code = 402, Msg = "日充超限需人工" + max + ":" + amount };
-            }
-        }
-        else
-        {
-            return new ReviewResult { Code = -203, Msg = "未知的通道:" + way };
-        }
+            // 检查当日波币充值限制
+            "数字钱包" => amount > max
+                ? new ReviewResult { Code = 402, Msg = "日充超限需人工" + max + ":" + amount }
+                : new ReviewResult { Code = 0, Msg = "@日充通过:" + amount },
 
-        return new ReviewResult { Code = 0, Msg = "@日充通过:" + amount };
+            // 未知的通道
+            _ => new ReviewResult { Code = 203, Msg = "未知的通道:" + way }
+        };
     }
 
     // 检查如果玩了某种游戏，当日提现总额限制
-    ReviewResult? checkDayGames(User user, Dictionary<string, decimal> dayMaxGames, decimal dayAmount, decimal amount)
+    private static ReviewResult? CheckDayGames(User user, Dictionary<string, decimal> dayMaxGames, decimal dayAmount,
+        decimal amount)
     {
         var checkAmount = dayAmount + amount;
-        if ((dayMaxGames != null) && (dayMaxGames.Count > 0))
+        foreach (var kv in dayMaxGames)
         {
-            foreach (var kv in dayMaxGames)
+            if (user.GameInfo.PlayGame(string.Empty, kv.Key))
             {
-                if (user.GameInfo.PlayGame(string.Empty, kv.Key))
+                // 游戏日提限制
+                if (checkAmount > kv.Value)
                 {
-                    // 游戏日提限制
-                    if (checkAmount > kv.Value)
-                    {
-                        var gameName = kv.Key; //.Replace("all", "");
-                        var msg = "@游戏[" + gameName + "]日提超限:" + kv.Value + "<" + checkAmount;
-                        return new ReviewResult { Code = -401, Msg = msg };
-                    }
+                    var gameName = kv.Key; //.Replace("all", "");
+                    var msg = "@游戏[" + gameName + "]日提超限:" + kv.Value + "<" + checkAmount;
+                    return new ReviewResult { Code = -401, Msg = msg };
                 }
             }
         }

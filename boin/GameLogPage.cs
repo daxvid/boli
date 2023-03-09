@@ -1,24 +1,23 @@
-﻿namespace boin;
+﻿namespace Boin;
 
-using System;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using boin.Util;
+using Boin.Util;
 
 // 用户游戏日志
 public class GameLogPage : PopPage
 {
-    public GameLogPage(ChromeDriver driver, AppConfig cnf, string gameId) : base(driver, cnf, gameId,
+    public GameLogPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
         "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span")
     {
-        this.maxPage = cnf.GameLogMaxPage;
+        this.MaxPage = config.GameLogMaxPage;
     }
 
     // 查询用户游戏日志
     public GameInfo Select(int hour)
     {
         GameInfo info = new GameInfo();
-        var table = getCurrentTable(1);
+        var table = GetCurrentTable(1);
         if (hour > 0)
         {
             var timeRang = FindElementByXPath(table,
@@ -48,8 +47,8 @@ public class GameLogPage : PopPage
         var tbody = FindElementByXPath(table, bodyPath);
         var allLogs = ReadLogs(tbody, 1);
 
-        maxPage = 1;
-        for (var page = 2; page <= maxPage; page++)
+        MaxPage = 1;
+        for (var page = 2; page <= MaxPage; page++)
         {
             // 去到下一页
             if (!GoToNextPage(table))
@@ -57,7 +56,7 @@ public class GameLogPage : PopPage
                 break;
             }
 
-            table = getCurrentTable(page);
+            table = GetCurrentTable(page);
             tbody = FindElementByXPath(table, bodyPath);
             var logs = ReadLogs(tbody, page);
             allLogs.AddRange(logs);
@@ -76,10 +75,7 @@ public class GameLogPage : PopPage
         {
             var row = allRows[i];
             var log = GameLog.Create(row);
-            if (log != null)
-            {
-                logs.Add(log);
-            }
+            logs.Add(log);
         }
 
         return logs;

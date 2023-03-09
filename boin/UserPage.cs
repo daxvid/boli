@@ -1,19 +1,18 @@
-﻿namespace boin;
+﻿namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Interactions;
-using boin.Util;
+using Boin.Util;
 
-
-public class UserPage : LablePage
+public class UserPage : LabelPage
 {
 
-    public UserPage(ChromeDriver driver, AppConfig cnf) : base(driver, cnf, 1, "用户列表")
+    public UserPage(ChromeDriver driver, AppConfig config) : base(driver, config, 1, "用户列表")
     {
     }
 
-    public User Select( Order  order)
+    public User Select(Order order)
     {
         string gameId = order.GameId;
         // 设置游戏ID
@@ -38,25 +37,24 @@ public class UserPage : LablePage
             var tbody = FindElementByXPath(table, ".//tbody[@class='ivu-table-tbody']");
             var row = FindElementByXPath(tbody, ".//tr");
             var user = User.Create(row, order);
-            readUserInfo(user, 0);
+            ReadUserInfo(user, 0);
             return user;
         }
 
         throw new MoreSuchElementException(xp, "selectUser", null);
     }
 
-    private bool readUserInfo(User user, int i)
+    private bool ReadUserInfo(User user, int i)
     {
         Console.WriteLine("AppId:" + user.AppId + "; GameId:" + user.GameId);
-        Int64 gid;
-        if (Int64.TryParse(user.GameId, out gid))
+        if (Int64.TryParse(user.GameId, out var _))
         {
             // 编辑(读取用户备注)
-            readUserEdit(user, i);
+            ReadUserEdit(user, i);
             // 注单(游戏)
-            readGameLog(user, i);
+            ReadGameLog(user, i);
             // 概况(资金)
-            readFunding(user, i);
+            ReadFunding(user, i);
             return true;
         }
         else
@@ -69,51 +67,50 @@ public class UserPage : LablePage
     }
 
     // 出入金概况
-    private void readFunding(User user, int i)
+    private void ReadFunding(User user, int i)
     {
         var xpath = "(//div[@id='timeListBox']/div/div[2]/button[3]/span[text()='概况']/..)[" +
                     (i + 1).ToString() + "]";
-        moveToOp(user, i);
+        MoveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using FundingPage gl = new FundingPage(driver, cnf, user.GameId);
+        using FundingPage gl = new FundingPage(Driver, Config, user.GameId);
         var funding = gl.Select();
         user.Funding = funding;
     }
 
     // 注单(游戏)
-    private void readGameLog(User user, int i)
+    private void ReadGameLog(User user, int i)
     {
         var xpath = "(//div[@id='timeListBox']/div/div[2]/button[4]/span[text()='注单']/..)[" +
                     (i + 1).ToString() + "]";
-        moveToOp(user, i);
+        MoveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using GameLogPage gl = new GameLogPage(driver, cnf, user.GameId);
-        var gameInfo = gl.Select(cnf.GameLogMaxHour);
+        using GameLogPage gl = new GameLogPage(Driver, Config, user.GameId);
+        var gameInfo = gl.Select(Config.GameLogMaxHour);
         user.GameInfo = gameInfo;
     }
 
     // 编辑,查看备注
-    private void readUserEdit(User user, int i)
+    private void ReadUserEdit(User user, int i)
     {
         var xpath = "(//div[@id='timeListBox']/div/div[1]/button[1]/span[text()='编辑']/..)[" +
                     (i + 1).ToString() + "]";
-        moveToOp(user, i);
+        MoveToOp(user, i);
         // 点击扩展按钮中的概况
         FindAndClickByXPath(xpath, 2000);
-        using UserEditPage ue = new UserEditPage(driver, cnf, user.GameId);
+        using UserEditPage ue = new UserEditPage(Driver, Config, user.GameId);
         user.Remark = ue.ReadRemark();
     }
 
 
-    private bool moveToOp(User user, int i)
+    private void MoveToOp(User user, int i)
     {
         var opBtn = FindElementByXPath(".//button/span[text()='操作 +']");
         // 移动到【操作+】，显示出扩展按钮
-        new Actions(driver).MoveToElement(opBtn).Perform();
+        new Actions(Driver).MoveToElement(opBtn).Perform();
         Thread.Sleep(500);
-        return true;
     }
 }
 

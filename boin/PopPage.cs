@@ -1,45 +1,27 @@
-namespace boin;
+namespace Boin;
 
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-public class PopPage : PageBase
+public class PopPage : ClosePage
 {
-    protected string gameId;
-    protected string path;
-    protected IWebElement mainTable;
-    private IWebElement? closeBtn;
+    protected readonly string GameId;
 
-    protected PopPage(ChromeDriver driver, AppConfig cnf, string gameId, string path) : base(driver, cnf)
+    protected PopPage(ChromeDriver driver, AppConfig config, string gameId, string path) :
+        base(driver, config, path + "[text()='游戏ID：" + gameId + "']/../../../../..")
     {
-        this.gameId = gameId;
-        this.path = path + "[text()='游戏ID：" + gameId + "']/../../../../..";
-        // 
-        mainTable = FindElementByXPath(this.path);
-        closeBtn = FindElementByXPath(mainTable,".//a[@class='ivu-modal-close']/i");
+        this.GameId = gameId;
         // this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
         // this.path = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
         // this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
         // this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
     }
 
-    protected IWebElement getCurrentTable(int page)
+    protected IWebElement GetCurrentTable(int page)
     {
-        // var pagePath = ".//div/span[@class='marginRight' and text()='第" + page.ToString() + "页']";
+        var table = FindElementByXPath(Path); // mainTable
         var pagePath = ".//div/span[@class='marginRight' and text()='第" + page.ToString() + "页']";
-        var table = FindElementByXPath(path); // mainTable
         var pageTag = FindElementByXPath(table, pagePath);
-        return mainTable;
-    }
-
-    public override bool Close()
-    {
-        if (closeBtn != null)
-        {
-            closeBtn.Click();
-            closeBtn = null;
-        }
-
-        return true;
+        return MainTable;
     }
 }
