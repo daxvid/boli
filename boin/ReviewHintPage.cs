@@ -56,7 +56,7 @@ public class ReviewHintPage : ClosePage
         
         var lastConfirmPath = "./div[@class='ivu-modal-confirm-footer']/button/span[text()='确定']";
         FindAndClickByXPath(confirmPage, lastConfirmPath, 100);
-        this.closed = true;
+        this.Closed = true;
         return (txt == "审核成功");
     }
 }

@@ -11,7 +11,7 @@ public class ClosePage : PageBase
     protected readonly IWebElement MainTable;
     private readonly IWebElement closeBtn;
     protected IWebElement? CancelBtn;
-    protected bool closed;
+    protected bool Closed;
 
     protected ClosePage(ChromeDriver driver, AppConfig config, string path) : base(driver, config)
     {
@@ -24,7 +24,7 @@ public class ClosePage : PageBase
     // 关闭窗口
     public override void Close()
     {
-        if (closed)
+        if (Closed)
         {
             return;
         }
@@ -47,7 +47,7 @@ public class ClosePage : PageBase
                 }
             }
 
-            closed = true;
+            Closed = true;
             Thread.Sleep(10);
         }
         catch (Exception err)

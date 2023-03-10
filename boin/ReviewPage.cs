@@ -48,7 +48,7 @@ public class ReviewPage : ClosePage
             return false;
         }
 
-        this.closed = true;
+        this.Closed = true;
         return true;
     }
 
@@ -99,7 +99,7 @@ public class ReviewPage : ClosePage
             return false;
         }
 
-        this.closed = true;
+        this.Closed = true;
         return true;
     }
 

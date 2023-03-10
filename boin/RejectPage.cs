@@ -34,7 +34,7 @@ public class RejectPage : ClosePage
         }
 
         btn.Click();
-        this.closed = true;
+        this.Closed = true;
         return true;
     }
 }
