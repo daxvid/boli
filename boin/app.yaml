@@ -27,5 +27,6 @@ AmountRang: [100,2000]
 ReviewFile: review.yaml
 
 # Chrome
-Headless: true 
+Headless: true
+WindowSize: 1600,1200
 
