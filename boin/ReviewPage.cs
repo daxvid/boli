@@ -43,12 +43,13 @@ public class ReviewPage : ClosePage
         string dfPath = "./div[3]/div/div[2]/div[2]/button[2]/span[text()='代付提现']";
         FindAndClickByXPath(MainTable, dfPath, 10);
         using var hint = new ReviewHintPage(Driver, Config, order);
-        if (hint.Confirm())
+        if (!hint.Confirm())
         {
-            return true;
+            return false;
         }
 
-        return false;
+        this.closed = true;
+        return true;
     }
 
     private void SetReason(string reason)
@@ -93,7 +94,13 @@ public class ReviewPage : ClosePage
         var rejectPath = "./div[3]/div/div[2]/div[2]/button[1]/span[text()='拒绝']";
         FindAndClickByXPath(MainTable, rejectPath, 100);
         using var rp = new RejectPage(Driver, Config);
-        return rp.RejectReason(reason);
+        if (!rp.RejectReason(reason))
+        {
+            return false;
+        }
+
+        this.closed = true;
+        return true;
     }
 
     public bool Submit()

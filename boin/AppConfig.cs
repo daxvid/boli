@@ -37,6 +37,7 @@ public class AppConfig
     
     // Chrome
     public bool Headless { get; set; }
+    public string WindowSize { get; set; } = string.Empty;
 
     public AppConfig()
     {

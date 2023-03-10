@@ -28,11 +28,13 @@ public class RejectPage : ClosePage
         // 确定
         // /html/body/div[55]/div[2]/div/div/ div[2]/div[2]/button/span/span
         var btn = FindElementByXPath(MainTable, "./div[2]/div[2]/button/span/span[text()='确定']");
-        if (btn.Enabled)
+        if (!btn.Enabled)
         {
-            btn.Click();
+            return false;
         }
 
+        btn.Click();
+        this.closed = true;
         return true;
     }
 }

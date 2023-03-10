@@ -11,7 +11,7 @@ public class ClosePage : PageBase
     protected readonly IWebElement MainTable;
     private readonly IWebElement closeBtn;
     protected IWebElement? CancelBtn;
-    private bool closed;
+    protected bool closed;
 
     protected ClosePage(ChromeDriver driver, AppConfig config, string path) : base(driver, config)
     {
@@ -21,6 +21,7 @@ public class ClosePage : PageBase
         closeBtn = FindElementByXPath(MainTable, "./a[@class='ivu-modal-close']/i");
     }
 
+    // 关闭窗口
     public override void Close()
     {
         if (closed)
@@ -28,21 +29,26 @@ public class ClosePage : PageBase
             return;
         }
 
-        // 关闭窗口
         try
         {
-            if (closeBtn.Enabled && closeBtn.Displayed)
+            try
             {
                 closeBtn.Click();
-                closed = true;
-                Thread.Sleep(10);
             }
-            else if (CancelBtn != null && CancelBtn.Enabled && CancelBtn.Displayed)
+            catch
             {
-                CancelBtn.Click();
-                closed = true;
-                Thread.Sleep(10);
+                if (CancelBtn != null && CancelBtn.Enabled && CancelBtn.Displayed)
+                {
+                    CancelBtn.Click();
+                }
+                else
+                {
+                    throw;
+                }
             }
+
+            closed = true;
+            Thread.Sleep(10);
         }
         catch (Exception err)
         {

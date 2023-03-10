@@ -26,7 +26,7 @@ public class BoinClient : IDisposable
         this.cnf = cnf;
         this.authCnf = authCnf;
         this.reviewer = new ReviewManager(cnf.ReviewFile);
-        this.driver = NewDriver(cnf.Headless);
+        this.driver = NewDriver(cnf.Headless, cnf.WindowSize);
         Cache.Init(authCnf.Redis, authCnf.Platform);
 
         loginPage = new LoginPage(driver, cnf, authCnf);
@@ -62,7 +62,7 @@ public class BoinClient : IDisposable
         Close();
     }
 
-    private static ChromeDriver NewDriver(bool headless)
+    private static ChromeDriver NewDriver(bool headless, string windowSize)
     {
         var op = new ChromeOptions();
 
@@ -70,9 +70,13 @@ public class BoinClient : IDisposable
         {
             // 为Chrome配置无头模式
             op.AddArgument("--headless");
-            op.AddArgument("window-size=1920,1440");
         }
 
+        if (!string.IsNullOrEmpty(windowSize))
+        {
+            //windowSize = "window-size=1366,768";
+            op.AddArgument("window-size=" + windowSize);
+        }
         //op.AddAdditionalChromeOption("excludeSwitches", new string[] { "enable-automation"});
         //op.AddAdditionalChromeOption("useAutomationExtension", false);
 
