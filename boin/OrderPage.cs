@@ -184,17 +184,15 @@ public class OrderPage : LabelPage
             success = Helper.SafeExec(Driver, () =>
             {
                 FindAndClickByXPath(reviewBtn, 2000);
-                using (var vp = new ReviewPage(Driver, Config, order))
-                {
-                    return vp.Submit();
-                }
+                using var vp = new ReviewPage(Driver, Config, order);
+                return vp.Submit();
             }, 2000, 5);
         }
         finally
         {
             if (success == false || (order.ReviewMsg == OrderReviewEnum.Doubt))
             {
-                Unlock(order.OrderId);
+                Unlock(order);
             }
         }
 
@@ -202,12 +200,21 @@ public class OrderPage : LabelPage
     }
 
     // 解锁
-    public bool Unlock(string orderId)
+    public bool Unlock(Order order)
     {
         this.Open();
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[3]/span
-        string reviewBtn = MakePath(orderId) + "/button[3]/span[text()='解锁']";
-        FindAndClickByXPath(reviewBtn, 4000);
+        string reviewBtn = MakePath(order.OrderId) + "/button[3]/span[text()='解锁']";
+        try
+        {
+            FindAndClickByXPath(reviewBtn, 4000);
+        }
+        catch
+        {
+            var msg = order.ReviewNote();
+            Log.SaveException(new Exception("unlock err:" + msg), Driver, order.OrderId);
+        }
+
         return true;
     }
 

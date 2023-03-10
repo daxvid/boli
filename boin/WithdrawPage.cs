@@ -63,7 +63,7 @@ public class WithdrawPage : PopPage
         var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']";
         foreach (var row in allRows)
         {
-            FindAndClickByXPath(row, expandPath, 0);
+            FindAndClickByXPath(row, expandPath, 10);
         }
 
         Thread.Sleep(200);

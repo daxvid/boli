@@ -11,7 +11,7 @@ public class Log
 
     }
 
-    public static void SaveException(Exception e, ChromeDriver? driver = null)
+    public static void SaveException(Exception e, ChromeDriver? driver = null, string fileName = "")
     {
         var msg = e.ToString();
         string dir = Path.Join(Environment.CurrentDirectory, "log");
@@ -20,7 +20,7 @@ public class Log
             Directory.CreateDirectory(dir);
         }
 
-        string t = DateTime.Now.ToString("yyMMddHHmmssfff");
+        string t = fileName + DateTime.Now.ToString("yyMMddHHmmssfff");
         if (e != null)
         {
             if (e is WebDriverException)
