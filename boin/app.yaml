@@ -27,5 +27,5 @@ AmountRang: [100,2000]
 ReviewFile: review.yaml
 
 # Chrome
-Headless: false
+Headless: true 
 

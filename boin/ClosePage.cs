@@ -18,7 +18,7 @@ public class ClosePage : PageBase
         this.Path = path;
         // ivu-modal-content
         MainTable = FindElementByXPath(path);
-        closeBtn = FindElementByXPath(MainTable, ".//a[@class='ivu-modal-close']/i");
+        closeBtn = FindElementByXPath(MainTable, "./a[@class='ivu-modal-close']/i");
     }
 
     public override void Close()
@@ -46,7 +46,7 @@ public class ClosePage : PageBase
         }
         catch (Exception err)
         {
-            //Log.SaveException(err, Driver);
+            Log.SaveException(err, Driver);
         }
     }
 }
