@@ -141,13 +141,13 @@ public class Order : WithdrawExpand
     public string ReviewNote()
     {
         StringBuilder sb = new StringBuilder(1024);
-        sb.Append(OrderId).Append(":").AppendLine(ReviewMsg.ToString());
+        sb.Append(OrderId).Append(':').AppendLine(ReviewMsg.ToString());
         //sb.Append("game:").AppendLine(this.GameId);
         foreach (var r in ReviewResult)
         {
             if (r.Code != 0)
             {
-                sb.Append(r.Code).Append(":");
+                sb.Append(r.Code).Append(':');
             }
 
             sb.AppendLine(r.Msg);

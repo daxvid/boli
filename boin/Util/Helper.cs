@@ -51,10 +51,11 @@ public class Helper
         {
             if (dicCell.TryGetValue(className, out var cell))
             {
-                var value = (cell.Text??string.Empty).Trim();
+                var value = (cell.Text ?? string.Empty).Trim();
                 return value;
             }
         }
+
         return string.Empty;
     }
 
@@ -64,7 +65,7 @@ public class Helper
         Dictionary<string, IWebElement> row = new Dictionary<string, IWebElement>(tdList.Count * 2);
         foreach (var td in tdList)
         {
-            var key = td.GetAttribute("class")??string.Empty;
+            var key = td.GetAttribute("class") ?? string.Empty;
             row.Add(key, td);
         }
 
@@ -151,6 +152,7 @@ public class Helper
         {
             r = def;
         }
+
         return r;
     }
 
@@ -251,8 +253,10 @@ public class Helper
                 {
                     Log.SaveException(err, driver, "exec_");
                 }
+
                 i++;
             }
+
             Thread.Sleep(sleep);
         }
     }
@@ -260,13 +264,13 @@ public class Helper
     public static string EncryptMd5(string s)
     {
         var md5 = MD5.Create();
-        return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s))).Replace("-","");
+        return BitConverter.ToString(md5.ComputeHash(Encoding.Default.GetBytes(s))).Replace("-", "");
     }
 
     public static string? GetJsonValue(string key, string content)
     {
         var keyName = "\"" + key + "\"";
-        var index = content.IndexOf(keyName,StringComparison.Ordinal);
+        var index = content.IndexOf(keyName, StringComparison.Ordinal);
         if (index > 0)
         {
             var i = index + keyName.Length;
@@ -278,8 +282,10 @@ public class Helper
             {
                 name = System.Text.RegularExpressions.Regex.Unescape(name);
             }
+
             return name;
         }
+
         return null;
     }
 
@@ -292,7 +298,7 @@ public class Helper
         }
 
         var len = name.Length;
-        var mask = new string('*', len-1);
+        var mask = new string('*', len - 1);
         return mask + name[len - 1];
     }
 }

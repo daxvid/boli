@@ -16,12 +16,12 @@ public class UserPage : LabelPage
     {
         var gameId = order.GameId;
         // 设置游戏ID
-        var gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
+        const string gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
         SetTextElementByXPath(gameIdPath, gameId);
 
         // 点击查询按钮
         //*[@id="LiveGameRoleList"]/div[1]/div/div[9]/button[1]/span
-        var btnPath = "//div[@id='LiveGameRoleList']/div[1]/div/div[9]/button[1]/span[text()='查询']";
+        const string btnPath = "//div[@id='LiveGameRoleList']/div[1]/div/div[9]/button[1]/span[text()='查询']";
         FindAndClickByXPath(btnPath, 1000);
 
         // 等待查询结果

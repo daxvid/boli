@@ -22,7 +22,7 @@ public class UserEditPage : ClosePage
     public string ReadRemark()
     {
         // /html/body/div[16]/div[2]/div/div/div[2]/div/table/tr[10]/td[2]/div/textarea
-        var remarkPath = ".//table/tr[10]/td[2]/div/textarea";
+        const string remarkPath = ".//table/tr[10]/td[2]/div/textarea";
         var txt = FindElementByXPath(MainTable, remarkPath);
         var remark = txt.GetAttribute("value") ?? string.Empty;
         return remark;

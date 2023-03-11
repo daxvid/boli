@@ -33,7 +33,7 @@ public class WithdrawPage : PopPage
     private List<Withdraw> ReadWithdrawLog(IWebElement table)
     {
         // table = ivu-modal-content
-        var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+        const string bodyPath = ".//tbody[@class='ivu-table-tbody']";
         var tbody = FindElementByXPath(table, bodyPath);
         var allLogs = ReadWithdraws(tbody, 1);
 
@@ -60,7 +60,7 @@ public class WithdrawPage : PopPage
     {
         var allRows = FindElementsByXPath(tbody, ".//tr");
         // 展开所有列表
-        var expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']";
+        const string expandPath = "./td[1]/div/div[@class='ivu-table-cell-expand']";
         foreach (var row in allRows)
         {
             FindAndClickByXPath(row, expandPath, 10);

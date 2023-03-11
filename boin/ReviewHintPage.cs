@@ -55,7 +55,7 @@ public class ReviewHintPage : ClosePage
         var confirmPage = FindElementByXPath(".//div[@class='ivu-modal-body']/div[@class='ivu-modal-confirm']");
         var txt = FindElementByXPath(confirmPage, "./div[@class='ivu-modal-confirm-body']/div").Text;
         
-        var lastConfirmPath = "./div[@class='ivu-modal-confirm-footer']/button/span[text()='确定']";
+        const string lastConfirmPath = "./div[@class='ivu-modal-confirm-footer']/button/span[text()='确定']";
         FindAndClickByXPath(confirmPage, lastConfirmPath, 100);
         this.Closed = true;
         return (txt == "审核成功");

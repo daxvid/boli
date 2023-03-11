@@ -53,10 +53,10 @@ public class OrderPage : LabelPage
         // //*[@id="Cash"]/div[1]/div[13]/button[1]/span
         FindAndClickByXPath("//div[@id='Cash']/div[1]/div[13]/button[1]/span[text()='查询']", 2000);
 
-        var tablePath = "//*[@id='Cash']/div[2]/div[1]";
+        const string tablePath = "//*[@id='Cash']/div[2]/div[1]";
         var table = FindElementByXPath(tablePath);
 
-        var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+        const string bodyPath = ".//tbody[@class='ivu-table-tbody']";
         var tbody = FindElementByXPath(table, bodyPath);
 
         // 锁定一批
@@ -70,7 +70,7 @@ public class OrderPage : LabelPage
     private int WaitOrders(IWebElement tbody)
     {
         // 查询出已经锁定的还没有处理的单数
-        var waitPath = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']";
+        const string waitPath = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']";
         var waitRows = FindElementsByXPath(tbody, waitPath);
         return waitRows.Count;
     }
@@ -122,7 +122,7 @@ public class OrderPage : LabelPage
     // 读取每一项的信息
     private List<Order> ReadOrders(IWebElement tbody)
     {
-        var path = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']/../../../../../../../..";
+        const string path = ".//tr/td[14]/div/div/div/div/div/button[1]/span[text()='审核']/../../../../../../../..";
         var allRows = FindElementsByXPath(tbody, path);
 
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[30]/td[1]/div/div/i
@@ -130,7 +130,7 @@ public class OrderPage : LabelPage
         // 已展开 <div class="ivu-table-cell-expand ivu-table-cell-expand-expanded"><i class="ivu-icon ivu-icon-ios-arrow-forward"></i></div>
         // 展开所有列表
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[2]/td[1]/div/div/i
-        var expandPath = "./td[1]/div/div";
+        const string expandPath = "./td[1]/div/div";
         foreach (var row in allRows)
         {
             var exBtn = FindElementByXPath(row, expandPath);
@@ -167,7 +167,7 @@ public class OrderPage : LabelPage
     {
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[02]/div/span
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[4]/td[14]/div/div/div/div/div/button/span
-        string td14Path = "//div[@id='Cash']/div[2]/div[1]/div[2]/table/tbody/tr/td[02]/div/span[text()='" +
+        var td14Path = "//div[@id='Cash']/div[2]/div[1]/div[2]/table/tbody/tr/td[02]/div/span[text()='" +
                           orderId +
                           "']/../../../td[14]/div/div/div/div/div";
         return td14Path;
@@ -177,7 +177,7 @@ public class OrderPage : LabelPage
     public bool SubmitOrder(Order order)
     {
         this.Open();
-        string reviewBtn = MakePath(order.OrderId) + "/button[1]/span[text()='审核']";
+        var reviewBtn = MakePath(order.OrderId) + "/button[1]/span[text()='审核']";
         bool success = false;
         try
         {
@@ -204,7 +204,7 @@ public class OrderPage : LabelPage
     {
         this.Open();
         // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[3]/span
-        string reviewBtn = MakePath(order.OrderId) + "/button[3]/span[text()='解锁']";
+        var reviewBtn = MakePath(order.OrderId) + "/button[3]/span[text()='解锁']";
         try
         {
             FindAndClickByXPath(reviewBtn, 4000);
@@ -220,9 +220,9 @@ public class OrderPage : LabelPage
 
     private bool LockOrder(string orderId)
     {
-        string td14Path = MakePath(orderId);
+        var td14Path = MakePath(orderId);
         var td14 = FindElementByXPath(td14Path);
-        string lockPath = "./button[1]/span[text()='锁定' or text()='审核']";
+        const string lockPath = "./button[1]/span[text()='锁定' or text()='审核']";
         var lockBtn = FindElementByXPath(td14, lockPath);
         var hit = lockBtn.Text;
         if (hit == "审核")

@@ -19,7 +19,7 @@ public class FundingPage : PopPage
 
     public Funding Select()
     {
-        var tboxPath = ".//div[@class='tab_box ivu-row']";
+        const string tboxPath = ".//div[@class='tab_box ivu-row']";
         var table = GetCurrentTable();
         var tbox = FindElementByXPath(table, tboxPath);
 
@@ -45,7 +45,7 @@ public class FundingPage : PopPage
 
     private void FillRechargeAndWithdraw(Funding f, FundingDay fund, int rechargeMaxDay, int withdrawMaxDay)
     {
-        var tboxPath = ".//div[@class='tab_box ivu-row']";
+        const string tboxPath = ".//div[@class='tab_box ivu-row']";
         var table = GetCurrentTable();
         var tbox = FindElementByXPath(table, tboxPath);
 

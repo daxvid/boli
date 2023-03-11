@@ -43,7 +43,7 @@ public class RechargePage : PopPage
     private List<Recharge> ReadRechargeLog(IWebElement table)
     {
         // table = ivu-modal-content
-        var bodyPath = ".//tbody[@class='ivu-table-tbody']";
+        const string bodyPath = ".//tbody[@class='ivu-table-tbody']";
         var tbody = FindElementByXPath(table, bodyPath);
         var allLogs = ReadLogs(tbody, 1);
 

@@ -137,11 +137,11 @@ public class WithdrawExpand
         foreach (var cell in cells)
         {
             var txt = Helper.ReadString(cell);
-            var index = txt.IndexOf('：');
+            var index = txt.IndexOf('：', StringComparison.Ordinal);
             if (index > 0 && index < txt.Length - 1)
             {
-                var k = txt.Substring(0, index + 1);
-                var v = txt.Substring(index + 1);
+                var k = txt[.. (index + 1)];
+                var v = txt[(index + 1)..];
                 dic.Add(k, v);
             }
             else

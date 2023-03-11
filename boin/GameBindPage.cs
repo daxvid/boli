@@ -31,11 +31,11 @@ public class GameBindPage : LabelPage
     {
         // 设置游戏ID
         // //*[@id="GameBindList"]/div[1]/div[2]/input
-        var gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
+        const string gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
         SetTextElementByXPath(gameIdPath, gameId);
         // 点击查询按钮
         // //*[@id="GameBindList"]/div[1]/button/span
-        var btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
+        const string btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
         FindAndClickByXPath(btnPath, 1000);
         // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
         var pathNone = "//div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
@@ -109,21 +109,21 @@ public class GameBindPage : LabelPage
     {
         // 设置游戏ID
         // //*[@id="GameBindList"]/div[1]/div[2]/input
-        var gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
+        const string gameIdPath = "//div[@id='GameBindList']/div[1]/div[2]/input[@placeholder='请输入查询游戏ID']";
         SetTextElementByXPath(gameIdPath, gameId);
 
         // 设置账号
         // //*[@id="GameBindList"]/div[1]/div[4]/input
-        var cardNoPath = "//div[@id='GameBindList']/div[1]/div[4]/input[@placeholder='请输入查询账号']";
+        const string cardNoPath = "//div[@id='GameBindList']/div[1]/div[4]/input[@placeholder='请输入查询账号']";
         SetTextElementByXPath(cardNoPath, cardNo);
 
         // 点击查询按钮
         // //*[@id="GameBindList"]/div[1]/button/span
-        var btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
+        const string btnPath = "//div[@id='GameBindList']/div[1]/button/span[text()='查询']";
         FindAndClickByXPath(btnPath, 1000);
 
         // 暂无数据 //*[@id="GameBindList"]/div[2]/div[1]/div[3]/table/tbody/tr/td/span
-        var pathNone = "//div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
+        const string pathNone = "//div[@id='GameBindList']/div[2]/div[1]/div[3]/table/tbody/tr/td/span[text()='暂无数据']";
         if (FindElementsByXPath(pathNone).Count == 1)
         {
             return false;
