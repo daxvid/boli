@@ -277,7 +277,7 @@ public class Helper
             var start = content.IndexOf("\"", i, content.Length - i, StringComparison.Ordinal);
             i = start + 1;
             var end = content.IndexOf("\"", i, content.Length - i, StringComparison.Ordinal);
-            var name = content[(start + 1)..(end - start - 1)];
+            var name = content.Substring((start + 1),(end - start - 1));
             if (!string.IsNullOrEmpty(name))
             {
                 name = System.Text.RegularExpressions.Regex.Unescape(name);
