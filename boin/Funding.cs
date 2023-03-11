@@ -54,24 +54,24 @@ public class FundingDay
         index = recharge.IndexOf('\n');
         if (index > 0)
         {
-            recharge = recharge.Substring(0, index);
+            recharge = recharge[..index];
         }
 
         index = recharge.IndexOf('/');
-        RechargeCount = int.Parse(recharge.Substring(0, index - 1));
-        RechargeAmount = decimal.Parse(recharge.Substring(index + 1));
+        RechargeCount = int.Parse(recharge[..(index - 1)]);
+        RechargeAmount = decimal.Parse(recharge[(index + 1)..]);
 
         // 提现
         var withdraw = Helper.ReadString(tbox.FindElement(By.XPath(".//div/table/tr/td[text()='提现']/../td[2]")));
         index = withdraw.IndexOf('\n');
         if (index > 0)
         {
-            withdraw = withdraw.Substring(0, index);
+            withdraw = withdraw[..index];
         }
 
         index = withdraw.IndexOf('/');
-        WithdrawCount = int.Parse(withdraw.Substring(0, index - 1));
-        WithdrawAmount = decimal.Parse(withdraw.Substring(index + 1));
+        WithdrawCount = int.Parse(withdraw[..(index - 1)]);
+        WithdrawAmount = decimal.Parse(withdraw[(index + 1)..]);
 
         // 筹码兑钻石
         var chipToDiamond =
@@ -79,12 +79,12 @@ public class FundingDay
         index = chipToDiamond.IndexOf('\n');
         if (index > 0)
         {
-            chipToDiamond = chipToDiamond.Substring(0, index);
+            chipToDiamond = chipToDiamond[..index];
         }
 
         index = chipToDiamond.IndexOf('/');
-        ChipToDiamondCount = int.Parse(chipToDiamond.Substring(0, index - 1));
-        ChipToDiamondAmount = decimal.Parse(chipToDiamond.Substring(index + 1));
+        ChipToDiamondCount = int.Parse(chipToDiamond[..(index - 1)]);
+        ChipToDiamondAmount = decimal.Parse(chipToDiamond[(index + 1)..]);
 
         // 提充客损
         ChargeCustomerLoss =

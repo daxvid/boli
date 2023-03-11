@@ -292,7 +292,7 @@ public class BankUtil
         }
 
         // 6位Bin号
-        var cardBinSix = idCard.Substring(0, 6);
+        var cardBinSix = idCard[..6];
         for (var i = 0; i < BANK_BIN.Length; i++)
         {
             if (cardBinSix.Equals(BANK_BIN[i]))
@@ -307,7 +307,7 @@ public class BankUtil
         }
 
         // 8位Bin号
-        var cardBinEight = idCard.Substring(0, 8);
+        var cardBinEight = idCard[..8];
         for (var i = 0; i < BANK_BIN.Length; i++)
         {
             if (cardBinEight.Equals(BANK_BIN[i]))

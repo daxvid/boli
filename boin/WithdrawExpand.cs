@@ -140,7 +140,7 @@ public class WithdrawExpand
             var index = txt.IndexOf('：', StringComparison.Ordinal);
             if (index > 0 && index < txt.Length - 1)
             {
-                var k = txt[.. (index + 1)];
+                var k = txt[..(index + 1)];
                 var v = txt[(index + 1)..];
                 dic.Add(k, v);
             }

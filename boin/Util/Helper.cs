@@ -133,7 +133,7 @@ public class Helper
     {
         var txt = e.Text;
         var index = txt.IndexOf('：');
-        txt = txt.Substring(index + 1);
+        txt = txt[(index + 1)..];
         decimal.TryParse(txt, out var r);
         return r;
     }
@@ -277,7 +277,7 @@ public class Helper
             var start = content.IndexOf("\"", i, content.Length - i, StringComparison.Ordinal);
             i = start + 1;
             var end = content.IndexOf("\"", i, content.Length - i, StringComparison.Ordinal);
-            var name = content.Substring(start + 1, end - start - 1);
+            var name = content[(start + 1)..(end - start - 1)];
             if (!string.IsNullOrEmpty(name))
             {
                 name = System.Text.RegularExpressions.Regex.Unescape(name);
