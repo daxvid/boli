@@ -17,9 +17,9 @@ public class LabelPage : PageBase
 
     public override bool Open()
     {
-        return  GoToPage(labIndex, labName);
+        return GoToPage(labIndex, labName);
     }
-    
+
     public override void Close()
     {
         var path =
@@ -27,7 +27,7 @@ public class LabelPage : PageBase
             labName + "')]/i";
         // 关闭窗口
         try
-        {     
+        {
             wait.Until(drv =>
             {
                 var btn = drv.FindElement(By.XPath(path));
@@ -37,6 +37,7 @@ public class LabelPage : PageBase
                     Thread.Sleep(10);
                     return true;
                 }
+
                 return false;
             });
         }

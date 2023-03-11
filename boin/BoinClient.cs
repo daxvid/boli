@@ -16,7 +16,7 @@ public class BoinClient : IDisposable
     private UserPage userPage;
     private OrderPage orderPage;
     private GameBindPage bindPage;
-    
+
     private readonly AppConfig cnf;
     private readonly AuthConfig authCnf;
     private bool closed;
@@ -45,7 +45,7 @@ public class BoinClient : IDisposable
         closed = true;
         driver.Quit();
     }
-    
+
     public void SaveException(Exception err)
     {
         try
@@ -56,7 +56,7 @@ public class BoinClient : IDisposable
         {
         }
     }
-    
+
     public void Dispose()
     {
         Close();
@@ -202,6 +202,7 @@ public class BoinClient : IDisposable
             {
                 userPage.Close();
                 userPage = new UserPage(driver, cnf);
+                userPage.Open();
             }
         }
     }
@@ -224,6 +225,7 @@ public class BoinClient : IDisposable
             {
                 bindPage.Close();
                 bindPage = new GameBindPage(driver, cnf);
+                bindPage.Open();
             }
         }
     }
