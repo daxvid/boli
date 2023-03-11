@@ -52,40 +52,47 @@ public class ReviewPage : ClosePage
         return true;
     }
 
-    private void SetReason(string reason)
+    private bool SetReason(string reason)
     {
-        // 设置备注内容
-        // <input autocomplete="off" spellcheck="false" type="text" placeholder="请输入备注" class="ivu-input ivu-input-default">
-        // /html/body/div[47]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[5]/div/input
-        // /html/body/div[07]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[4]/div/input
-        var remarkPath = "./div[2]/div/div[2]/div/div[3]/div/div/input[@type='text' and @placeholder='请输入备注']";
-        SetTextElementByXPath(MainTable, remarkPath, reason);
+        try
+        {
+            // 设置备注内容
+            // <input autocomplete="off" spellcheck="false" type="text" placeholder="请输入备注" class="ivu-input ivu-input-default">
+            // /html/body/div[47]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[5]/div/input
+            // /html/body/div[07]/div[2]/div/  div/div[2]/div/div[2]/div/div[3]/div[4]/div/input
+            var remarkPath = "./div[2]/div/div[2]/div/div[3]/div/div/input[@type='text' and @placeholder='请输入备注']";
+            SetTextElementByXPath(MainTable, remarkPath, reason);
 
-        // 修改按钮
-        // <span>修改</span>
-        // /html/body/div[47]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[5]/button/span
-        // /html/body/div[07]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[4]/button/span
-        FindAndClickByXPath(MainTable, "./div[2]/div/div[2]/div/div[3]/div/button/span[text()='修改']", 10);
+            // 修改按钮
+            // <span>修改</span>
+            // /html/body/div[47]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[5]/button/span
+            // /html/body/div[07]/div[2]/div/div/div[2]/div/div[2]/div/div[3]/div[4]/button/span
+            FindAndClickByXPath(MainTable, "./div[2]/div/div[2]/div/div[3]/div/button/span[text()='修改']", 10);
 
-        // 修改确认框
-        // /html/body/div[64]/div[2]/div/div/div/div/div[2]/div <div>确定修改备注？</div>
-        // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[2]/span[确定]
-        // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[1]/span[取消]
-        var confirmPath = ".//div[@class='ivu-modal-confirm-body']/div[starts-with(text(),'确定修改备注')]/../../" +
-                          "div[3]/button[2]/span[text()='确定']";
-        FindAndClickByXPath(confirmPath, 100);
+            // 修改确认框
+            // /html/body/div[64]/div[2]/div/div/div/div/div[2]/div <div>确定修改备注？</div>
+            // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[2]/span[确定]
+            // /html/body/div[64]/div[2]/div/div/div/div/div[3]/button[1]/span[取消]
+            var confirmPath = ".//div[@class='ivu-modal-confirm-body']/div[starts-with(text(),'确定修改备注')]/../../" +
+                              "div[3]/button[2]/span[text()='确定']";
+            FindAndClickByXPath(confirmPath, 100);
+            return true;
+        }
+        catch (Exception err)
+        {
+            var msg = order.ReviewNote();
+            Log.SaveException(new Exception(msg, err), Driver, "reason_");
+        }
+
+        return false;
     }
 
     private bool Reject()
     {
         var reason = order.RejectReason;
-        try
+        if (!SetReason(reason))
         {
-            SetReason(reason);
-        }
-        catch (Exception err)
-        {
-            Log.SaveException(err, Driver);
+            return false;
         }
 
         // 拒绝按钮
@@ -125,17 +132,7 @@ public class ReviewPage : ClosePage
     private bool Doubt()
     {
         var reason = order.DoubtReason;
-        try
-        {
-            SetReason(reason);
-            return true;
-        }
-        catch (Exception err)
-        {
-            Log.SaveException(err, Driver);
-        }
-
-        return false;
+        return SetReason(reason);
     }
 }
 

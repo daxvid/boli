@@ -38,8 +38,9 @@ public class ReviewHintPage : ClosePage
             }
         }
         catch (Exception err)
-        {
-            Log.SaveException(err, Driver);
+        {            
+            var msg = order.ReviewNote();
+            Log.SaveException(new Exception(msg, err), Driver, "confirm_");
             return false;
         }
 

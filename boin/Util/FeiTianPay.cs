@@ -126,7 +126,7 @@ public class FeiTianPay
         }
         catch (Exception err)
         {
-            Log.SaveException(err);
+            Log.SaveException(new Exception(orderId, err), null, "feitian_");
         }
 
         return null;

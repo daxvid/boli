@@ -209,10 +209,10 @@ public class OrderPage : LabelPage
         {
             FindAndClickByXPath(reviewBtn, 4000);
         }
-        catch
+        catch(Exception err)
         {
             var msg = order.ReviewNote();
-            Log.SaveException(new Exception("unlock err:" + msg), Driver, order.OrderId);
+            Log.SaveException(new Exception(msg, err), Driver, "unlock_");
         }
 
         return true;

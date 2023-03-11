@@ -52,7 +52,7 @@ public class ClosePage : PageBase
         }
         catch (Exception err)
         {
-            Log.SaveException(err, Driver);
+            Log.SaveException(new Exception(Path, err), Driver, "close_");
         }
     }
 }

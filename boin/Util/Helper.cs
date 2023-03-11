@@ -254,7 +254,7 @@ public class Helper
             {
                 if (i == 0 && err != null)
                 {
-                    Log.SaveException(err, driver);
+                    Log.SaveException(err, driver, "exec_");
                 }
                 i++;
             }

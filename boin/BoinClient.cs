@@ -50,7 +50,7 @@ public class BoinClient : IDisposable
     {
         try
         {
-            Log.SaveException(err, driver);
+            Log.SaveException(err, driver, string.Empty);
         }
         catch
         {
