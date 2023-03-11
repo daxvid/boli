@@ -190,7 +190,7 @@ public class BankUtil
     // {"messages":[{"errorCodes":"CARD_BIN_NOT_MATCH","name":"cardNo"}],"validated":false,"stat":"ok","key":"621669750004140425"}
     public static BankCardInfo GetBankInfo(string cardNo)
     {
-        string url = aliUrl + cardNo;
+        var url = aliUrl + cardNo;
         string? content = string.Empty;
         try
         {
@@ -272,7 +272,7 @@ public class BankUtil
 
         //判断是否包含 bank简称
         //所属行。值：所属行简称，如：CMB 为招商银行
-        string nameOfBank = GetNameOfBank(bankInfo.bank);
+        var nameOfBank = GetNameOfBank(bankInfo.bank);
         return nameOfBank;
     }
 
@@ -284,7 +284,7 @@ public class BankUtil
      */
     public static string GetNameOfBankCard(string idCard)
     {
-        int index = -1;
+        var index = -1;
 
         if (idCard == null || idCard.Length < 16 || idCard.Length > 19)
         {
@@ -293,7 +293,7 @@ public class BankUtil
 
         // 6位Bin号
         var cardBinSix = idCard.Substring(0, 6);
-        for (int i = 0; i < BANK_BIN.Length; i++)
+        for (var i = 0; i < BANK_BIN.Length; i++)
         {
             if (cardBinSix.Equals(BANK_BIN[i]))
             {
@@ -308,7 +308,7 @@ public class BankUtil
 
         // 8位Bin号
         var cardBinEight = idCard.Substring(0, 8);
-        for (int i = 0; i < BANK_BIN.Length; i++)
+        for (var i = 0; i < BANK_BIN.Length; i++)
         {
             if (cardBinEight.Equals(BANK_BIN[i]))
             {

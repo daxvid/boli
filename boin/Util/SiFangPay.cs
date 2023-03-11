@@ -32,11 +32,11 @@ public class SiFangPay
     // public static string GetName(string content)
     // {
     //     string name = string.Empty;
-    //     int index = content.IndexOf("\"name\"");
+    //     var index = content.IndexOf("\"name\"");
     //     if (index > 0)
     //     {
-    //         int start = content.IndexOf("\"", index + 6, 16);
-    //         int end = content.IndexOf("\"", start + 1, 64);
+    //         var start = content.IndexOf("\"", index + 6, 16);
+    //         var end = content.IndexOf("\"", start + 1, 64);
     //         name = content.Substring(start + 1, end - start - 1);
     //         if (!string.IsNullOrEmpty(name))
     //         {

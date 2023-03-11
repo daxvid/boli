@@ -13,13 +13,13 @@ public class Log
 
     public static void SaveException(Exception e, ChromeDriver? driver, string head)
     {
-        string dir = Path.Join(Environment.CurrentDirectory, "log");
+        var dir = Path.Join(Environment.CurrentDirectory, "log");
         if (!Path.Exists(dir))
         {
             Directory.CreateDirectory(dir);
         }
 
-        string fileName = head + DateTime.Now.ToString("yyMMddHHmmssfff");
+        var fileName = head + DateTime.Now.ToString("yyMMddHHmmssfff");
         var fullName = Path.Join(dir, fileName + ".txt");
         SaveException(e, head, fullName);
 

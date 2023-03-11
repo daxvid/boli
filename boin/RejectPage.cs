@@ -5,7 +5,7 @@ using OpenQA.Selenium.Chrome;
 // 拒绝页面
 public class RejectPage : ClosePage
 {
-    private static readonly string path =
+    private const string path =
         ".//div/div[@class='ivu-modal-content']/div[@class='ivu-modal-body']/div[1]/div[text()='拒绝本次提现申请？']/../../..";
 
     public RejectPage(ChromeDriver driver, AppConfig config) : base(driver, config, path)

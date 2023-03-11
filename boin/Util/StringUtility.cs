@@ -42,8 +42,8 @@ public class StringUtility
         //string[] ls = unicode.Replace("\\", "").Split(new char[]{'u'},StringSplitOptions.RemoveEmptyEntries);
         string[] ls = unicode.Split(new string[] { "\\u" }, StringSplitOptions.RemoveEmptyEntries);
         StringBuilder builder = new StringBuilder();
-        int len = ls.Length;
-        for (int i = 0; i < len; i++)
+        var len = ls.Length;
+        for (var i = 0; i < len; i++)
         {
             //builder.Append((Char)ushort.Parse(ls[i], System.Globalization.NumberStyles.HexNumber));
             builder.Append(Convert.ToChar(ushort.Parse(ls[i], System.Globalization.NumberStyles.HexNumber)));

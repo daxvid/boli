@@ -14,7 +14,7 @@ public class UserPage : LabelPage
 
     public User Select(Order order)
     {
-        string gameId = order.GameId;
+        var gameId = order.GameId;
         // 设置游戏ID
         var gameIdPath = "//div[@id='LiveGameRoleList']/div/div/div[contains(text(),'游戏ID')]/div/input";
         SetTextElementByXPath(gameIdPath, gameId);

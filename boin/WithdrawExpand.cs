@@ -137,7 +137,7 @@ public class WithdrawExpand
         foreach (var cell in cells)
         {
             var txt = Helper.ReadString(cell);
-            int index = txt.IndexOf('：');
+            var index = txt.IndexOf('：');
             if (index > 0 && index < txt.Length - 1)
             {
                 var k = txt.Substring(0, index + 1);

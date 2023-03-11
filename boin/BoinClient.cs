@@ -94,8 +94,8 @@ public class BoinClient : IDisposable
 
         orderPage.InitItem();
 
-        int zeroCount = 0;
-        DateTime heartbeatTime = DateTime.Now;
+        var zeroCount = 0;
+        var heartbeatTime = DateTime.Now;
         while (true)
         {
             var orders = LoadOrders();

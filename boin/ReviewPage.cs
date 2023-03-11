@@ -40,7 +40,7 @@ public class ReviewPage : ClosePage
 
         // 代付提现
         // /html/body/div[7]/div[2]/div/   div/div[3]/div/div[2]/div[2]/button[2]/span
-        string dfPath = "./div[3]/div/div[2]/div[2]/button[2]/span[text()='代付提现']";
+        var dfPath = "./div[3]/div/div[2]/div[2]/button[2]/span[text()='代付提现']";
         FindAndClickByXPath(MainTable, dfPath, 10);
         using var hint = new ReviewHintPage(Driver, Config, order);
         if (!hint.Confirm())

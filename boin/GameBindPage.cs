@@ -12,7 +12,7 @@ public class GameBindPage : LabelPage
 
     public List<GameBind> Select(string gameId)
     {
-        int t = TrySelect(gameId);
+        var t = TrySelect(gameId);
         if (t >= 0)
         {
             if (t == 0)

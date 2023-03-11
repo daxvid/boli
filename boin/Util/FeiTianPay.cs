@@ -104,7 +104,7 @@ public class FeiTianPay
                 var timeStamp = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
 
                 var signSource = Cnf.Merchant + orderId + orderType + timeStamp + Cnf.Token;
-                var sign = Helper.EncryptMD5(signSource).ToLower();
+                var sign = Helper.EncryptMd5(signSource).ToLower();
 
                 //add parameters on request
                 var body = new List<KeyValuePair<string, string>>

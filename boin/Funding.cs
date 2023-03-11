@@ -195,8 +195,8 @@ public class Funding
     // 最近多少笔波币提现
     public int NearBobiCount(string orderId, int maxCount)
     {
-        int checkCount = 0;
-        int bobiCount = 0;
+        var checkCount = 0;
+        var bobiCount = 0;
         for (var i = 0; (i < WithdrawLog.Count && checkCount < maxCount); i++)
         {
             var w = WithdrawLog[i];
@@ -305,8 +305,7 @@ public class Funding
         {
             if ((!string.IsNullOrEmpty(r.Payer)) && (r.Payer != name))
             {
-                decimal t;
-                if (names.TryGetValue(r.Payer, out t))
+                if (names.TryGetValue(r.Payer, out var t))
                 {
                     names[r.Payer] = t + r.RechargeAmount;
                 }
@@ -324,7 +323,7 @@ public class Funding
     public Tuple<decimal, int> TotalRechargeByChannel(string chan, DateTime startTime)
     {
         decimal total = 0;
-        int count = 0;
+        var count = 0;
 
         foreach (var r in RechargeLog)
         {

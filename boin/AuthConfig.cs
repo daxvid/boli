@@ -38,7 +38,7 @@ public class AuthConfig
     
     public static AuthConfig FromYamlFile(string path)
     {
-        string yml = File.ReadAllText(path);
+        var yml = File.ReadAllText(path);
         var deserializer = new DeserializerBuilder().Build();
         var cnf = deserializer.Deserialize<AuthConfig>(yml);
         return cnf;

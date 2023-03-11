@@ -78,7 +78,7 @@ public class OrderPage : LabelPage
     // 锁定订单
     private int LockOrders(IWebElement tbody)
     {
-        int count = WaitOrders(tbody);
+        var count = WaitOrders(tbody);
         if (count > 0)
         {
             return count;
@@ -234,7 +234,7 @@ public class OrderPage : LabelPage
         {
             lockBtn.Click();
             // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[1]/span
-            for (int i = 0; (i < 100 && hit == "锁定"); i++)
+            for (var i = 0; (i < 100 && hit == "锁定"); i++)
             {
                 Thread.Sleep(200);
                 td14 = FindElementByXPath(td14Path);
