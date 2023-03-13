@@ -33,22 +33,21 @@ public class ClosePage : PageBase
         {
             try
             {
-                closeBtn.Click();
+                Closed = SafeClick(closeBtn);
             }
             catch
             {
-                if (CancelBtn != null && CancelBtn.Enabled && CancelBtn.Displayed)
-                {
-                    CancelBtn.Click();
-                }
-                else
+                if (CancelBtn == null)
                 {
                     throw;
                 }
+                Closed = SafeClick(CancelBtn);
             }
 
-            Closed = true;
-            Thread.Sleep(10);
+            if (Closed)
+            {
+                Thread.Sleep(10);
+            }
         }
         catch (Exception err)
         {

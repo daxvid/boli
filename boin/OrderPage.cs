@@ -48,7 +48,7 @@ public class OrderPage : LabelPage
     {
         // 设置查询时间
         var timeRang = FindElementByXPath("//div[@id='Cash']/div/div[12]/div/div/div/input");
-        Helper.SetTimeRang(timeRang, hour);
+        SetTimeRang(timeRang, hour);
         // 点击查询
         // //*[@id="Cash"]/div[1]/div[13]/button[1]/span
         FindAndClickByXPath("//div[@id='Cash']/div[1]/div[13]/button[1]/span[text()='查询']", 2000);
@@ -137,7 +137,7 @@ public class OrderPage : LabelPage
             var className = exBtn.GetAttribute("class");
             if (className == "ivu-table-cell-expand")
             {
-                exBtn.Click();
+                SafeClick(exBtn);
             }
         }
 
@@ -232,7 +232,7 @@ public class OrderPage : LabelPage
 
         if (hit == "锁定")
         {
-            lockBtn.Click();
+            SafeClick(lockBtn);
             // //*[@id="Cash"]/div[2]/div[1]/div[2]/table/tbody/tr[1]/td[14]/div/div/div/div/div/button[1]/span
             for (var i = 0; (i < 100 && hit == "锁定"); i++)
             {

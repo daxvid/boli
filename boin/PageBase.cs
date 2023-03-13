@@ -21,6 +21,16 @@ public class PageBase : IDisposable
         this.Config = config;
         this.Driver = driver;
         this.wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+        this.wait.IgnoreExceptionTypes(typeof(WebDriverException)
+            , typeof(InvalidElementStateException)
+            , typeof(NotFoundException)
+        );
+
+        // NoSuchElementException 
+        // StateElementReferenceException
+        // ElementNotVisibleException 
+        // ElementNotSelectableException
+        // NoSuchFrameException
     }
 
     protected bool SetTextElementByXPath(string path, string txt)
@@ -99,6 +109,38 @@ public class PageBase : IDisposable
         return result;
     }
 
+    // 设置查询的时间范围
+    protected void SetTimeRang(IWebElement et, int hour)
+    {
+        SafeClick(et);
+        et.SendKeys(Keys.Control + "a");
+        et.SendKeys(Keys.Delete);
+        et.SendKeys(Keys.Command + "a");
+        et.SendKeys(Keys.Delete);
+
+        var now = DateTime.Now;
+        var start = now.AddHours(-hour).ToString("yyyy-MM-dd HH:mm:ss");
+        var end = now.ToString("yyyy-MM-dd 23:59:59");
+        et.SendKeys(start + " - " + end);
+        Thread.Sleep(10);
+    }
+
+    // 设置查询的日期范围
+    protected void SetDayRang(IWebElement et, int day)
+    {
+        SafeClick(et);
+        et.SendKeys(Keys.Control + "a");
+        et.SendKeys(Keys.Delete);
+        et.SendKeys(Keys.Command + "a");
+        et.SendKeys(Keys.Delete);
+
+        var now = DateTime.Now;
+        var start = now.AddDays(-(day - 1)).ToString("yyyy-MM-dd");
+        var end = now.ToString("yyyy-MM-dd");
+        et.SendKeys(start + " - " + end);
+        Thread.Sleep(10);
+    }
+    
     protected IWebElement FindElementByXPath(string path)
     {
         return FindElement(By.XPath(path));
@@ -219,9 +261,15 @@ public class PageBase : IDisposable
         wait.Until(drv =>
         {
             var btn = drv.FindElement(by);
+            if (btn.Enabled == false || btn.Displayed == false)
+            {
+                return false;
+            }
+
             btn.Click();
             Thread.Sleep(ms);
             return true;
+
         });
     }
 
@@ -235,6 +283,10 @@ public class PageBase : IDisposable
         wait.Until(_ =>
         {
             var btn = e.FindElement(by);
+            if (btn.Enabled == false || btn.Displayed == false)
+            {
+                return false;
+            }
             btn.Click();
             Thread.Sleep(ms);
             return true;
@@ -245,21 +297,14 @@ public class PageBase : IDisposable
     {
         return wait.Until(_ =>
         {
-            try
+            if (btn.Enabled == false || btn.Displayed == false)
             {
-                if (btn.Enabled)
-                {
-                    btn.Click();
-                    Thread.Sleep(ms);
-                }
-
-                return true;
-            }
-            catch (ElementClickInterceptedException)
-            {
+                return false;
             }
 
-            return false;
+            btn.Click();
+            Thread.Sleep(ms);
+            return true;
         });
     }
 
@@ -336,10 +381,7 @@ public class PageBase : IDisposable
             return false;
         }
 
-        nextPage.Click();
-        //TODO: 检查是否加载完成
-        Thread.Sleep(ms);
-        return true;
+        return SafeClick(nextPage,ms);
     }
 }
 

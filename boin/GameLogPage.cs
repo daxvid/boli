@@ -22,7 +22,7 @@ public class GameLogPage : PopPage
         {
             var timeRang = FindElementByXPath(table,
                 ".//div[@class='ivu-date-picker-rel']/div/input[@placeholder='开始时间-结束时间']");
-            Helper.SetTimeRang(timeRang, hour);
+            SetTimeRang(timeRang, hour);
             // 点击查询按钮;
             FindAndClickByXPath(table, ".//button/span[text()='查询']", 1000);
         }

@@ -22,7 +22,7 @@ public class RejectPage : ClosePage
         var selected = checkBox.Selected;
         if (!selected)
         {
-            checkBox.Click();
+            SafeClick(checkBox,10);
         }
 
         // 确定
@@ -33,7 +33,7 @@ public class RejectPage : ClosePage
             return false;
         }
 
-        btn.Click();
+        SafeClick(btn, 10);
         this.Closed = true;
         return true;
     }
