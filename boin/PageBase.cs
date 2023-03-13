@@ -266,10 +266,16 @@ public class PageBase : IDisposable
                 return false;
             }
 
-            btn.Click();
-            Thread.Sleep(ms);
-            return true;
-
+            try
+            {
+                btn.Click();
+                Thread.Sleep(ms);
+                return true;
+            }
+            catch (WebDriverException)
+            {
+                return false;
+            }
         });
     }
 
@@ -287,9 +293,17 @@ public class PageBase : IDisposable
             {
                 return false;
             }
-            btn.Click();
-            Thread.Sleep(ms);
-            return true;
+
+            try
+            {
+                btn.Click();
+                Thread.Sleep(ms);
+                return true;
+            } 
+            catch (WebDriverException)
+            {
+                return false;
+            }
         });
     }
 
@@ -302,9 +316,17 @@ public class PageBase : IDisposable
                 return false;
             }
 
-            btn.Click();
-            Thread.Sleep(ms);
-            return true;
+            try
+            {
+                btn.Click();
+                Thread.Sleep(ms);
+                return true;
+            }
+            catch (WebDriverException)
+            {
+                return false;
+            }
+
         });
     }
 
