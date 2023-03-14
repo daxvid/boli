@@ -8,7 +8,7 @@ using Boin.Util;
 public class GameLogPage : PopPage
 {
     public GameLogPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
-        "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span")
+        "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../..//span")
     {
         this.MaxPage = config.GameLogMaxPage;
     }

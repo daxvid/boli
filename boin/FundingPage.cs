@@ -8,7 +8,7 @@ using Boin.Util;
 public class FundingPage : PopPage
 {
     public FundingPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
-        "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div")
+        "//div[text()='概况' and @class='ivu-modal-header-inner']/../..//div")
     {
     }
 

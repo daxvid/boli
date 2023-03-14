@@ -8,7 +8,7 @@ using Boin.Util;
 public class WithdrawPage : PopPage
 {
     public WithdrawPage(ChromeDriver driver, AppConfig config, string gameId) : base(driver, config, gameId,
-        "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span")
+        "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../..//span")
     {
         this.MaxPage = config.WithdrawMaxPage;
     }

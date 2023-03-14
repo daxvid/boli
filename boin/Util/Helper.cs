@@ -120,10 +120,7 @@ public class Helper
     public static DateTime ReadShortTime(IWebElement e)
     {
         var str = Helper.ReadString(e);
-        if (str.IndexOf('/') >= 0)
-        {
-            str = str.Replace("/", "-");
-        }
+        str = str.Replace('/', '-');
 
         var now = DateTime.Now;
         for (var year = now.Year; year >= 2022; year--)

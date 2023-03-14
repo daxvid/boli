@@ -11,10 +11,10 @@ public class PopPage : ClosePage
         base(driver, config, path + "[text()='游戏ID：" + gameId + "']/../../../../..")
     {
         this.GameId = gameId;
-        // this.path = "//div[text()='概况' and @class='ivu-modal-header-inner']/../.././/div[text()='游戏ID：" + gameId + "']/../../../../..";
-        // this.path = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-        // this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
-        // this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../.././/span[text()='游戏ID：" + gameId + "']/../../../../..";
+        // this.path = "//div[text()='概况'        and @class='ivu-modal-header-inner']/../..//div[text()='游戏ID：" + gameId + "']/../../../../..";
+        // this.path = "//div[text()='用户游戏日志' and @class='ivu-modal-header-inner']/../..//span[text()='游戏ID：" + gameId + "']/../../../../..";
+        // this.path = "//div[text()='用户充值详情' and @class='ivu-modal-header-inner']/../..//span[text()='游戏ID：" + gameId + "']/../../../../..";
+        // this.path = "//div[text()='用户提现详情' and @class='ivu-modal-header-inner']/../..//span[text()='游戏ID：" + gameId + "']/../../../../..";
     }
 
     protected IWebElement GetCurrentTable(int page)
